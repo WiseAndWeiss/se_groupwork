@@ -33,6 +33,7 @@ class BizSearcher:
         self.cookies = json.loads(self.cookies)  # 转化为requests可以使用的形式
         self.query = query  # 搜索的内容
         self.avatar_urls = {}  # 存放图片的地址
+        self.avatar_downloader = AvatarDownloader()
         # 初始化参数和headers
         self.params = {
             "token": self.token,
@@ -157,6 +158,13 @@ class BizSearcher:
         except Exception as e:
             print(f"保存到数据库失败: {e}")
 
+    def biz_search(self):
+        mp_json = searcher.get_mp_list()
+        mp_dict = searcher.process_mp_list(mp_json)
+        self.avatar_urls = self.avatar_downloader.download(self.avatar_urls)
+        print(mp_dict)
+        searcher.save_to_database(mp_dict)
+
 
 # 使用示例
 if __name__ == '__main__':
@@ -164,15 +172,5 @@ if __name__ == '__main__':
     searcher = BizSearcher(
         query="人民日报"
     )
-    avatar_downloader = AvatarDownloader(
-        save_dir="avatars"
-    )
+    searcher.biz_search()
 
-    # 分步执行
-    my_mp_json = searcher.get_mp_list()
-    my_mp_dict = searcher.process_mp_list(my_mp_json)
-    # print(mp_json)
-    # print(my_mp_dict)
-    searcher.avatar_urls = avatar_downloader.download(searcher.avatar_urls)
-    print(searcher.avatar_urls)
-    searcher.save_to_database(my_mp_dict)

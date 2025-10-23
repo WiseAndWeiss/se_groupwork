@@ -2,17 +2,21 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.conf import settings
+
+from webspider.models import PublicAccount
 
 
 class UserManager(BaseUserManager):
     """自定义用户管理器"""
 
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, username,  password, email=None, **extra_fields):
         """创建普通用户"""
-        if not email:
-            raise ValueError('用户必须提供邮箱地址')
         if not username:
             raise ValueError('用户必须提供用户名')
+        if not password:
+            raise ValueError('用户必须提供密码')
 
         email = self.normalize_email(email)
         user = self.model(
@@ -20,25 +24,25 @@ class UserManager(BaseUserManager):
             email=email,
             **extra_fields
         )
+
         user.set_password(password)  # 加密密码
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
+    def create_superuser(self, username, password, email=None, **extra_fields):
         """创建超级用户"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('超级用户必须设置 is_staff=True')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('超级用户必须设置 is_superuser=True')
 
-        return self.create_user(username, email, password, **extra_fields)
+        return self.create_user(username, password, email, **extra_fields)
 
 
-class User(models.Model):
+class User(AbstractBaseUser):
     """
     自定义用户模型
     - 储存用户的基本信息
@@ -48,9 +52,9 @@ class User(models.Model):
     # 基本身份信息
     username = models.CharField(
         _('用户名'),
-        max_length=150,
+        max_length=20,
         unique=True,
-        help_text=_('必填。150个字符或更少。只能包含字母、数字和 @/./+/-/_ 字符。'),
+        help_text=_('必填，不超过20个字符。只能包含字母、数字和 @/./+/-/_ 字符。'),
         error_messages={
             'unique': _("该用户名已被占用。"),
         },
@@ -61,14 +65,6 @@ class User(models.Model):
         error_messages={
             'unique': _("该邮箱地址已被占用。"),
         },
-    )
-
-    # 个人信息
-    nickname = models.CharField(
-        _('昵称'),
-        max_length=50,
-        blank=True,
-        help_text=_('用户的显示名称')
     )
     avatar = models.ImageField(
         _('头像'),
@@ -83,26 +79,21 @@ class User(models.Model):
         max_length=500,
         help_text=_('简短的个人介绍，最多500字')
     )
-
-    # 状态标志
-    is_active = models.BooleanField(
-        _('活跃状态'),
-        default=True,
-        help_text=_('标记用户是否活跃。取消选中此项而不是删除用户。')
-    )
     is_staff = models.BooleanField(
         _('员工状态'),
         default=False,
         help_text=_('标记用户是否可以登录到管理员站点。')
     )
+    is_active = models.BooleanField(
+        _('活跃状态'),
+        default=True,
+        help_text=_('标记用户是否被视为活跃用户。取消选中而不是删除账户。')
+    )
 
     # 时间信息
     date_joined = models.DateTimeField(_('注册时间'), default=timezone.now)
-    last_login = models.DateTimeField(_('最后登录'), blank=True, null=True)
-    last_activity = models.DateTimeField(_('最后活动'), auto_now=True)
 
     # 统计信息
-    article_read_count = models.IntegerField(_('阅读文章数'), default=0)
     subscription_count = models.IntegerField(_('订阅公众号数'), default=0)
 
     # 设置字段
@@ -118,17 +109,29 @@ class User(models.Model):
         ordering = ['-date_joined']
 
     def __str__(self):
-        return self.nickname or self.username
+        return self.username
 
-    def get_full_name(self):
+    def get_name(self):
         """返回用户的完整名称（昵称或用户名）"""
-        return self.nickname or self.username
+        return self.username
 
-    def get_short_name(self):
-        """返回用户的简短名称"""
-        return self.nickname or self.username
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """发送邮件给用户"""
-        from django.core.mail import send_mail
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+class Subscription(models.Model):
+    """
+    订阅关系：连接一个用户-一个公众号的中间表，此外还记录一些其它订阅信息
+    图例：用户A-订阅-公众号A
+    当用户/公众号删除时，订阅记录自动删除
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    public_account = models.ForeignKey(PublicAccount, on_delete=models.CASCADE)
+    subscribe_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = [('user', 'public_account')]  # 防止重复订阅
+        ordering = ['-subscribe_at']  # 按照订阅创建顺序排列，最新创建的订阅在前面
+
+    def __str__(self):
+        return f"{self.user} -> {self.public_account} ({'active' if self.is_active else 'inactive'})"
+
+

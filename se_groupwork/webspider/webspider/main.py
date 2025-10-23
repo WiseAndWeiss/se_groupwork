@@ -56,7 +56,6 @@ def main():
         selected_name = list(mp_dict.keys())[0]
         fakeid = mp_dict[selected_name]
         print(f"\n默认选择第一个公众号: {selected_name} (fakeid: {fakeid})")
-
     except Exception as e:
         print(f"搜索公众号过程中发生错误: {e}")
         return
@@ -78,7 +77,6 @@ def main():
 
         # 获取文章列表，并保存
         fetcher.fetch_articles(5)
-
     except Exception as e:
         print(f"获取文章列表过程中发生错误: {e}")
         return

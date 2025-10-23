@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from user.views import subscribe, unsubscribe
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('subscribe/<str:fakeid>/', subscribe, name='subscribe'),
+    path('unsubscribe/<str:fakeid>/', unsubscribe, name='unsubscribe'),
 ]
