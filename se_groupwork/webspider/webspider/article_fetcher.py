@@ -218,7 +218,7 @@ class ArticleFetcher:
         if not content_list:
             print("获取文章列表失败")
             return
-
+        # 保存到数据库
         self.save_to_database(content_list)
 
 
@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     # 初始化文章抓取器
     fetcher = ArticleFetcher(
-        fakeid='MzA4NDI3NjcyNA=='
+        fakeid='MzU1NTcxODQ0OQ=='
     )
 
     print(fetcher.cookies)

@@ -56,7 +56,7 @@ class Article(models.Model):
     公众号文章
     - 储存文章的标题、上传时间、所属的公众号、url链接、ai总结后的内容、ai提取的关键信息、ai提供的标签
     """
-    account = models.ForeignKey(
+    public_account = models.ForeignKey(
         PublicAccount,
         on_delete=models.CASCADE,  # 公众号删除时文章也删除
         related_name='articles',
@@ -96,7 +96,7 @@ class Article(models.Model):
         verbose_name = '微信文章'
         verbose_name_plural = '微信文章'
         ordering = ['-publish_time']
-        unique_together = ['account', 'article_url']
+        unique_together = ['public_account', 'article_url']
 
 
 class Cookies(models.Model):
@@ -146,6 +146,6 @@ def update_account_crawl_time(sender, instance, created, **kwargs):
     当文章保存时，自动更新对应公众号的最后爬取时间
     """
     # 更新公众号的最后爬取时间
-    instance.account.last_crawl_time = timezone.localtime(timezone.now())
-    instance.account.save(update_fields=['last_crawl_time'])
+    instance.public_account.last_crawl_time = timezone.localtime(timezone.now())
+    instance.public_account.save(update_fields=['last_crawl_time'])
 
