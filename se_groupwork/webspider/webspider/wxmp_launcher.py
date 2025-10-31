@@ -129,7 +129,8 @@ class WxmpLauncher:
             # 提取token和cookies
             self.token = self.get_token()
             self.cookies = self.get_all_cookies()
-
+            # 储存到数据库
+            self.save_to_database()
             return True
 
         except Exception as e:
@@ -174,6 +175,5 @@ if __name__ == "__main__":
         launcher.login()
         print(launcher.token)
         print(launcher.cookies)
-        launcher.save_to_database()
     finally:
         launcher.close()

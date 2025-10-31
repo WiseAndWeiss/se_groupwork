@@ -2,13 +2,10 @@ import requests
 import os
 
 
-
-
 class AvatarDownloader:
     def __init__(self, save_dir="avatars"):
         """
         初始化头像下载器
-
         Args:
             save_dir: 保存目录
         """
