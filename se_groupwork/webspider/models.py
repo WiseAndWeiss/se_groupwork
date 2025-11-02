@@ -91,6 +91,14 @@ class Article(models.Model):
         blank=True,
         verbose_name='标签'
     )
+    tags_vector = models.JSONField(
+        default=list,
+        verbose_name="标签向量"
+    )
+    semantic_vector = models.JSONField(
+        default=list,
+        verbose_name="语义向量"
+    )
 
     class Meta:
         verbose_name = '微信文章'
