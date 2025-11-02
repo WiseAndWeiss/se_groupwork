@@ -27,6 +27,8 @@ class UserManager(BaseUserManager):
 
         user.set_password(password)  # 加密密码
         user.save(using=self._db)
+        from articleSelector.models import Preference
+        Preference.objects.add_user(user)
         return user
 
     def create_superuser(self, username, password, email=None, **extra_fields):
@@ -131,6 +133,8 @@ class SubscriptionManager(models.Manager):
     # 创建订阅并更新用户的订阅计数
     def create_subscription(self, user, public_account):
         subscription = self.create(user=user, public_account=public_account)
+        from articleSelector.models import Preference
+        Preference.objects.add_subscription(user, public_account)
         return subscription
     
     # 删除订阅并更新用户的订阅计数
@@ -156,6 +160,7 @@ class Subscription(models.Model):
         auto_now_add=True
     )
     is_active = models.BooleanField(default=True)
+    objects = SubscriptionManager()
 
     class Meta:
         unique_together = [('user', 'public_account')]  # 防止重复订阅

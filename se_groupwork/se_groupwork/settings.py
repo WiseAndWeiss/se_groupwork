@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'webspider',
     'user',
     'remoteAI',
+    'articleSelector',
 ]
 
 MIDDLEWARE = [
