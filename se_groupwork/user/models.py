@@ -61,9 +61,17 @@ class User(AbstractBaseUser):
     )
     email = models.EmailField(
         _('邮箱地址'),
-        unique=True,
+        blank=True,
         error_messages={
             'unique': _("该邮箱地址已被占用。"),
+        },
+    )
+    phone_number = models.CharField(
+        _('手机号'),
+        max_length=20,
+        blank=True,
+        error_messages={
+            'unique': _("该手机号已被占用。"),
         },
     )
     avatar = models.ImageField(
@@ -161,6 +169,8 @@ class Subscription(models.Model):
         auto_now_add=True
     )
     is_active = models.BooleanField(default=True)
+    
+    objects = SubscriptionManager()
 
     class Meta:
         unique_together = [('user', 'public_account')]  # 防止重复订阅
@@ -253,8 +263,6 @@ class History(models.Model):
     用户浏览历史
     图例：用户A-浏览-文章A
     当用户/文章删除时，浏览记录自动删除
-    用户可以删除浏览记录，但是只会将浏览记录变为inactive
-    数据库中仍然保存浏览记录，用于推荐算法
     """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 

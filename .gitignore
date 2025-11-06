@@ -84,3 +84,6 @@ webspider/webspider/avatars/
 # 临时文件
 *.tmp
 *.temp
+
+# 文本
+*.md
