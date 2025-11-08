@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
+from .param_validate import validate_credentials, check_password_strength, check_phone_number
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """用户注册序列化器
@@ -16,13 +17,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'password_confirm', 'avatar', 'bio']  # 序列化器包含的字段
 
     def validate(self, data):
-        """数据验证方法
-        - 检查两次输入的密码是否一致
-        - 如果密码不匹配，抛出验证错误
-        """
+        # 1. 检查密码一致性
         if data['password'] != data['password_confirm']:
             raise serializers.ValidationError("两次密码不一致")
-        return data  # 验证通过返回原始数据
+        
+        # 2. 调用检验函数
+        validation_result = validate_credentials(data['username'], data['password'])
+        
+        if not validation_result['is_valid']:
+            errors = []
+            errors.extend(validation_result['username_errors'])
+            errors.extend(validation_result['password_errors'])
+            raise serializers.ValidationError("；".join(errors))
+        
+        return data
 
     def create(self, validated_data):
         """创建用户实例
@@ -129,3 +137,58 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History  # 关联历史模型
         fields = ['id', 'article', 'viewed_at']  # 包含的历史信息字段
+
+# 修改个人资料相关的序列化器
+class UserPasswordChangeSerializer(serializers.Serializer):
+    """修改密码序列化器"""
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+    
+    def validate_old_password(self, value):
+        """验证旧密码是否正确"""
+        user = self.context['request'].user
+        if not authenticate(username=user.username, password=value):
+            raise serializers.ValidationError("旧密码不正确")
+        return value
+    
+    def validate(self, data):
+        """验证新密码和确认密码是否一致"""
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError("两次输入的新密码不一致")
+        return data
+    
+    def validate_new_password(self, value):
+        """验证新密码强度"""
+        result = check_password_strength(value)
+        if result['strength'] == 'weak':
+            raise serializers.ValidationError(result['suggestion'])
+        return value
+    
+class UserEmailChangeSerializer(serializers.Serializer):
+    """修改邮箱序列化器"""
+    new_email = serializers.EmailField()
+    
+    def validate_new_email(self, value):
+        """这里不需要验证邮箱格式，因为django内置了检验"""
+        """验证新邮箱是否已被使用"""
+        user = self.context['request'].user
+        if User.objects.filter(email=value).exclude(id=user.id).exists():
+            raise serializers.ValidationError("该邮箱已被使用")
+        return value
+
+class UserPhoneChangeSerializer(serializers.Serializer):
+    """修改手机号序列化器"""
+    new_phone = serializers.CharField()
+    
+    def validate_new_phone(self, value):
+        """验证新手机号格式是否正确"""
+        validated, reason = check_phone_number(value)
+        if not validated:
+            raise serializers.ValidationError(reason)
+        
+        """验证新手机是否已被使用"""
+        user = self.context['request'].user
+        if User.objects.filter(phone_number=value).exclude(id=user.id).exists():
+            raise serializers.ValidationError("该手机号已被使用")
+        return value
