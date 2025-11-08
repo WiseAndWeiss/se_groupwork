@@ -1,0 +1,9 @@
+<view class="card">
+  <t-image t-class="card__image" src="{{url}}" mode="aspectFill" />
+  <view class="card__info">
+    <text>{{desc}}</text>
+    <view class="card__tag-group">
+      <t-tag wx:for="{{tags}}" wx:key="index" size="small" variant="light" theme="{{item.theme}}">{{item.text}}</t-tag>
+    </view>
+  </view>
+</view>

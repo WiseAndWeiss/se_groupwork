@@ -1,0 +1,29 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">校内</view>
+</view>
+
+
+
+
+
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

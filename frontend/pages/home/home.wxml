@@ -1,0 +1,60 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">首页</view>
+</view>
+
+<!-- 页面内容 -->
+<view class="home-container">
+  <!-- 图片区域 -->
+  <view class="banner-section">
+    <view class="banner-image">
+      <!-- 图片占位区域，后期从数据库传入 -->
+      <view class="image-placeholder">图片区域</view>
+    </view>
+    <view class="banner-text">
+      <!-- 图片上方文字区域，后期从数据库传入 -->
+      <view class="text-placeholder">图片说明文字区域</view>
+    </view>
+  </view>
+
+  <!-- 最新消息标题 -->
+  <view class="latest-news-title">
+    <text>最新消息</text>
+  </view>
+
+  <!-- 资讯滚动列表 -->
+  <scroll-view class="news-list" scroll-y>
+    <view class="news-item" wx:for="{{newsList}}" wx:key="id">
+      <view class="news-header">
+        <view class="news-title">{{item.title}}</view>
+        <view class="news-tags">
+          <text class="news-tag" wx:for="{{item.tags}}" wx:key="*this">#{{item}}</text>
+        </view>
+      </view>
+      <view class="news-footer">
+        <text class="news-source">{{item.source}}</text>
+        <text class="news-time">{{item.time}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>
