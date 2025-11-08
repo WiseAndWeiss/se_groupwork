@@ -63,9 +63,17 @@ class User(AbstractBaseUser):
     )
     email = models.EmailField(
         _('邮箱地址'),
-        unique=True,
+        blank=True,
         error_messages={
             'unique': _("该邮箱地址已被占用。"),
+        },
+    )
+    phone_number = models.CharField(
+        _('手机号'),
+        max_length=20,
+        blank=True,
+        error_messages={
+            'unique': _("该手机号已被占用。"),
         },
     )
     avatar = models.ImageField(
@@ -98,6 +106,7 @@ class User(AbstractBaseUser):
     # 统计信息
     subscription_count = models.IntegerField(_('订阅公众号数'), default=0)
     favorite_count = models.IntegerField(_('收藏文章数'), default=0)
+    history_count = models.IntegerField(_('活跃浏览历史数'), default=0)
 
     # 设置字段
     EMAIL_FIELD = 'email'
@@ -137,6 +146,10 @@ class SubscriptionManager(models.Manager):
         Preference.objects.add_subscription(user, public_account)
         return subscription
     
+    # 删除所有用户的订阅
+    def clear_user_subscriptions(self, user):
+        self.filter(user=user).delete()
+
     # 删除订阅并更新用户的订阅计数
     def delete_subscription(self, subscription):
         subscription.delete()
@@ -160,6 +173,7 @@ class Subscription(models.Model):
         auto_now_add=True
     )
     is_active = models.BooleanField(default=True)
+    
     objects = SubscriptionManager()
 
     class Meta:
@@ -186,9 +200,14 @@ class FavoriteManager(models.Manager):
         favorite = self.create(user=user, article=article)
         return favorite
     
+    # 删除所有用户的收藏
+    def clear_user_favorites(self, user):
+        self.filter(user=user).delete()
+    
     # 删除收藏并更新用户的收藏计数
     def delete_favorite(self, favorite):
         favorite.delete()
+
 
 class Favorite(models.Model):
     """
@@ -216,3 +235,55 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user} favorited {self.article}"
+    
+
+class HistoryManager(models.Manager):
+    """自定义浏览历史管理器"""
+
+    # 获取用户的所有浏览历史
+    def get_user_history(self, user):
+        return self.filter(user=user).select_related('article')
+
+    # 检测用户是否浏览过某篇文章
+    def is_viewed(self, user, article): 
+        return self.filter(user=user, article=article).exists()
+
+    # 创建一条浏览历史记录
+    def create_history(self, user, article):
+        history = self.create(user=user, article=article)
+        return history
+
+    # 删除某个用户的所有浏览历史记录
+    def clear_user_history(self, user):
+        self.filter(user=user).delete()
+
+    # 删除某条浏览历史记录
+    def delete_history(self, history):
+        history.delete()
+
+
+class History(models.Model):
+    """
+    用户浏览历史
+    图例：用户A-浏览-文章A
+    当用户/文章删除时，浏览记录自动删除
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE
+    )
+    article = models.ForeignKey(
+        Article, 
+        on_delete=models.CASCADE
+    )
+    viewed_at = models.DateTimeField(
+        auto_now_add=True
+    )   
+
+    objects = HistoryManager()
+
+    class Meta:
+        ordering = ['-viewed_at']  # 按照浏览时间排列，最新浏览的在前面
+
+    def __str__(self):
+        return f"{self.user} viewed {self.article}"
