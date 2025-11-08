@@ -13,7 +13,13 @@ class RemoteAITestCase(TestCase):
         for account in data['account']:
             PublicAccount.objects.create(**account)
         for article in data['article']:
-            Article.objects.create(**article)
+            Article.objects.create(
+                public_account_id=article['public_account'],
+                title=article['title'],
+                content=article['content'],
+                article_url=article['article_url'],
+                publish_time=article['publish_time']
+            )
 
     # 测试具体功能（方法名必须以test_开头）
     def test_get_summary_ids(self):

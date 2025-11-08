@@ -1,6 +1,7 @@
 import re
 import json
 from remoteAI.remoteAI.ai_request import get_response
+from remoteAI.remoteAI.vectorize import keywords_vectorize, tags_vectorize
 
 def extract_json(content):
 	pattern = r'```json(.*?)```'
@@ -62,5 +63,10 @@ def ai_summarize_article(content):
 
 
 def entry(article_msg):
-	ai_resp = ai_summarize_article(json.dumps(article_msg, ensure_ascii=False, indent=4))
-	return ai_resp
+	for i in range(3):
+		ai_resp = ai_summarize_article(json.dumps(article_msg, ensure_ascii=False, indent=4))
+		if ai_resp is not None:
+			ai_resp["semantic_vector"] = keywords_vectorize(ai_resp["keyinfo"])
+			ai_resp["tags_vector"] = tags_vectorize(ai_resp["tags"])
+			return ai_resp
+	return None
