@@ -16,10 +16,32 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from user.views import subscribe, unsubscribe
+from rest_framework_simplejwt.views import TokenRefreshView
+import user.views as user_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('subscribe/<str:fakeid>/', subscribe, name='subscribe'),
-    path('unsubscribe/<str:fakeid>/', unsubscribe, name='unsubscribe'),
+    # 认证相关
+    path('api/auth/register/', user_views.RegisterView.as_view(), name='register'),
+    path('api/auth/login/', user_views.LoginView.as_view(), name='login'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/profile/', user_views.ProfileView.as_view(), name='profile'),
+    
+    # 订阅相关 - RESTful风格
+    path('api/subscriptions/', user_views.SubscriptionListView.as_view(), name='subscription-list'),
+    path('api/subscriptions/<int:pk>/', user_views.SubscriptionDetailView.as_view(), name='subscription-detail'),
+    
+    # 收藏相关 - RESTful风格
+    path('api/favorites/', user_views.FavoriteListView.as_view(), name='favorite-list'),
+    path('api/favorites/<int:pk>/', user_views.FavoriteDetailView.as_view(), name='favorite-detail'),
+    
+    # 历史记录相关 - RESTful风格
+    path('api/history/', user_views.HistoryListView.as_view(), name='history-list'),
+    path('api/history/<int:pk>/', user_views.HistoryDetailView.as_view(), name='history-detail'),
+
+    # 修改个人资料相关
+    path('api/auth/update/username/', user_views.UsernameUpdateView.as_view(), name='update-username'),
+    path('api/auth/update/avatar/', user_views.AvatarUpdateView.as_view(), name='update-avatar'),
+    path('api/auth/update/password/', user_views.PasswordChangeView.as_view(), name='update-password'),
+    path('api/auth/update/email/', user_views.EmailChangeView.as_view(), name='update-email'),
+    path('api/auth/update/phone/', user_views.PhoneChangeView.as_view(), name='update-phone'),
 ]

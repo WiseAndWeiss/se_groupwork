@@ -7,15 +7,15 @@ from tqdm import tqdm
 import time
 import random
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from django.utils import timezone
 import cloudscraper
 import bs4
-from webspider_utils import get_random_user_agent
 # 添加Django环境设置
 import os
 import django
 import sys
+from avatar_downloader import AvatarDownloader
 # 定位到项目根目录（manage.py所在目录）
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
@@ -39,6 +39,7 @@ class ArticleFetcher:
         self.public_account, _ = PublicAccount.objects.get_or_create(fakeid=fakeid)
         self.url = "https://mp.weixin.qq.com/cgi-bin/appmsg"
         self.scraper = cloudscraper.create_scraper()
+        self.avatar_downloader = AvatarDownloader(save_dir="article_covers")
 
         # 初始化参数和headers
         self.params = {
@@ -146,55 +147,100 @@ class ArticleFetcher:
 
         return content_list
 
-    def get_article_content(self, article_url: str) -> str:
+    def get_article_content(self, article_url: str) -> Dict[str, str]:
         """
-        通过文章的url，获取文章的内容
+        通过文章的url，获取文章的短链接、标题、内容、封面、作者等
+        提取短链接是因为：短链接不会改变，长链接会改变
+
+        Return:
+            [文章内容，封面]
         """
         headers = {
-            'User-Agent': get_random_user_agent(),
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x63090819) XWEB/8519 Flu',
             'Referer': 'https://mp.weixin.qq.com/'
         }
         try:
             response = self.scraper.get(article_url, headers=headers)
             soup = bs4.BeautifulSoup(response.text, 'html.parser')
-            # 提取文章内容
-            content_element = soup.find('div', class_='rich_media_content')
-            if not content_element:
-                print(f"未找到文章: {article_url}内容")
-                return "未找到文章内容"
-            content = content_element.get_text()
-            return content
+            # 提取信息
+            result = {}
+            title = soup.find(attrs={'property':'og:title'})['content']
+            author = soup.find(attrs={'property':'og:article:author'})['content']
+            link = soup.find(attrs={'property':'og:url'})['content']
+            content = soup.find('div', class_='rich_media_content').get_text()
+            remote_cover_url = soup.find(attrs={'property':'og:image'})['content']
+            # 提取文章封面
+            local_cover_url = self.get_cover(remote_cover_url, title)
+            result.update({
+                'link': link, 
+                'author': author, 
+                'content': content, 
+                'title': title,
+                'cover_url': local_cover_url
+            })
+            
+            return result
         except Exception as e:
             print(f"获取文章内容失败: {e}")
-            return "获取文章内容失败"
+            return "获取文章内容失败", ""
+
+
+    def get_cover(self, img_url: str, article_title: str) -> str:
+        """
+        通过img_url下载对应的文章封面图
+        
+        Args:
+            img_url: 封面图URL
+            article_title: 文章标题（用于生成文件名）
+            
+        Returns:
+            本地文件路径
+        """
+        if not img_url:
+            return "获取封面失败"
+            
+        try:
+            # 使用文章标题作为文件名，下载封面图
+            name_url_dict = {article_title: img_url}
+            result_dict = self.avatar_downloader.download(name_url_dict)
+            
+            # 返回下载的本地路径
+            return result_dict.get(article_title, "")
+        except Exception as e:
+            print(f"下载文章封面图失败: {e}")
+            return ""
 
     def save_to_database(self, content_list: List[Dict[str, Any]]) -> None:
         """
         将文章数据保存到数据库。
 
         Args:
-            content_list：包含title、link、publish_time等信息
+            content_list：包含title、link、publish_time、cover_url等信息
         """
         try:
             for item in content_list:
                 article_url = item.get("link", "")
                 title = item.get("title", "")
+                publish_time = timezone.datetime.fromtimestamp(item.get("create_time", 0))
+
                 # 由于公众号发布文章后很少会修改（正文部分支持修改最多20个字），因此如果数据库已有文章，就不需要爬取其它内容了（降低被封风险）
                 if Article.objects.filter(article_url=article_url).exists():
                     print(f"文章 {title} 已存在，停止爬取")
                     continue
-                content = self.get_article_content(article_url)
-                publish_time = timezone.datetime.fromtimestamp(item.get("create_time", 0))
+                
+                result = self.get_article_content(article_url)
+
                 article, created = Article.objects.get_or_create(
-                    article_url=article_url,
+                    article_url=result['link'],
                     defaults={
-                        'account': self.public_account,
+                        'public_account': self.public_account,
                         'title': title,
                         'publish_time': publish_time,
-                        'content': content
+                        'content': result['content'],
+                        'cover_url': result['cover_url'],
+                        'author': result['author']
                     }
                 )
-                article.account
                 if created:
                     print(f"✅ 已保存文章链接: {title}")
                 else:
@@ -227,7 +273,7 @@ if __name__ == '__main__':
 
     # 初始化文章抓取器
     fetcher = ArticleFetcher(
-        fakeid='MzU1NTcxODQ0OQ=='
+        fakeid='MzA4OTIyMzgxMw=='
     )
 
     print(fetcher.cookies)

@@ -70,6 +70,11 @@ class Article(models.Model):
         blank=True,
         verbose_name='文章内容'
     )
+    author = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name='作者'
+    )
     article_url = models.URLField(
         unique=True,
         verbose_name='文章链接'
@@ -99,7 +104,11 @@ class Article(models.Model):
         default=list,
         verbose_name="语义向量"
     )
-
+    cover_url = models.TextField(
+        blank=True,
+        verbose_name='封面URL',
+    )
+    
     class Meta:
         verbose_name = '微信文章'
         verbose_name_plural = '微信文章'

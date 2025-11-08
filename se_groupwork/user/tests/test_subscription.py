@@ -152,13 +152,13 @@ class SubscriptionTestCase(TestCase):
             public_account=self.account1
         )
 
-        expected_str = f"{self.user1} -> {self.account1} (active)"
+        expected_str = f"{self.user1} -> {self.account1}"
         self.assertEqual(str(subscription), expected_str)
 
         # 测试非活跃状态的显示
         subscription.is_active = False
         subscription.save()
-        expected_str_inactive = f"{self.user1} -> {self.account1} (inactive)"
+        expected_str_inactive = f"{self.user1} -> {self.account1}"
         self.assertEqual(str(subscription), expected_str_inactive)
 
 
