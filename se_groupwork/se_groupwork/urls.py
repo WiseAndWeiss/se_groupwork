@@ -37,4 +37,11 @@ urlpatterns = [
     # 历史记录相关 - RESTful风格
     path('api/history/', user_views.HistoryListView.as_view(), name='history-list'),
     path('api/history/<int:pk>/', user_views.HistoryDetailView.as_view(), name='history-detail'),
+
+    # 修改个人资料相关
+    path('api/auth/update/username/', user_views.UsernameUpdateView.as_view(), name='update-username'),
+    path('api/auth/update/avatar/', user_views.AvatarUpdateView.as_view(), name='update-avatar'),
+    path('api/auth/update/password/', user_views.PasswordChangeView.as_view(), name='update-password'),
+    path('api/auth/update/email/', user_views.EmailChangeView.as_view(), name='update-email'),
+    path('api/auth/update/phone/', user_views.PhoneChangeView.as_view(), name='update-phone'),
 ]
