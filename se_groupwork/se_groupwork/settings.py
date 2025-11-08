@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'user',
     'rest_framework',
     'remoteAI',
+    'articleSelector',
 ]
 
 # 配置Django Rest Framework

@@ -20,10 +20,11 @@ class TaskManager:
                     "title": article.title,
                     "url": article.article_url,
                     "content": article.content,
-                    "account": PublicAccount.objects.get(id=article.account_id).name,
+                    "account": article.public_account.name,
                     "summary": article.summary,
                     "keyinfo": article.key_info,
-                    "tags": article.tags
+                    "tags": article.tags,
+                    "semantic_vector": article.semantic_vector
                 }
                 for article in all_articles
             ]
@@ -50,7 +51,7 @@ class TaskManager:
             "id": task_id,
             "title": item.title,
             "content": item.content,
-            "account": PublicAccount.objects.get(id=item.account_id).name
+            "account": item.public_account.name
         }
         return article_msg
 
@@ -61,9 +62,7 @@ class TaskManager:
             self.semaphore.acquire()
             resp = entry(article_msg)
             if resp is None:
-                resp = entry(article_msg)
-                if resp is None:
-                    return
+                self.result.append({"id": article_msg["id"], "summary": "", "keyinfo": [], "tags": [], "semantic_vector": [], "tags_vector": []})
             # 更新数据库
             print(f"开始任务：{article_msg['title']}")
             self.result.append(resp | {"id": article_msg["id"]})
@@ -91,8 +90,9 @@ class TaskManager:
             thread.join()
         
         # 3. 更新数据库
+
         for item in self.result:
-            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=",".join(item["tags"]))
+            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=",".join(item["tags"]), tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
         self.result = []
         self.print_table_to_json("result.json")
         return True
