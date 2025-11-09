@@ -11,9 +11,35 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import FavoriteSerializer, HistorySerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
 from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
-
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 
 # 认证相关API
+@extend_schema(
+    tags=['用户认证'],
+    summary='用户注册',
+    description='创建新用户并返回JWT令牌',
+    request=UserRegistrationSerializer,
+    examples=[
+        OpenApiExample(
+            '弱密码注册请求',
+            value={
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'password': 'password123',
+                'password_confirm': 'password123'
+            }
+        ),
+        OpenApiExample(
+            '正常注册请求',
+            value={
+                'username': 'testuser_',
+                'email': 'test1@example.com',
+                'password': 'Password123!',
+                'password_confirm': 'Password123!'
+            }
+        )
+    ]
+)
 class RegisterView(APIView):
     """用户注册API"""
     permission_classes = [permissions.AllowAny]
@@ -34,6 +60,21 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    tags=['用户认证'], 
+    summary='用户登录',
+    description='用户登录获取JWT令牌',
+    request=UserLoginSerializer,
+    examples=[
+        OpenApiExample(
+            '登录请求',
+            value={
+                'username': 'testuser',
+                'password': 'password123'
+            }
+        )
+    ]
+)
 class LoginView(APIView):
     """用户登录API"""
     permission_classes = [permissions.AllowAny]
@@ -50,6 +91,11 @@ class LoginView(APIView):
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(
+    tags=['用户资料'],
+    summary='获取用户资料', 
+    description='获取当前登录用户的详细信息'
+)
 class ProfileView(APIView):
     """用户资料API"""
     permission_classes = [IsAuthenticated]
@@ -60,6 +106,28 @@ class ProfileView(APIView):
 
 
 # 订阅相关API
+@extend_schema(
+    tags=['订阅管理'],
+    summary='订阅列表',
+    description='获取用户的公众号订阅列表',
+    methods=['GET']
+)
+@extend_schema(
+    tags=['订阅管理'],
+    methods=['POST'],
+    description='添加新订阅',
+    examples=[
+        OpenApiExample(
+            '添加订阅',
+            value={'public_account_id': 1}
+        )
+    ]
+)
+@extend_schema(
+    tags=['订阅管理'],
+    methods=['DELETE'],
+    description='清空所有订阅'
+)
 class SubscriptionListView(APIView):
     """订阅列表API - 处理列表和创建操作"""
     permission_classes = [IsAuthenticated]
@@ -88,6 +156,14 @@ class SubscriptionListView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=['订阅管理'],
+    summary='删除订阅',
+    description='删除特定的订阅关系',
+    parameters=[
+        OpenApiParameter(name='pk', description='订阅ID', type=int)
+    ]
+)
 class SubscriptionDetailView(APIView):
     """订阅详情API - 处理单个订阅的操作"""
     permission_classes = [IsAuthenticated]
@@ -100,6 +176,28 @@ class SubscriptionDetailView(APIView):
 
 
 # 收藏相关API
+@extend_schema(
+    tags=['收藏管理'],
+    summary='收藏列表',
+    description='获取用户的文章收藏列表',
+    methods=['GET']
+)
+@extend_schema(
+    tags=['收藏管理'],
+    methods=['POST'],
+    description='添加新收藏',
+    examples=[
+        OpenApiExample(
+            '添加收藏',
+            value={'article_id': 1}
+        )
+    ]
+)
+@extend_schema(
+    tags=['收藏管理'],
+    methods=['DELETE'],
+    description='清空所有收藏'
+)
 class FavoriteListView(APIView):
     """收藏列表API - 处理列表和创建操作"""
     permission_classes = [IsAuthenticated]
@@ -128,6 +226,14 @@ class FavoriteListView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=['收藏管理'],
+    summary='删除收藏',
+    description='删除特定的收藏记录',
+    parameters=[
+        OpenApiParameter(name='pk', description='收藏ID', type=int)
+    ]
+)
 class FavoriteDetailView(APIView):
     """收藏详情API - 处理单个收藏的操作"""
     permission_classes = [IsAuthenticated]
@@ -139,6 +245,28 @@ class FavoriteDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=['历史记录'],
+    summary='历史记录列表',
+    description='获取用户的文章浏览历史',
+    methods=['GET']
+)
+@extend_schema(
+    tags=['历史记录'],
+    methods=['POST'],
+    description='添加浏览记录',
+    examples=[
+        OpenApiExample(
+            '添加记录',
+            value={'article_id': 1}
+        )
+    ]
+)
+@extend_schema(
+    tags=['历史记录'],
+    methods=['DELETE'],
+    description='清空所有历史记录'
+)
 # 历史记录相关API
 class HistoryListView(APIView):
     """历史记录列表API - 处理列表和创建操作"""
@@ -173,6 +301,14 @@ class HistoryListView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=['历史记录'],
+    summary='删除历史记录',
+    description='删除特定的浏览记录',
+    parameters=[
+        OpenApiParameter(name='pk', description='记录ID', type=int)
+    ]
+)
 class HistoryDetailView(APIView):
     """历史记录详情API - 处理单个历史记录的操作"""
     permission_classes = [IsAuthenticated]
@@ -183,6 +319,19 @@ class HistoryDetailView(APIView):
         History.objects.delete_history(history)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+@extend_schema(
+    tags=['用户资料'],
+    summary='修改用户名',
+    description='修改当前用户的用户名',
+    request=UserProfileSerializer,
+    examples=[
+        OpenApiExample(
+            '修改用户名',
+            value={'new_username': 'newname'}
+        )
+    ]
+)
 # 用户资料更新相关API
 class UsernameUpdateView(APIView):
     """修改用户名API"""
@@ -210,6 +359,12 @@ class UsernameUpdateView(APIView):
             'user': serializer.data
         })
 
+
+@extend_schema(
+    tags=['用户资料'],
+    summary='修改头像',
+    description='上传新的头像图片'
+)
 class AvatarUpdateView(APIView):
     """修改头像API"""
     permission_classes = [IsAuthenticated]
@@ -253,6 +408,23 @@ class AvatarUpdateView(APIView):
             'user': serializer.data
         })
 
+
+@extend_schema(
+    tags=['用户管理'],
+    summary='修改密码',
+    description='修改用户登录密码',
+    request=UserPasswordChangeSerializer,
+    examples=[
+        OpenApiExample(
+            '修改密码',
+            value={
+                'old_password': 'oldpassword123',
+                'new_password': 'newpassword456',
+                'confirm_password': 'newpassword456'
+            }
+        )
+    ]
+)
 class PasswordChangeView(APIView):
     """修改密码API"""
     permission_classes = [IsAuthenticated]
@@ -280,6 +452,19 @@ class PasswordChangeView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@extend_schema(
+    tags=['用户资料'],
+    summary='修改邮箱',
+    description='修改用户邮箱地址',
+    request=UserEmailChangeSerializer,
+    examples=[
+        OpenApiExample(
+            '修改邮箱',
+            value={'new_email': 'newemail@example.com'}
+        )
+    ]
+)
 class EmailChangeView(APIView):
     """修改邮箱API"""
     permission_classes = [IsAuthenticated]
@@ -302,6 +487,19 @@ class EmailChangeView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@extend_schema(
+    tags=['用户资料'],
+    summary='修改手机号',
+    description='修改用户手机号码',
+    request=UserPhoneChangeSerializer,
+    examples=[
+        OpenApiExample(
+            '修改手机号',
+            value={'new_phone': '13800138000'}
+        )
+    ]
+)
 class PhoneChangeView(APIView):
     """修改手机号API"""
     permission_classes = [IsAuthenticated]
