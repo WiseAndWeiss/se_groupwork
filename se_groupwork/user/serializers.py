@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
-from .register_validate import validate_credentials, check_password_strength
+from .param_validate import validate_credentials, check_password_strength, check_phone_number
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """用户注册序列化器
@@ -170,6 +170,7 @@ class UserEmailChangeSerializer(serializers.Serializer):
     new_email = serializers.EmailField()
     
     def validate_new_email(self, value):
+        """这里不需要验证邮箱格式，因为django内置了检验"""
         """验证新邮箱是否已被使用"""
         user = self.context['request'].user
         if User.objects.filter(email=value).exclude(id=user.id).exists():
@@ -181,6 +182,11 @@ class UserPhoneChangeSerializer(serializers.Serializer):
     new_phone = serializers.CharField()
     
     def validate_new_phone(self, value):
+        """验证新手机号格式是否正确"""
+        validated, reason = check_phone_number(value)
+        if not validated:
+            raise serializers.ValidationError(reason)
+        
         """验证新手机是否已被使用"""
         user = self.context['request'].user
         if User.objects.filter(phone_number=value).exclude(id=user.id).exists():

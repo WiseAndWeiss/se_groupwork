@@ -41,15 +41,78 @@ INSTALLED_APPS = [
     'webspider',
     'user',
     'rest_framework',
+    'drf_spectacular',
 ]
 
 # 配置Django Rest Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+SPECTACULAR_SETTINGS = {
+    # 项目基本信息
+    'TITLE': '微信公众号管理系统 API',  # 改为项目总体名称
+    'DESCRIPTION': """
+    完整的微信公众号内容管理系统API文档
+    
+    ## 功能模块
+    - 用户认证管理（注册、登录、资料修改）
+    - 公众号订阅管理  
+    - 文章收藏功能
+    - 浏览历史记录
+    - 文章推送功能
+    
+    ## 技术栈
+    - Django + Django REST Framework
+    - JWT身份认证
+    - OpenAPI 3.0规范
+    """,
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+    # 多应用支持配置
+    # 'SCHEMA_PATH_PREFIX': '/api/',  # 只包含/api/开头的路径
+    # 'SCHEMA_PATH_PREFIX_TRIM': True,
+    
+    # 标签分组配置（重要！）
+    'TAGS': [
+        {
+            'name': '用户认证',
+            'description': '用户注册、登录、JWT令牌管理'
+        },
+        {
+            'name': '用户资料', 
+            'description': '用户个人信息管理和修改'
+        },
+        {
+            'name': '订阅管理',
+            'description': '公众号订阅功能'
+        },
+        {
+            'name': '收藏管理',
+            'description': '文章收藏功能'
+        },
+        {
+            'name': '历史记录',
+            'description': '用户浏览记录管理'
+        },
+    ],
+    
+    # 其他优化配置
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    
+    'REDOC_UI_SETTINGS': {
+        'hideDownloadButton': False,
+        'expandResponses': '200,201',
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
