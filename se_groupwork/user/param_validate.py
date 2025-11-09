@@ -23,9 +23,8 @@ def validate_credentials(username: str, password: str) -> Dict[str, any]:
     if not username:
         result['username_errors'].append("用户名不能为空")
     else:
-        validated, error = check_username(username)
-        if not validated:
-            result['username_errors'].append(error)
+        check_result = check_username(username)
+        result['username_errors'].append(check_result)
     
     # 2. 密码基础验证 [5,6](@ref)
     if not password:
