@@ -15,9 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 import user.views as user_views
+from articleSelector.views import ArticleViewSet
 
 urlpatterns = [
     # 认证相关
@@ -44,4 +45,12 @@ urlpatterns = [
     path('api/auth/update/password/', user_views.PasswordChangeView.as_view(), name='update-password'),
     path('api/auth/update/email/', user_views.EmailChangeView.as_view(), name='update-email'),
     path('api/auth/update/phone/', user_views.PhoneChangeView.as_view(), name='update-phone'),
+	
+    # 文章相关
+    path('api/articles/latest/', ArticleViewSet.as_view({'get': 'latest'}), name='articles-latest'),
+    path('api/articles/recommended/', ArticleViewSet.as_view({'get': 'recommended'}), name='articles-recommended'),
+	path('api/articles/campus-latest/', ArticleViewSet.as_view({'get': 'campus_latest'}), name='articles-campus-latest'),
+	path('api/articles/customized-latest/', ArticleViewSet.as_view({'get': 'customized_latest'}), name='articles-customized-latest'),
+	path('api/articles/by-account/', ArticleViewSet.as_view({'get': 'by_account'}), name='articles-by-account'),
+    path('api/articles/filter/', ArticleViewSet.as_view({'get': 'filter'}), name='article-filter'),
 ]

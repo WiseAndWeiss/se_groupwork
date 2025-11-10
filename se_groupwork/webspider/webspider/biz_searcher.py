@@ -170,7 +170,7 @@ class BizSearcher:
 if __name__ == '__main__':
     # 初始化公众号抓取器
     searcher = BizSearcher(
-        query="人民日报"
+        query=""
     )
     searcher.biz_search()
 

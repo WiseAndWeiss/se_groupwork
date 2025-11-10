@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_extensions",
+    'rest_framework',
+    'rest_framework.authtoken', 
     'webspider',
     'user',
-    'rest_framework',
     'remoteAI',
     'articleSelector',
 ]
@@ -91,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'se',      # 数据库名
         'USER': 'root',           # 数据库用户
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),       # 数据库密码
+        'PASSWORD': "3213",       # 数据库密码
         'HOST': 'localhost',              # 数据库地址
         'PORT': '3306',                   # 数据库端口
         'OPTIONS': {
@@ -119,6 +121,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 
 # Internationalization
