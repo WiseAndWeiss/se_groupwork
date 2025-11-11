@@ -1,0 +1,147 @@
+/* 1. 页面基础样式：重置默认边距+占满屏幕 */
+page {
+    overflow: hidden;
+    height: 100vh;
+    background-color: #fafafa;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 2. 页面容器：承载所有内容，避开底部tab栏 */
+  .home-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 120rpx); /* 减去底部tab栏高度（120rpx） */
+  }
+  
+  /* 3. 自定义导航栏：白色背景+轻微阴影，增强层次 */
+  .custom-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100rpx;
+    line-height: 100rpx;
+    text-align: center;
+    font-size: 36rpx;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1rpx solid #eee;
+    background-color: #fff;
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03); /* 轻微阴影，不生硬 */
+    z-index: 99; /* 层级高于轮播图，低于底部tab */
+  }
+  
+  /* 4. 轮播图区域：固定定位，不随页面滚动 */
+  .banner-section {
+    position: fixed;
+    top: 100rpx; /* 紧贴导航栏底部 */
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 340rpx; /* 优化高度，适配更多屏幕 */
+    z-index: 10;
+    overflow: hidden; /* 防止图片溢出 */
+  }
+  
+  /* 5. 原生swiper容器：填满轮播图区域 */
+  .native-swiper {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* 6. 原生swiper-item：承载单张轮播图 */
+  .swiper-item {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* 7. 轮播图片：强制显示+不变形 */
+  .swiper-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 保持比例，填满容器 */
+    display: block; /* 解决底部间隙问题 */
+  }
+  
+  /* 8. 卡片区域：在轮播图下方，独立滚动 */
+  .card-area {
+    position: absolute;
+    top: calc(100rpx + 340rpx); /* 导航栏高度 + 轮播图高度 */
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 20rpx; /* 加大左右内边距，避免卡片贴边 */
+    box-sizing: border-box;
+  }
+  
+  /* 9. 最新消息标题：和卡片对齐，风格统一 */
+  .latest-news-title {
+    width: 100%;
+    margin: 20rpx 0 16rpx; /* 优化上下间距 */
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333;
+    padding-left: 8rpx;
+    border-left: 4rpx solid #7b2ff7; /* 主题紫色竖线 */
+  }
+  
+  /* 10. 卡片滚动容器：独立滚动，高度自适应 */
+  .card-scroll {
+    width: 100%;
+    height: calc(100vh - 100rpx - 340rpx - 120rpx - 60rpx); /* 动态计算，不超出屏幕 */
+    background-color: #fafafa;
+  }
+  
+  /* 11. 卡片列表：间距宽松，避免拥挤 */
+  .card-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx; /* 优化卡片间距 */
+    padding-bottom: 30rpx; /* 底部留白，避免最后一张卡片被遮挡 */
+  }
+  
+  /* 12. 底部导航栏：保持原有样式，主题统一 */
+  .tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120rpx;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1rpx solid #eee;
+    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+    z-index: 100;
+  }
+  
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    font-size: 26rpx;
+  }
+  
+  .tab-item .menu-icon {
+    width: 40rpx;
+    height: 40rpx;
+    margin-bottom: 6rpx;
+    filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+  }
+  
+  .tab-item.active {
+    color: #7b2ff7;
+    font-weight: bold;
+  }
+  
+  .tab-item.active .menu-icon {
+    filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+  }
+
+  

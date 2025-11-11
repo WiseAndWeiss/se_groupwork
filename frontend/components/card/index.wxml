@@ -1,0 +1,24 @@
+<view class="card">
+  <!-- 文章标题 -->
+  <text class="title">{{title}}</text>
+   
+   <!-- 文章时间 -->
+   <view class="time">{{time}}</view>
+
+<!-- 文章标签 -->
+<view class="tags">
+  <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
+</view>
+
+  <!-- 收藏和展开按钮 -->
+  <view class="buttons">
+    <button bindtap="onFavorite">收藏</button>
+    <button bindtap="onExpand">展开</button>
+  </view>
+
+  <!-- 悬浮窗显示更多内容 -->
+  <view wx:if="{{isExpanded}}" class="floating-window">
+    <view class="desc">{{desc}}</view>
+    <a href="{{url}}" target="_blank">原文链接</a>
+  </view>
+</view>

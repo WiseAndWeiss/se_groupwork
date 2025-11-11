@@ -1,0 +1,8 @@
+##当前代码：
+基本实现已有界面的正常交互，并设计了一点点的css。
+##无实际意义的填充：
+主页滚动栏图片：assets/images
+公众号标志图：assets/campus/
+测试数据：：data/testData
+##关于CSS：
+各个页面有点基本的css，但还要修改。COMPONENTS里面有组件card和card-picture。card即为“主页”、“校内”、“自选”里面所有的展示条，只需要修改card.wxss即可。card-picture展示的是公众号标签，应用在“校内公众号一览”和“自选”中的“按公众号排序”。

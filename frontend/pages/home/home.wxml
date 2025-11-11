@@ -1,0 +1,82 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">首页</view>
+</view>
+
+<!-- 轮播图固定，卡片单独滚动 -->
+<view class="home-container">
+  <!-- 轮播图区域（固定定位，不随页面滚动） -->
+  <view class="banner-section">
+  <swiper
+    current="{{current}}"
+    autoplay="{{autoplay}}"
+    duration="{{duration}}"
+    interval="{{interval}}"
+    indicator-dots="{{true}}"
+    indicator-color="#ccc"
+    indicator-active-color="#7b2ff7"
+    bindchange="onChange"
+    class="native-swiper"
+  >
+    <block wx:for="{{swiperList}}" wx:key="index">
+      <swiper-item class="swiper-item">
+        <image 
+          src="{{item.image}}" 
+          mode="aspectFill" 
+          class="swiper-img"
+          bindload="onImageLoad"
+          data-index="{{index}}"
+          bindtap="onTap"
+          data-index="{{index}}"
+        />
+      </swiper-item>
+    </block>
+  </swiper>
+  </view>
+
+  <!-- 卡片区域：在轮播图下方，独立滚动 -->
+  <view class="card-area">
+    <!-- 最新消息标题 -->
+    <view class="latest-news-title">
+      <text>最新消息</text>
+    </view>
+
+    <!-- 卡片独立滚动容器 -->
+    <scroll-view 
+      class="card-scroll"
+      scroll-y="true"
+    >
+      <view class="card-list">
+        <block wx:for="{{selectionList}}" wx:key="id"> 
+          <card-component
+            title="{{item.title}}"
+            time="{{item.time}}"
+            tags="{{item.tags}}"
+            desc="{{item.desc}}"
+            url="{{item.url}}"
+          />
+        </block>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

@@ -1,0 +1,91 @@
+<!-- pages/selection/selection.wxml -->
+<view class="selection-container">
+  <!-- 标题栏 -->
+  <view class="selection-title">自选</view>
+  <button class="expand-btn" bindtap="goToAdd">添加自选</button>
+
+  <!-- 排序按钮区域 -->
+  <view class="sort-bar">
+    <view 
+      class="sort-btn {{currentSort === 'time' ? 'active' : ''}}"
+      bindtap="switchSort"
+      data-type="time"
+    >
+      按时间排序
+    </view>
+    <view 
+      class="sort-btn {{currentSort === 'official' ? 'active' : ''}}"
+      bindtap="switchSort"
+      data-type="official"
+    >
+      按公众号排序
+    </view>
+  </view>
+
+  <!-- 按时间排序 -->
+  <view wx:if="{{currentSort === 'time'}}" class="content-section">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <input 
+        type="text" 
+        placeholder="快速搜索动态" 
+        placeholder-class="search-placeholder"
+        class="search-input"
+      />
+    </view>
+
+    <scroll-view 
+      class="card-scroll"
+      scroll-y="true"
+    >
+      <view class="card-list">
+        <block wx:for="{{selectionList}}" wx:key="id"> 
+          <card-component
+            title="{{item.title}}"
+            time="{{item.time}}"
+            tags="{{item.tags}}"
+            desc="{{item.desc}}"
+            url="{{item.url}}"
+          />
+        </block>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 按公众号排序：显示空白页面（后续可补充逻辑） -->
+  <view wx:if="{{currentSort === 'official'}}" class="empty-page">
+    <!-- 公众号列表：用 card-picture 组件呈现 -->
+<view class="official-list">
+  <block wx:for="{{officialList}}" wx:key="id">
+    <!-- 引用公众号卡片组件，传递图标和名称 -->
+    <card-picture
+      avatar="{{item.avatar}}"
+      name="{{item.name}}"
+      bind:click="goToOfficialDetail" 
+      data-id="{{item.id}}"
+      data-name="{{item.name}}"
+    />
+  </block>
+</view>
+  </view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>
