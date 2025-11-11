@@ -1,0 +1,10 @@
+{
+    "component": true,
+    "usingComponents": {
+      "t-swiper": "tdesign-miniprogram/swiper/swiper",
+      "card-component": "/components/card/index"  
+    },
+
+    "navigationStyle": "custom",
+    "renderer": "webview"
+  }

@@ -1,0 +1,23 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+<!-- 返回上一页按钮 -->
+<view class="back-btn" bindtap="goBack">
+    <text class="back-icon">返回</text>
+  </view>
+  <view class="navbar-title">校内公众号一览</view>
+</view>
+
+<!-- 公众号列表：用 card-picture 组件呈现 -->
+<view class="official-list">
+  <block wx:for="{{officialList}}" wx:key="id">
+    <!-- 引用公众号卡片组件，传递图标和名称 -->
+    <card-picture
+      avatar="{{item.avatar}}"
+      name="{{item.name}}"
+      bind:click="goToOfficialDetail" 
+      data-id="{{item.id}}"
+      data-name="{{item.name}}"
+    />
+  </block>
+</view>
+

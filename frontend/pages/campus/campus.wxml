@@ -1,0 +1,103 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">校内</view>
+</view>
+
+<!-- 搜索框 -->
+<view class="search-box">
+      <input 
+        type="text" 
+        placeholder="快速搜索动态" 
+        placeholder-class="search-placeholder"
+        class="search-input"
+      />
+    <button class="expand-btn" bindtap="goToAlllist">校内公众号一览</button>
+    <button class="filter-btn" bindtap="showFilterPopup">标签筛选</button>
+</view>
+
+    <!-- 卡片独立滚动容器 -->
+    <scroll-view 
+      class="card-scroll"
+      scroll-y="true"
+    >
+      <view class="card-list">
+        <block wx:for="{{filteredList}}" wx:key="id"> 
+          <card-component
+            title="{{item.title}}"
+            time="{{item.time}}"
+            tags="{{item.tags}}"
+            desc="{{item.desc}}"
+            url="{{item.url}}"
+          />
+        </block>
+        <view wx:if="{{filteredList.length === 0}}" class="empty-tip">
+    暂无匹配标签的动态
+  </view>
+      </view>
+    </scroll-view>
+
+<!-- 标签筛选悬浮窗 -->
+<view class="filter-mask" wx:if="{{isFilterShow}}" bindtap="hideFilterPopup"></view>
+<view class="filter-popup" wx:if="{{isFilterShow}}">
+  <!-- 悬浮窗头部 -->
+  <view class="popup-header">
+    <button class="popup-back-btn" bindtap="hideFilterPopup">关闭</button>
+    <view class="popup-title">筛选</view>
+  </view>
+  <!-- 标签容器 -->
+  <scroll-view class="tags-scroll" scroll-y="true">
+    <view class="tags-wrapper">
+      <!-- 标签 -->
+      <view class="tag-group">
+        <view class="group-title">标签</view>
+        <view class="tag-row">
+          <block wx:for="{{contentTags}}" wx:key="index">
+            <view 
+              class="tag-item {{selectedTag === item ? 'tag-selected' : ''}}"
+              bindtap="selectTag"
+              data-tag="{{item}}"
+            >
+              {{item}}
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <!-- 公众号 -->
+      <view class="tag-group">
+        <view class="group-title">公众号</view>
+        <view class="tag-row">
+          <block wx:for="{{officialTags}}" wx:key="index">
+            <view 
+              class="tag-item {{selectedTag === item ? 'tag-selected' : ''}}"
+              bindtap="selectTag"
+              data-tag="{{item}}"
+            >
+              {{item}}
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

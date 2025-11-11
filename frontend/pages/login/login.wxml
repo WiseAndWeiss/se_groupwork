@@ -1,0 +1,80 @@
+<!-- 顶部标题栏 -->
+<view class="header">
+  <view class="title-container">
+    <!-- 图标 -->
+    <image class="app-icon" src="/assets/icon.png" mode="widthFix"></image>
+    <text class="app-name">小助手</text>
+    <text class="app-desc">校内公众号信息整合助手</text>
+  </view>
+</view>
+
+<!-- 登录/注册切换按钮 -->
+<view class="tab-container">
+  <view 
+    class="tab {{isLogin ? 'active' : ''}}" 
+    bindtap="switchToLogin"
+  >
+    登录
+  </view>
+  <view 
+    class="tab {{!isLogin ? 'active' : ''}}" 
+    bindtap="switchToRegister"
+  >
+    注册
+  </view>
+</view>
+
+<!-- 登录表单 -->
+<view class="form-container" wx:if="{{isLogin}}">
+  <view class="input-group">
+    <input 
+      class="input" 
+      type="text" 
+      placeholder="用户名" 
+      value="{{loginData.username}}"
+      bindinput="onLoginUsernameInput"
+    />
+  </view>
+  <view class="input-group">
+    <input 
+      class="input" 
+      type="password" 
+      placeholder="密码" 
+      value="{{loginData.password}}"
+      bindinput="onLoginPasswordInput"
+    />
+  </view>
+  <button class="submit-btn" hover-class="btn-hover" bindtap="handleLogin">登录</button>
+</view>
+
+<!-- 注册表单 -->
+<view class="form-container" wx:if="{{!isLogin}}">
+  <view class="input-group">
+    <input 
+      class="input" 
+      type="text" 
+      placeholder="用户名" 
+      value="{{registerData.username}}"
+      bindinput="onRegisterUsernameInput"
+    />
+  </view>
+  <view class="input-group">
+    <input 
+      class="input" 
+      type="password" 
+      placeholder="输入密码" 
+      value="{{registerData.password}}"
+      bindinput="onRegisterPasswordInput"
+    />
+  </view>
+  <view class="input-group">
+    <input 
+      class="input" 
+      type="password" 
+      placeholder="确认密码" 
+      value="{{registerData.confirmPassword}}"
+      bindinput="onRegisterConfirmPasswordInput"
+    />
+  </view>
+  <button class="submit-btn" hover-class="btn-hover" bindtap="handleRegister">注册并登录</button>
+</view>

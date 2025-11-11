@@ -1,0 +1,109 @@
+/* 页面整体样式 */
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部标题栏 */
+.header {
+  background: linear-gradient(90deg, #7b2ff7 0%, #9c4dff 100%);
+  padding: 120rpx 20rpx 70rpx;
+  text-align: center;
+  color: #fff;
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-name {
+  font-size: 52rpx;
+  font-weight: bold;
+  margin-top: 22rpx;
+}
+
+.app-desc {
+  font-size: 30rpx;
+  opacity: 0.9;
+  margin-top: 22rpx;
+}
+
+.app-icon {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+/* 登录/注册切换按钮 */
+.tab-container {
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 40rpx;
+  margin: 60rpx auto 60rpx;
+  width: 80%;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  background: linear-gradient(90deg, #7b2ff7 0%, #9c4dff 100%);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 表单容器 */
+.form-container {
+  margin: 0 60rpx;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 输入框组 */
+.input-group {
+  width: 100%;
+  margin-bottom: 40rpx;
+}
+
+.input {
+  padding: 26rpx 30rpx;
+  border: none;
+  border-radius: 50rpx;
+  font-size: 30rpx;
+  background-color: #fff;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 提交按钮 */
+.submit-btn {
+  margin-top: 20rpx;
+  background: linear-gradient(90deg, #7b2ff7 0%, #9c4dff 100%);
+  color: #fff;
+  border-radius: 50rpx;
+  padding: 28rpx 60rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  box-shadow: 0 8rpx 20rpx rgba(123, 47, 247, 0.4);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.btn-hover {
+  opacity: 0.8;
+  transform: scale(0.98);
+}

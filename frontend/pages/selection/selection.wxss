@@ -1,0 +1,169 @@
+/* 页面容器 */
+.selection-container {
+    padding-bottom: 120rpx; /* 留出底部导航栏空间 */
+    background-color: #fafafa;
+  }
+  
+  /* 标题栏 */
+  .selection-title {
+    height: 100rpx;
+    line-height: 100rpx;
+    text-align: center;
+    font-size: 32rpx;
+    font-weight: bold;
+    border-bottom: 1rpx solid #eee;
+    background-color: #fff;
+  }
+  
+  /* 排序按钮区域 */
+  .sort-bar {
+    display: flex;
+    padding: 16rpx 20rpx;
+    background-color: #fff;
+    border-bottom: 1rpx solid #eee;
+  }
+  
+  .sort-btn {
+    flex: 1;
+    text-align: center;
+    padding: 12rpx 0;
+    font-size: 26rpx;
+    color: #666;
+    border-radius: 30rpx;
+    margin: 0 8rpx;
+  }
+  
+  /* 选中排序按钮样式（紫色主题） */
+  .sort-btn.active {
+    background-color: #7b2ff7;
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  /* 内容区域通用样式 */
+  .content-section {
+    padding: 20rpx;
+  }
+  
+  /* 搜索框样式（和首页/校内页一致） */
+  .search-box {
+    margin-bottom: 20rpx;
+  }
+  
+  .search-input {
+    width: 100%;
+    height: 72rpx;
+    padding: 0 20rpx;
+    background-color: #fff;
+    border-radius: 36rpx;
+    font-size: 26rpx;
+    color: #333;
+    box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+  }
+  
+  .search-placeholder {
+    color: #999;
+    font-size: 26rpx;
+  }
+  
+  /* 时间排序的卡片列表样式 */
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
+  }
+  
+  /* 空数据提示 */
+  .empty-tip {
+    text-align: center;
+    padding: 80rpx 0;
+    color: #999;
+    font-size: 26rpx;
+  }
+  
+  /* 公众号排序：横向滚动容器 */
+  .official-scroll {
+    width: 100%;
+    white-space: nowrap; /* 禁止换行 */
+    padding-bottom: 16rpx;
+  }
+  
+  /* 公众号列表（横向排列） */
+  .official-list {
+    display: inline-flex;
+    gap: 24rpx;
+  }
+  
+  /* 方案B：原生公众号卡片样式（若无 card-picture 组件时使用） */
+  .official-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 160rpx;
+  }
+  
+  .official-avatar {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 50%; /* 圆形头像 */
+    border: 2rpx solid #eee;
+    object-fit: cover;
+  }
+  
+  .official-name {
+    margin-top: 12rpx;
+    font-size: 24rpx;
+    color: #333;
+    text-align: center;
+    white-space: normal; /* 允许文字换行 */
+    line-height: 1.3;
+    max-width: 100%;
+  }
+  
+  /* 公众号内容提示 */
+  .official-content-tip {
+    margin-top: 20rpx;
+    text-align: center;
+    font-size: 24rpx;
+    color: #999;
+  }
+  
+  /* 12. 底部导航栏：保持原有样式，主题统一 */
+  .tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120rpx;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1rpx solid #eee;
+    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+    z-index: 100;
+  }
+  
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #666;
+    font-size: 26rpx;
+  }
+  
+  .tab-item .menu-icon {
+    width: 40rpx;
+    height: 40rpx;
+    margin-bottom: 6rpx;
+    filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+  }
+  
+  .tab-item.active {
+    color: #7b2ff7;
+    font-weight: bold;
+  }
+  
+  .tab-item.active .menu-icon {
+    filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+  }

@@ -1,0 +1,8 @@
+{
+    "component": true,
+    "usingComponents": {
+      "card-picture": "/components/card-picture/index" 
+    },
+    "navigationStyle": "custom",
+    "renderer": "webview"
+  }

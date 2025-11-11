@@ -1,0 +1,47 @@
+{
+    "pages": [
+      "pages/login/login",
+      "pages/home/home",
+      "pages/selection/selection",
+      "pages/user/user",
+      "pages/campus/campus",
+      "pages/campus-all/campus-all",
+      "pages/add/add"
+    ],
+    "window": {
+      "navigationBarTextStyle": "black",
+      "navigationStyle": "custom"
+    },
+    "tabBar": {
+      "color": "#666",
+      "selectedColor": "#7b2ff7",
+      "backgroundColor": "#fff",
+      "borderStyle": "black",
+      "showIcon": false, 
+      "showText": false, 
+      "list": [
+        {
+          "pagePath": "pages/home/home", 
+          "text": "" 
+        },
+        {
+          "pagePath": "pages/campus/campus",
+          "text": ""
+        },
+        {
+          "pagePath": "pages/selection/selection",
+          "text": ""
+        },
+        {
+          "pagePath": "pages/user/user",
+          "text": ""
+        }
+      ]
+    },
+    "style": "v2",
+    "renderer": "webview",
+    "rendererOptions": {},
+    "componentFramework": "glass-easel",
+    "sitemapLocation": "sitemap.json",
+    "lazyCodeLoading": "requiredComponents"
+  }

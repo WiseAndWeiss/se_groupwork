@@ -1,0 +1,17 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+<!-- 返回上一页按钮 -->
+<view class="back-btn" bindtap="goBack">
+    <text class="back-icon">返回</text>
+  </view>
+  <view class="navbar-title">添加自选</view>
+</view>
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <input 
+        type="text" 
+        placeholder="搜索公众号" 
+        placeholder-class="search-placeholder"
+        class="search-input"
+      />
+    </view>
