@@ -18,21 +18,21 @@
     ],
     "accounts":[
         {
-            "name":"清华职协",
+            "name":"职业发展",
             "icon_url": "https://example.com/icon1.jpg",
             "fakeid": "fakeid1",
             "last_crawl_time": "2023-01-01 00:00:00",
             "created_at": "2023-01-01 00:00:00"
         },
         {
-            "name":"清华教务",
+            "name":"清华大学教务",
             "icon_url": "https://example.com/icon2.jpg",
             "fakeid": "fakeid2",
             "last_crawl_time": "2023-01-01 00:00:00",
             "created_at": "2023-01-01 00:00:00"
         },
         {
-            "name":"清华体育",
+            "name":"清华大学体育",
             "icon_url": "https://example.com/icon3.jpg",
             "fakeid": "fakeid3",
             "last_crawl_time": "2023-01-01 00:00:00",
@@ -1215,15 +1215,15 @@
     "subscriptions": [
         {
             "user": 1,
-            "accounts": [1, 2, 3]
+            "accounts": [1]
         },
         {
             "user": 2,
-            "accounts": [1, 2, 3]
+            "accounts": [1]
         },
         {
             "user": 3,
-            "accounts": [1, 2, 3]
+            "accounts": []
         }
     ],
     "browses": [

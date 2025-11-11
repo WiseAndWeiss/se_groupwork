@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'webspider',
     'user',
     'remoteAI',
-    'articleSelector',
+    'article_selector',
 ]
 
 # 配置Django Rest Framework

@@ -2,8 +2,11 @@ import json
 import numpy as np
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from user.models import User, Subscription
 from webspider.models import PublicAccount, Article
+
 
 TAGS_DICT = {
     "文娱活动":     np.array([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
@@ -75,7 +78,7 @@ class PreferenceManager(models.Manager):
         return preferences
 
 
-    def add_user(self, user):
+    def add_user(self, user, account_preference={}, tag_preference=[0.0625]*16, keyword_preference=[0.01]*100):
         """
         在偏好表中添加用户
         :param user: 用户
@@ -84,8 +87,9 @@ class PreferenceManager(models.Manager):
         try:
             preferences = self.get(user=user)
         except Preference.DoesNotExist:
-            preferences = self.create(user=user, account_preference={}, tag_preference=[0.0625]*16, keyword_preference=[0.01]*100)
+            preferences = self.create(user=user, account_preference=account_preference, tag_preference=tag_preference, keyword_preference=keyword_preference)
         return preferences
+
 
     def add_subscription(self, user, account):
         """
@@ -104,6 +108,7 @@ class PreferenceManager(models.Manager):
         item.save()
         return item
     
+
     def remove_subscription(self, user, account):
         """
         在偏好表中移除用户订阅
@@ -125,7 +130,7 @@ class PreferenceManager(models.Manager):
             item.save()
         return item
 
-    def update_preference(self, user, article, operation):
+    def update_preference_by_article(self, user, article, alpha=0.1):
         """
         根据用户行为更新用户偏好
         :param user: 用户
@@ -133,27 +138,28 @@ class PreferenceManager(models.Manager):
         :param operation: 操作("browse", "favorite")
         :return: 用户偏好
         """
-        radio = 1 if operation == "browse" else 2
         item = self.get_user_preferences(user)
         # 更新公众号偏好
         account_id = str(article.public_account.id)
         if account_id in item.account_preference:
             for id in item.account_preference:
-                item.account_preference[id] *= (1 - (radio * 0.1))
-            item.account_preference[account_id] += (radio * 0.1)
+                item.account_preference[id] *= (1 - alpha)
+            item.account_preference[account_id] += alpha
         else:
-            print("[Error] 未订阅该公众号")
+            # TODO: 日志警告
+            print("Error: account_id not in item.account_preference")
+            pass
         # 更新标签偏好
         tags_vector = np.array(article.tags_vector)
         tag_preference_vector = np.array(item.tag_preference)
         if tags_vector.shape[0] == 16 and tag_preference_vector.shape[0] == 16:
-            tag_preference_vector = (1 - radio * 0.1) * tag_preference_vector + radio * 0.1 * tags_vector
+            tag_preference_vector = (1 - alpha) * tag_preference_vector + alpha * tags_vector
             item.tag_preference = tag_preference_vector.tolist()
         # 更新关键词偏好
         semantic_vector = np.array(article.semantic_vector)
         keyword_preference_vector = np.array(item.keyword_preference)
         if semantic_vector.shape[0] == 100 and keyword_preference_vector.shape[0] == 100:
-            keyword_preference_vector = (1 - radio * 0.1) * keyword_preference_vector + radio * 0.1 * semantic_vector
+            keyword_preference_vector = (1 - alpha) * keyword_preference_vector + alpha* semantic_vector
             item.keyword_preference = keyword_preference_vector.tolist()
         item.save()
         return item

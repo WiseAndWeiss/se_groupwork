@@ -12,8 +12,8 @@ from django.utils import timezone
 
 from webspider.models import Article, PublicAccount
 from user.models import Subscription
-from articleSelector.serializers import ArticleSerializer, ArticlesFilterSerializer
-from articleSelector.articleSelector import *
+from article_selector.serializers import ArticleSerializer, ArticlesFilterSerializer
+from article_selector.article_selector import *
 
 class ArticleViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]

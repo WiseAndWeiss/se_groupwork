@@ -1,8 +1,7 @@
 import numpy as np
-from articleSelector.models import Preference
+from article_selector.models import Preference
 from webspider.models import Article, PublicAccount
 from user.models import User, Subscription
-# 多处定义，请勿修改
 
 def sort_articles_by_preference(user, articles):
     unsorted_articles = []
@@ -20,13 +19,15 @@ def sort_articles_by_preference(user, articles):
 def get_campus_accounts():
     #TODO: 等待公众号数据库完善
     accounts = PublicAccount.objects.filter(
-        name__contains='清华'
+        name__contains='清华大学'
     )
-    accounts = list(accounts)
-    return accounts
+    return list(accounts)
 
 def get_customized_accounts(user):
-    return Subscription.objects.filter(user=user).values_list('public_account', flat=True)
+    accounts = PublicAccount.objects.filter(
+        subscription__user=user
+    )
+    return list(accounts)
 
 
 def get_accounts_by_user(user):
@@ -35,4 +36,5 @@ def get_accounts_by_user(user):
     accounts = customized_accounts + campus_accounts
     accounts = list(set(accounts))
     return accounts
+
 

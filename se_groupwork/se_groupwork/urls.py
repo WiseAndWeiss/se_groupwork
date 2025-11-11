@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 import user.views as user_views
-from articleSelector.views import ArticleViewSet
+from article_selector.views import ArticleViewSet
 
 urlpatterns = [
     # 认证相关
