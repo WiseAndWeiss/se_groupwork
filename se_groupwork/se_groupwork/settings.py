@@ -103,6 +103,10 @@ SPECTACULAR_SETTINGS = {
             'name': '历史记录',
             'description': '用户浏览记录管理'
         },
+        {
+            'name': '文章推送',
+            'description': '按时间、推荐或其他条件获取推文列表'
+        }
     ],
     
     # 其他优化配置
@@ -193,6 +197,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 

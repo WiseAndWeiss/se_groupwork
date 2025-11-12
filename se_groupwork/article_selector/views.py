@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
 
 from datetime import timedelta
 from django.utils import timezone
@@ -15,9 +16,57 @@ from user.models import Subscription
 from article_selector.serializers import ArticleSerializer, ArticlesFilterSerializer
 from article_selector.article_selector import *
 
+response_format = {
+    200: OpenApiResponse(
+        description="成功返回文章列表及是否到达末尾",
+        examples=[
+            OpenApiExample(
+                name="返回文章列表",
+                value={
+                    "articles": [
+                        {
+                            "id": 1,
+                            "title": "测试文章",
+                            "summary": "文章摘要",
+                            "publish_time": "2025-11-12T10:00:00+08:00",
+                            "public_account": {"id": 1, "name": "测试公众号"}
+                        }
+                    ],
+                    "reach_end": False
+                }
+            )
+        ]
+    ),
+    400: OpenApiResponse(description="参数缺失或格式错误"),
+    401: OpenApiResponse(description="未登录或登录失效"),
+    404: OpenApiResponse(description="所查询对象不存在"),
+}
+
+@extend_schema(
+    description="按时间、推荐或其他条件获取推文列表",
+    tags=["文章推送"],
+)
 class ArticleViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
     
+    @extend_schema(
+        summary="获取最新文章列表",
+        description="按发布时间倒序获取用户关联公众号的最新文章，支持分页加载（每次20条）",
+        parameters=[
+            OpenApiParameter(
+                name="start_rank",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="起始偏移量（用于分页，默认0）",
+                required=False,
+                examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+            )
+        ],
+        responses=response_format
+    )
     @action(detail=False, methods=['get'])
     def latest(self, request):
         """
@@ -37,6 +86,11 @@ class ArticleViewSet(viewsets.ViewSet):
             'reach_end': reached_end
         })
     
+    @extend_schema(
+        summary="获取推荐文章列表",
+        description="基于用户偏好推荐3天内的文章，固定返回最多8条",
+        responses=response_format
+    )
     @action(detail=False, methods=['get'])
     def recommended(self, request):
         """
@@ -56,7 +110,22 @@ class ArticleViewSet(viewsets.ViewSet):
             'articles': serializer.data,
             'reach_end': True
         })
-    
+
+    @extend_schema(
+        summary="获取最新校内咨询文章",
+        description="按发布时间倒序获取默认公众号的最新文章，支持分页加载（每次20条）",
+        parameters=[
+            OpenApiParameter(
+                name="start_rank",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="起始偏移量（用于分页，默认0）",
+                required=False,
+                examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+            )
+        ],
+        responses=response_format
+    )
     @action(detail=False, methods=['get'])
     def campus_latest(self, request):
         """
@@ -76,6 +145,21 @@ class ArticleViewSet(viewsets.ViewSet):
             'reach_end': reached_end
         })
     
+    @extend_schema(
+        summary="获取最新自选咨询文章",
+        description="按发布时间倒序获取自选公众号的最新文章，支持分页加载（每次20条）",
+        parameters=[
+            OpenApiParameter(
+                name="start_rank",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="起始偏移量（用于分页，默认0）",
+                required=False,
+                examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+            )
+        ],
+        responses=response_format
+    )
     @action(detail=False, methods=['get'])
     def customized_latest(self, request):
         """
@@ -96,6 +180,29 @@ class ArticleViewSet(viewsets.ViewSet):
             'reach_end': reached_end
         })
     
+    @extend_schema(
+        summary="获取指定公众号的最新文章",
+        description="按发布时间倒序获取单个公众号的文章，支持分页加载（每次20条）",
+        parameters=[
+            OpenApiParameter(
+                name="account_id",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="公众号ID（必填）",
+                required=True,
+                examples=[OpenApiExample(name="account_id", value="123")]
+            ),
+            OpenApiParameter(
+                name="start_rank",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="起始偏移量（用于分页，默认0）",
+                required=False,
+                examples=[OpenApiExample(name="start_rank", value=0)]
+            )
+        ],
+        responses=response_format
+    )
     @action(detail=False, methods=['get'])
     def by_account(self, request):
         """
@@ -121,6 +228,57 @@ class ArticleViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
     
+    @extend_schema(
+        summary="按条件筛选文章",
+        description="支持按公众号、日期范围、标签、内容搜索等条件筛选文章，支持分页加载",
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "accounts_id": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "公众号ID列表（可选，默认使用用户关联的公众号）"
+                    },
+                    "date_from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "开始日期（包含，格式：YYYY-MM-DD，可选）"
+                    },
+                    "date_to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "结束日期（不包含，格式：YYYY-MM-DD，可选）"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "标签列表（可选，匹配包含任一标签的文章）"
+                    },
+                    "search_content": {
+                        "type": "string",
+                        "description": "搜索内容（可选）"
+                    },
+                    "start_rank": {
+                        "type": "integer",
+                        "description": "起始偏移量（默认0）"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "每页条数（默认20）"
+                    }
+                },
+                "examples": [
+                    {
+                        "date_from": "2025-11-01T00:00:00+08:00",
+                        "tags": ["通知", "活动"],
+                        "start_rank": 0
+                    }
+                ]
+            }
+        },
+        responses=response_format
+    )
     @action(detail=False, methods=['post'])
     def filter(self, request):
         """
@@ -163,6 +321,12 @@ class ArticleViewSet(viewsets.ViewSet):
         if search_content:
             # TODO: 实现搜索功能
             pass
+
+        if len(queryset) == 0 or queryset is None:
+            return Response(
+                {'error': '没有找到符合条件的文章'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         start_rank = data.get('start_rank', 0)
         limit = data.get('limit', 21)
