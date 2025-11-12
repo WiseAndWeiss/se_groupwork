@@ -3,7 +3,8 @@ from sklearn.random_projection import GaussianRandomProjection
 import numpy as np
 import json
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+local_model_path = 'remoteAI/all-MiniLM-L6-v2'
+model = SentenceTransformer(local_model_path)
 
 TAGS_DICT = {
     "文娱活动":     np.array([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
@@ -92,6 +93,7 @@ data = [
 
 if __name__ == '__main__':
     # for test
+    print("Already loaded model")
     result = []
     for item in data:
         tags = item['tags'].split(',')
