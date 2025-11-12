@@ -18,11 +18,11 @@ class UserRegistrationAPITests(APITestCase):
     
     def setUp(self):
         """测试前置设置"""
-        self.register_url = reverse('register')
+        self.register_url = reverse('user:register')
         self.valid_data = {
             'username': 'testuser',
-            'password': 'testpass123',
-            'password_confirm': 'testpass123'
+            'password': 'Testpass123!',
+            'password_confirm': 'Testpass123!'
         }
     
     def test_successful_registration_with_username_password_only(self):
@@ -46,13 +46,13 @@ class UserRegistrationAPITests(APITestCase):
         
         # 检查用户是否真的被创建
         user = User.objects.get(username='testuser')
-        self.assertTrue(user.check_password('testpass123'))  # 验证密码是否正确加密
+        self.assertTrue(user.check_password('Testpass123!'))  # 验证密码是否正确加密
     
     def test_registration_fails_with_mismatched_passwords(self):
         """测试密码不匹配时的注册失败"""
         invalid_data = {
             'username': 'testuser2',
-            'password': 'password123',
+            'password': 'Testpass123!d',
             'password_confirm': 'differentpassword'
         }
         response = self.client.post(self.register_url, invalid_data, format='json')
@@ -67,8 +67,8 @@ class UserRegistrationAPITests(APITestCase):
         
         duplicate_data = {
             'username': 'existinguser',  # 重复的用户名
-            'password': 'newpassword',
-            'password_confirm': 'newpassword'
+            'password': 'Testpass123!',
+            'password_confirm': 'Testpass123!'
         }
         response = self.client.post(self.register_url, duplicate_data, format='json')
         
@@ -79,8 +79,8 @@ class UserRegistrationAPITests(APITestCase):
     def test_registration_fails_with_missing_username(self):
         """测试缺少用户名时的注册失败"""
         missing_username_data = {
-            'password': 'password123',
-            'password_confirm': 'password123'
+            'password': 'Testpass123!',
+            'password_confirm': 'Testpass123!'
             # 缺少username字段
         }
         response = self.client.post(self.register_url, missing_username_data, format='json')
@@ -104,8 +104,8 @@ class UserRegistrationAPITests(APITestCase):
         """测试密码过短时的注册失败"""
         short_password_data = {
             'username': 'testuser4',
-            'password': '123',  # 过短的密码
-            'password_confirm': '123'
+            'password': '123!Ts',  # 过短的密码
+            'password_confirm': '123!Ts'
         }
         response = self.client.post(self.register_url, short_password_data, format='json')
         
@@ -152,18 +152,18 @@ class UserRegistrationAPITests(APITestCase):
         users_data = [
             {
                 'username': 'user1',
-                'password': 'pass1',
-                'password_confirm': 'pass1'
+                'password': 'pass11Word!',
+                'password_confirm': 'pass11Word!'
             },
             {
                 'username': 'user2', 
-                'password': 'pass2',
-                'password_confirm': 'pass2'
+                'password': 'pass21Word!',
+                'password_confirm': 'pass21Word!'
             },
             {
                 'username': 'user3',
-                'password': 'pass3',
-                'password_confirm': 'pass3'
+                'password': 'pass31Word!',
+                'password_confirm': 'pass31Word!'
             }
         ]
         
@@ -181,7 +181,7 @@ class UserRegistrationEdgeCaseTests(APITestCase):
     """边界情况测试"""
     
     def setUp(self):
-        self.register_url = reverse('register')
+        self.register_url = reverse('user:register')
     
     def test_registration_with_max_length_username(self):
         """测试使用最大长度的用户名"""
@@ -190,8 +190,8 @@ class UserRegistrationEdgeCaseTests(APITestCase):
         
         data = {
             'username': long_username,
-            'password': 'password123',
-            'password_confirm': 'password123'
+            'password': 'password123T!',
+            'password_confirm': 'password123T!'
         }
         response = self.client.post(self.register_url, data, format='json')
         
@@ -205,8 +205,8 @@ class UserRegistrationEdgeCaseTests(APITestCase):
         
         data = {
             'username': special_username,
-            'password': 'password123',
-            'password_confirm': 'password123'
+            'password': 'password123T!',
+            'password_confirm': 'password123T!'
         }
         response = self.client.post(self.register_url, data, format='json')
         
