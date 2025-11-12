@@ -20,14 +20,14 @@ class SubscriptionTests(TestCase):
 
     def test_create_subscription(self):
         """测试创建订阅"""
-        url = reverse('subscription-list')
+        url = reverse('user:subscription-list')
         data = {'public_account_id': self.public_account.id}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_duplicate_subscription(self):
         """测试重复订阅"""
-        url = reverse('subscription-list')
+        url = reverse('user:subscription-list')
         data = {'public_account_id': self.public_account.id}
         
         # 第一次订阅
@@ -38,7 +38,7 @@ class SubscriptionTests(TestCase):
 
     def test_get_subscriptions(self):
         """测试获取订阅列表"""
-        url = reverse('subscription-list')
+        url = reverse('user:subscription-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -51,6 +51,6 @@ class SubscriptionTests(TestCase):
             public_account=self.public_account
         )
         
-        url = reverse('subscription-detail', kwargs={'pk': subscription.id})
+        url = reverse('user:subscription-detail', kwargs={'pk': subscription.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
