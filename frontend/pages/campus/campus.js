@@ -112,7 +112,7 @@ Component({
 
     goToAlllist() {
       wx.showToast({ title: '校内公众号一览', icon: 'none' });
-      wx.navigateTo({ url: '/pages/campus-all/campus-all' });
+      wx.switchTab({ url: '/pages/campus-all/campus-all' });
     },
 
         // 跳转到首页（Tab 切换）

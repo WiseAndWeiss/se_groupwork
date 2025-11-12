@@ -1,19 +1,33 @@
 <view class="card">
-  <!-- 文章标题 -->
-  <text class="title">{{title}}</text>
-   
-   <!-- 文章时间 -->
-   <view class="time">{{time}}</view>
+  <view class="header">
+    <!-- 标题：展开时去掉截断 -->
+    <text class="title {{isExpanded ? 'expanded' : ''}}">{{title}}</text>
 
-<!-- 文章标签 -->
-<view class="tags">
-  <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
-</view>
+    <view class="icon-group">
+      <!-- 收藏：用不同 svg 切换（outline / filled） -->
+      <image class="icon icon-star"
+             src="{{isFavourite ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}"
+             bindtap="onFavourite" mode="widthFix" />
 
-  <!-- 收藏和展开按钮 -->
-  <view class="buttons">
-    <button bindtap="onFavorite">收藏</button>
-    <button bindtap="onExpand">展开</button>
+      <!-- 展开箭头：用两张 svg 切换 -->
+      <image class="icon icon-arrow"
+             src="{{isExpanded ? '/assets/icons/arrow-up.svg' : '/assets/icons/arrow-down.svg'}}"
+             bindtap="onExpand" mode="widthFix" />
+
+    </view>
+  </view>
+
+  <view class="bottom-row">
+    <!-- 左边标签 -->
+    <view class="tags">
+      <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
+    </view>
+
+    <!-- 右边作者和时间 -->
+    <view class="footer">
+      <text class="author">{{author}}</text>
+      <text class="time">{{time}}</text>
+    </view>
   </view>
 
   <!-- 悬浮窗显示更多内容 -->

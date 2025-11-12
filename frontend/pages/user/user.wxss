@@ -104,6 +104,7 @@ page {
 .menu-text {
   font-size: 32rpx;
   color: #333;
+  margin-bottom: 1rpx;
 }
 
 .menu-arrow {

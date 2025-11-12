@@ -1,47 +1,52 @@
-/* 1. 页面基础样式：重置默认边距+占满屏幕 */
+/* 页面整体布局 */
 page {
-    overflow: hidden;
-    height: 100vh;
-    background-color: #fafafa;
-    margin: 0;
-    padding: 0;
-  }
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 自定义导航栏 */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+/* 导航标题 */
+.navbar-title {
+  font-size: 35rpx;
+}
   
-  /* 2. 页面容器：承载所有内容，避开底部tab栏 */
-  .home-container {
+/* 2. 页面容器：承载所有内容，避开底部tab栏 */
+.home-container {
     position: relative;
     width: 100%;
     height: calc(100vh - 120rpx); /* 减去底部tab栏高度（120rpx） */
-  }
+  }  
   
-  /* 3. 自定义导航栏：白色背景+轻微阴影，增强层次 */
-  .custom-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100rpx;
-    line-height: 100rpx;
-    text-align: center;
-    font-size: 36rpx;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 1rpx solid #eee;
-    background-color: #fff;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03); /* 轻微阴影，不生硬 */
-    z-index: 99; /* 层级高于轮播图，低于底部tab */
-  }
   
   /* 4. 轮播图区域：固定定位，不随页面滚动 */
   .banner-section {
     position: fixed;
-    top: 100rpx; /* 紧贴导航栏底部 */
-    left: 0;
-    right: 0;
-    width: 100%;
+    top: 170rpx; /* 紧贴导航栏底部 */
+    width: calc(100vw - 60rpx);
     height: 340rpx; /* 优化高度，适配更多屏幕 */
     z-index: 10;
     overflow: hidden; /* 防止图片溢出 */
+    padding: 30rpx;
+    border-radius: 20rpx;
   }
   
   /* 5. 原生swiper容器：填满轮播图区域 */
@@ -64,12 +69,13 @@ page {
     height: 100%;
     object-fit: cover; /* 保持比例，填满容器 */
     display: block; /* 解决底部间隙问题 */
+    border-radius: 20rpx;
   }
   
   /* 8. 卡片区域：在轮播图下方，独立滚动 */
   .card-area {
     position: absolute;
-    top: calc(100rpx + 340rpx); /* 导航栏高度 + 轮播图高度 */
+    top: calc(170rpx + 375rpx); /* 导航栏高度 + 轮播图高度 */
     left: 0;
     right: 0;
     width: 100%;
@@ -80,28 +86,27 @@ page {
   /* 9. 最新消息标题：和卡片对齐，风格统一 */
   .latest-news-title {
     width: 100%;
-    margin: 20rpx 0 16rpx; /* 优化上下间距 */
+    margin: 20rpx 10rpx 30rpx; /* 优化上下间距 */
     font-size: 32rpx;
     font-weight: 600;
     color: #333;
-    padding-left: 8rpx;
+    padding-left: 10rpx;
     border-left: 4rpx solid #7b2ff7; /* 主题紫色竖线 */
   }
   
   /* 10. 卡片滚动容器：独立滚动，高度自适应 */
   .card-scroll {
     width: 100%;
-    height: calc(100vh - 100rpx - 340rpx - 120rpx - 60rpx); /* 动态计算，不超出屏幕 */
-    background-color: #fafafa;
+    height: calc(100vh - 100rpx - 340rpx - 120rpx - 80rpx); /* 动态计算，不超出屏幕 */
   }
   
   /* 11. 卡片列表：间距宽松，避免拥挤 */
   .card-list {
-    width: 100%;
+    width: calc(100% - 24rpx);
     display: flex;
     flex-direction: column;
     gap: 20rpx; /* 优化卡片间距 */
-    padding-bottom: 30rpx; /* 底部留白，避免最后一张卡片被遮挡 */
+    padding: 0 10rpx;
   }
   
   /* 12. 底部导航栏：保持原有样式，主题统一 */
@@ -142,6 +147,6 @@ page {
   
   .tab-item.active .menu-icon {
     filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
-  }
+  }  
 
   

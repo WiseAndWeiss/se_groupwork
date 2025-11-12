@@ -38,7 +38,7 @@
   <view class="card-area">
     <!-- 最新消息标题 -->
     <view class="latest-news-title">
-      <text>最新消息</text>
+      <text>猜你喜欢</text>
     </view>
 
     <!-- 卡片独立滚动容器 -->
@@ -50,6 +50,7 @@
         <block wx:for="{{selectionList}}" wx:key="id"> 
           <card-component
             title="{{item.title}}"
+            author="{{item.author}}"
             time="{{item.time}}"
             tags="{{item.tags}}"
             desc="{{item.desc}}"

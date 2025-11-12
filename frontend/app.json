@@ -35,6 +35,10 @@
         {
           "pagePath": "pages/user/user",
           "text": ""
+        },
+        {
+          "pagePath": "pages/campus-all/campus-all",
+          "text": ""
         }
       ]
     },

@@ -20,21 +20,26 @@ Component({
       },
 
       goBack() {
-        wx.navigateBack({
-          delta: 1 // 返回1级页面栈
-        });
+        wx.showToast({ title: '跳转到校内页面', icon: 'none' });
+        wx.switchTab({ url: '/pages/campus/campus' }); // 替换为 switchTab
       },
   
-      // 底部导航跳转方法（和校内页面一致）
+      // 跳转到首页（Tab 切换）
       goToHome() {
-        wx.redirectTo({ 
-            url: '/pages/home/home' });
+        wx.showToast({ title: '跳转到首页页面', icon: 'none' });
+        wx.switchTab({ url: '/pages/home/home' }); // 替换为 switchTab
       },
+      
+      // 跳转到自选页面（Tab 切换）
       goToSelection() {
-        wx.redirectTo({ url: '/pages/selection/selection' });
+        wx.showToast({ title: '跳转到自选页面', icon: 'none' });
+        wx.switchTab({ url: '/pages/selection/selection' }); // 替换为 switchTab
       },
+      
+      // 跳转到我的页面（Tab 切换）
       goToUser() {
-        wx.redirectTo({ url: '/pages/user/user' });
+        wx.showToast({ title: '跳转到我的页面', icon: 'none' });
+        wx.switchTab({ url: '/pages/user/user' }); // 替换为 switchTab
       }
     }
   });

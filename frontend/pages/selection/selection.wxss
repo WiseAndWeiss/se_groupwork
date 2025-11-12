@@ -1,24 +1,43 @@
-/* 页面容器 */
-.selection-container {
-    padding-bottom: 120rpx; /* 留出底部导航栏空间 */
-    background-color: #fafafa;
-  }
-  
-  /* 标题栏 */
-  .selection-title {
-    height: 100rpx;
-    line-height: 100rpx;
-    text-align: center;
-    font-size: 32rpx;
-    font-weight: bold;
-    border-bottom: 1rpx solid #eee;
-    background-color: #fff;
-  }
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+.navbar-title {
+  font-size: 35rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.add-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+}
   
   /* 排序按钮区域 */
   .sort-bar {
     display: flex;
-    padding: 16rpx 20rpx;
+    padding: 190rpx 20rpx 20rpx;
     background-color: #fff;
     border-bottom: 1rpx solid #eee;
   }
@@ -28,6 +47,7 @@
     text-align: center;
     padding: 12rpx 0;
     font-size: 26rpx;
+    font-weight: 600;
     color: #666;
     border-radius: 30rpx;
     margin: 0 8rpx;
@@ -37,98 +57,86 @@
   .sort-btn.active {
     background-color: #7b2ff7;
     color: #fff;
-    font-weight: 500;
+    font-weight: 600;
   }
   
-  /* 内容区域通用样式 */
-  .content-section {
-    padding: 20rpx;
-  }
+  /* 搜索栏整体 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 92%;
+  margin: 20rpx auto 20rpx;
+  gap: 16rpx;
+}
+
+/* 输入框 */
+.search-box {
+  flex: 1;
+}
+.search-inner {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 2rpx solid #7b2ff7;
+  border-radius: 50rpx;
+  height: 70rpx;
+  padding: 0 24rpx;
+}
+.search-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 14rpx;
+}
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+  border: none;
+  background: transparent;
+}
+.search-placeholder {
+  color: #aaa;
+}
   
-  /* 搜索框样式（和首页/校内页一致） */
-  .search-box {
-    margin-bottom: 20rpx;
-  }
+/* 卡片列表 */
+.card-scroll {
+  flex: 1;
+  margin-top: 20rpx;
+}
+.card-list {
+  width: 90%;
+  margin: 0 auto 140rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.empty-tip {
+  text-align: center;
+  color: #aaa;
+  font-size: 26rpx;
+  padding: 80rpx 0;
+}
   
-  .search-input {
-    width: 100%;
-    height: 72rpx;
-    padding: 0 20rpx;
-    background-color: #fff;
-    border-radius: 36rpx;
-    font-size: 26rpx;
-    color: #333;
-    box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
-  }
+/* 公众号列表布局 */
+.official-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 30rpx 30rpx 160rpx 0; /* 顶部和底部空出导航栏 */
+  box-sizing: border-box;
+  background-color: #f7f7f7;
+}
+
+/* 确保 card-picture 组件宽度适合三列布局 */
+.official-list card-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+  margin-left: 30rpx;
+}
   
-  .search-placeholder {
-    color: #999;
-    font-size: 26rpx;
-  }
-  
-  /* 时间排序的卡片列表样式 */
-  .card-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16rpx;
-  }
-  
-  /* 空数据提示 */
-  .empty-tip {
-    text-align: center;
-    padding: 80rpx 0;
-    color: #999;
-    font-size: 26rpx;
-  }
-  
-  /* 公众号排序：横向滚动容器 */
-  .official-scroll {
-    width: 100%;
-    white-space: nowrap; /* 禁止换行 */
-    padding-bottom: 16rpx;
-  }
-  
-  /* 公众号列表（横向排列） */
-  .official-list {
-    display: inline-flex;
-    gap: 24rpx;
-  }
-  
-  /* 方案B：原生公众号卡片样式（若无 card-picture 组件时使用） */
-  .official-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 160rpx;
-  }
-  
-  .official-avatar {
-    width: 120rpx;
-    height: 120rpx;
-    border-radius: 50%; /* 圆形头像 */
-    border: 2rpx solid #eee;
-    object-fit: cover;
-  }
-  
-  .official-name {
-    margin-top: 12rpx;
-    font-size: 24rpx;
-    color: #333;
-    text-align: center;
-    white-space: normal; /* 允许文字换行 */
-    line-height: 1.3;
-    max-width: 100%;
-  }
-  
-  /* 公众号内容提示 */
-  .official-content-tip {
-    margin-top: 20rpx;
-    text-align: center;
-    font-size: 24rpx;
-    color: #999;
-  }
-  
-  /* 12. 底部导航栏：保持原有样式，主题统一 */
+
   .tab-bar {
     position: fixed;
     bottom: 0;

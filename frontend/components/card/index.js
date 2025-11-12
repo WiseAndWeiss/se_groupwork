@@ -4,6 +4,7 @@ Component({
       },
     properties: {
       title: String,   // 文章标题
+      author: String,  // 文章作者
       time: String,    // 文章时间
       tags: Array,     // 文章标签
       desc: String,    // 文章描述
@@ -11,13 +12,13 @@ Component({
     },
     data: {
       isExpanded: false,  // 控制悬浮窗的展开和收起
+      isFavourite: false,
     },
     methods: {
       // 收藏按钮的处理函数
-      onFavorite: function () {
-        wx.showToast({
-          title: '已收藏',
-          icon: 'success',
+      onFavourite: function () {
+        this.setData({
+          isFavourite: !this.data.isFavourite,
         });
       },
   

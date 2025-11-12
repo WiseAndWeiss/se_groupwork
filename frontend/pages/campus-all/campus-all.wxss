@@ -1,42 +1,93 @@
-/* 底部导航栏 */
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+.navbar-title {
+  font-size: 35rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.return-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+}
+
+/* 公众号列表布局 */
+.official-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 200rpx 30rpx 160rpx 0; /* 顶部和底部空出导航栏 */
+  box-sizing: border-box;
+  background-color: #f7f7f7;
+}
+
+/* 确保 card-picture 组件宽度适合三列布局 */
+.official-list card-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+  margin-left: 30rpx;
+}
+
 .tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 120rpx;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1rpx solid #eee;
-    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-    z-index: 100;
-  }
-  
-  .tab-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #666;
-    font-size: 26rpx;
-  }
-  
-  /* 底部导航图标样式 */
-  .tab-item .menu-icon {
-    width: 40rpx;
-    height: 40rpx;
-    margin-bottom: 6rpx;
-    filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
-    /* 默认灰色 */
-  }
-  
-  /* 选中态图标改为紫色 */
-  .tab-item.active {
-    color: #7b2ff7;
-    font-weight: bold;
-  }
-  
-  .tab-item.active .menu-icon {
-    filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
-  }
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1rpx solid #eee;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.tab-item .menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 6rpx;
+  filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+}
+
+.tab-item.active {
+  color: #7b2ff7;
+  font-weight: bold;
+}
+
+.tab-item.active .menu-icon {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+}  

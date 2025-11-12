@@ -1,111 +1,113 @@
-/* card-component.wxss （组件自身的样式文件）*/
 .card {
-    background-color: #fff;
-    border-radius: 20rpx;
-    padding: 24rpx;
-    margin-bottom: 16rpx;
-    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .card:active {
-    transform: translateY(-2rpx);
-    box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
-  }
-  
-  .title {
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #333;
-    line-height: 1.4;
-    margin-bottom: 12rpx;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .time {
-    font-size: 22rpx;
-    color: #999;
-    margin-bottom: 16rpx;
-    display: inline-block;
-  }
-  
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12rpx;
-    margin-bottom: 20rpx;
-    max-width: 100%;
-  }
-  
-  .tag {
-    font-size: 22rpx;
-    color: #7b2ff7;
-    background-color: rgba(123, 47, 247, 0.08);
-    padding: 6rpx 16rpx;
-    border-radius: 30rpx;
-    white-space: nowrap;
-  }
-  
-  .buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12rpx;
-    margin-top: 8rpx;
-  }
-  
-  .buttons button {
-    padding: 8rpx 24rpx;
-    font-size: 24rpx;
-    border-radius: 30rpx;
-    line-height: 1.2;
-    height: auto;
-  }
-  
-  .buttons button:first-child {
-    background-color: transparent;
-    color: #7b2ff7;
-    border: 2rpx solid #7b2ff7;
-  }
-  
-  .buttons button:last-child {
-    background-color: #7b2ff7;
-    color: #fff;
-    border: none;
-  }
-  
-  .buttons button:active {
-    opacity: 0.9;
-    transform: scale(0.96);
-  }
-  
-  .floating-window {
-    background-color: #fff;
-    border-radius: 16rpx;
-    padding: 24rpx;
-    margin-top: 16rpx;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-    border-top: 1rpx solid #f5f5f5;
-  }
-  
-  .desc {
-    font-size: 24rpx;
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 16rpx;
-    white-space: pre-line;
-  }
-  
-  .floating-window a {
-    font-size: 24rpx;
-    color: #7b2ff7;
-    text-decoration: underline;
-    text-underline-offset: 4rpx;
-  }
-  
-  .floating-window a:active {
-    color: #6219e0;
-  }
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 头部布局 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+/* 标题：默认截断 1 行 */
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+  flex: 1;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 展开后去掉截断（关键） */
+.title.expanded {
+  display: block;            /* 覆盖 -webkit-box */
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  overflow: visible;
+  white-space: normal;
+}
+
+/* 图标组 */
+.icon-group {
+  display: flex;
+  gap: 18rpx;
+  margin-left: 20rpx;
+  align-items: center;
+}
+
+/* svg 图标尺寸 */
+.icon {
+  width: 44rpx;
+  height: 44rpx;
+  display: block;
+}
+
+/* 整体布局：标签在左，footer 在右 */
+.bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+/* 标签容器：左对齐，换行显示 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  max-width: 65%; /* 限制宽度，防止挤到右边 */
+}
+
+/* 单个标签 */
+.tag {
+  font-size: 22rpx;
+  color: #7b2ff7;
+  background-color: rgba(123, 47, 247, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: 30rpx;
+  white-space: nowrap;
+}
+
+/* footer 区域在右边 */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* 展开内容的浮层 */
+.floating-window {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+  white-space: pre-line;
+}
+
+a {
+  font-size: 24rpx;
+  color: #7b2ff7;
+  text-decoration: underline;
+  text-underline-offset: 4rpx;
+}
