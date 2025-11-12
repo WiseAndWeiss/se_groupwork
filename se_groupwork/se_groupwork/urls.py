@@ -17,27 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 import user.views as user_views
 from article_selector.views import ArticleViewSet
 
 urlpatterns = [
-    # 认证相关
-    path('api/auth/register/', user_views.RegisterView.as_view(), name='register'),
-    path('api/auth/login/', user_views.LoginView.as_view(), name='login'),
-    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/auth/profile/', user_views.ProfileView.as_view(), name='profile'),
-    
-    # 订阅相关 - RESTful风格
-    path('api/subscriptions/', user_views.SubscriptionListView.as_view(), name='subscription-list'),
-    path('api/subscriptions/<int:pk>/', user_views.SubscriptionDetailView.as_view(), name='subscription-detail'),
-    
-    # 收藏相关 - RESTful风格
-    path('api/favorites/', user_views.FavoriteListView.as_view(), name='favorite-list'),
-    path('api/favorites/<int:pk>/', user_views.FavoriteDetailView.as_view(), name='favorite-detail'),
-    
-    # 历史记录相关 - RESTful风格
-    path('api/history/', user_views.HistoryListView.as_view(), name='history-list'),
-    path('api/history/<int:pk>/', user_views.HistoryDetailView.as_view(), name='history-detail'),
+    path('admin/', admin.site.urls),
+    # 用户管理API
+    path('api/user/', include('user.urls')),
 
     # 修改个人资料相关
     path('api/auth/update/username/', user_views.UsernameUpdateView.as_view(), name='update-username'),
@@ -53,4 +40,9 @@ urlpatterns = [
 	path('api/articles/customized-latest/', ArticleViewSet.as_view({'get': 'customized_latest'}), name='articles-customized-latest'),
 	path('api/articles/by-account/', ArticleViewSet.as_view({'get': 'by_account'}), name='articles-by-account'),
     path('api/articles/filter/', ArticleViewSet.as_view({'post': 'filter'}), name='articles-filter'),
+	
+    # API文档
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
