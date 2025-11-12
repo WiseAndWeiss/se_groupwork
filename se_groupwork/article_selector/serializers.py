@@ -10,6 +10,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'title',
             'account_name',
             'article_url',
+            'publish_time',
+            'cover_url',
             'summary',
             'tags',
             'key_info'
@@ -22,6 +24,6 @@ class ArticlesFilterSerializer(serializers.Serializer):
     # 可以根据需要添加更多筛选字段
     accounts_id = serializers.ListField(child=serializers.IntegerField(), required=False)
     tags = serializers.ListField(child=serializers.CharField(), required=False)
-    date_from = serializers.DateField(required=False)
-    date_to = serializers.DateField(required=False)
+    date_from = serializers.DateField(required=False, format="%Y-%m-%dT%H:%M:%S.%f%z")
+    date_to = serializers.DateField(required=False, format="%Y-%m-%dT%H:%M:%S.%f%z")
     search_content = serializers.CharField(required=False)

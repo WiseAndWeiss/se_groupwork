@@ -28,8 +28,7 @@ class ArticleViewSet(viewsets.ViewSet):
         related_accounts = get_accounts_by_user(request.user)
         all_articles = Article.objects.filter(
             public_account__in = related_accounts,
-            summary__ne = ''
-        ).order_by('-publish_date')[start_rank:start_rank+21]
+        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(all_articles) < 21
         all_articles = all_articles[:20]
         serializer = ArticleSerializer(all_articles, many=True)
@@ -49,9 +48,8 @@ class ArticleViewSet(viewsets.ViewSet):
         related_accounts = get_accounts_by_user(request.user)
         recent_articles = Article.objects.filter(
             public_account__in=related_accounts,
-            summary__ne = '',
             publish_time__gte=timezone.now() - timedelta(days=3)
-        )
+        ).exclude(summary='')
         recommended_articles = sort_articles_by_preference(request.user, recent_articles)[:8]
         serializer = ArticleSerializer(recommended_articles, many=True)
         return Response({
@@ -68,9 +66,8 @@ class ArticleViewSet(viewsets.ViewSet):
         start_rank = int(request.query_params.get('start_rank', 0))
         campus_accounts = get_campus_accounts()
         campus_articles = Article.objects.filter(
-            public_account__in=campus_accounts,
-            summary__ne = ''
-        ).order_by('-publish_date')[start_rank:start_rank+21]
+            public_account__in=campus_accounts
+        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(campus_articles) < 21
         campus_articles = campus_articles[:20]
         serializer = ArticleSerializer(campus_articles, many=True)
@@ -89,9 +86,8 @@ class ArticleViewSet(viewsets.ViewSet):
         # 根据用户的自选偏好获取文章
         customized_accounts = get_customized_accounts(request.user)
         customized_articles = Article.objects.filter(
-            public_account__in=customized_accounts,
-            summary__ne = ''
-        ).order_by('-publish_date')[start_rank:start_rank+21]
+            public_account__in=customized_accounts
+        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(customized_articles) < 21
         customized_articles = customized_articles[:20]
         serializer = ArticleSerializer(customized_articles, many=True)
@@ -111,8 +107,7 @@ class ArticleViewSet(viewsets.ViewSet):
         try:
             account_articles = Article.objects.filter(
                 public_account_id=account_id,
-                summary__ne = ''
-            ).order_by('-publish_date')[start_rank:start_rank+21]
+            ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
             reached_end = len(account_articles) < 21
             account_articles = account_articles[:20]
             serializer = ArticleSerializer(account_articles, many=True)
@@ -127,7 +122,7 @@ class ArticleViewSet(viewsets.ViewSet):
             )
     
     @action(detail=False, methods=['post'])
-    def filtered(self, request):
+    def filter(self, request):
         """
         指定筛选条件获取文章列表
         POST /api/articles/filtered/
@@ -148,15 +143,14 @@ class ArticleViewSet(viewsets.ViewSet):
             account_list = get_accounts_by_user(request.user)
         queryset = Article.objects.filter(
             public_account__in=account_list,
-            summary__ne = ''
-        )
+        ).exclude(summary='')
         
         date_from = data.get('date_from')
         if date_from:
-            queryset = queryset.filter(publish_date__gte=date_from)
+            queryset = queryset.filter(publish_time__gte=date_from)
         date_to = data.get('date_to')
         if date_to:
-            queryset = queryset.filter(publish_date__lte=date_to)
+            queryset = queryset.filter(publish_time__lt=date_to)
         
         tags = data.get('tags')
         if tags:
@@ -172,7 +166,7 @@ class ArticleViewSet(viewsets.ViewSet):
 
         start_rank = data.get('start_rank', 0)
         limit = data.get('limit', 21)
-        queryset = queryset.order_by('-publish_date')[start_rank:start_rank+limit+1]
+        queryset = queryset.order_by('-publish_time')[start_rank:start_rank+limit+1]
 
         reached_end = len(queryset) < limit
         queryset = queryset[:limit]
