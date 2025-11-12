@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_extensions",
+    'rest_framework',
+    'rest_framework.authtoken', 
+    'drf_spectacular',
     'webspider',
     'user',
-    'rest_framework',
-    'drf_spectacular',
     'remoteAI',
-    'articleSelector',
+    'article_selector',
 ]
 
 # 配置Django Rest Framework
@@ -101,6 +103,10 @@ SPECTACULAR_SETTINGS = {
             'name': '历史记录',
             'description': '用户浏览记录管理'
         },
+        {
+            'name': '文章推送',
+            'description': '按时间、推荐或其他条件获取推文列表'
+        }
     ],
     
     # 其他优化配置
@@ -182,6 +188,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 
 # Internationalization
