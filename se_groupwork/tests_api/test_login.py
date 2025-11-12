@@ -9,14 +9,14 @@ class AuthenticationTests(TestCase):
         self.client = APIClient()
         self.user_data = {
             'username': 'testuser',
-            'password': 'testpass123T!',
-            'password_confirm': 'testpass123T!',
+            'password': 'testpass123',
+            'password_confirm': 'testpass123',
             'email': 'test@example.com'
         }
 
     def test_user_registration_success(self):
         """测试用户注册成功"""
-        url = reverse('user:register')
+        url = reverse('register')
         response = self.client.post(url, self.user_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue('access' in response.data)
@@ -26,22 +26,22 @@ class AuthenticationTests(TestCase):
         """测试密码不匹配"""
         data = self.user_data.copy()
         data['password_confirm'] = 'wrongpassword'
-        url = reverse('user:register')
+        url = reverse('register')
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_login_success(self):
         """测试用户登录成功"""
-        User.objects.create_user(username='testuser', password='testpass123T!')
-        url = reverse('user:login')
-        data = {'username': 'testuser', 'password': 'testpass123T!'}
+        User.objects.create_user(username='testuser', password='testpass123')
+        url = reverse('login')
+        data = {'username': 'testuser', 'password': 'testpass123'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue('access' in response.data)
 
     def test_user_login_invalid_credentials(self):
         """测试无效登录凭证"""
-        url = reverse('user:login')
+        url = reverse('login')
         data = {'username': 'wronguser', 'password': 'wrongpass'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

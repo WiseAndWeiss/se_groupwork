@@ -29,14 +29,14 @@ class HistoryTests(TestCase):
 
     def test_create_history(self):
         """测试创建历史记录"""
-        url = reverse('user:history-list')
+        url = reverse('history-list')
         data = {'article_id': self.article.id}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_history(self):
         """测试更新历史记录"""
-        url = reverse('user:history-list')
+        url = reverse('history-list')
         data = {'article_id': self.article.id}
         
         # 第一次创建
@@ -47,12 +47,12 @@ class HistoryTests(TestCase):
 
     def test_get_history(self):
         """测试获取历史记录列表"""
-        url = reverse('user:history-list')
+        url = reverse('history-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_clear_history(self):
         """测试清空历史记录"""
-        url = reverse('user:history-list')
+        url = reverse('history-list')
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

@@ -29,26 +29,26 @@ class FavoriteTests(TestCase):
 
     def test_create_favorite(self):
         """测试创建收藏"""
-        url = reverse('user:favorite-list')
+        url = reverse('favorite-list')
         data = {'article_id': self.article.id}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_get_favorites(self):
         """测试获取收藏列表"""
-        url = reverse('user:favorite-list')
+        url = reverse('favorite-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_clear_favorites(self):
         """测试清空收藏"""
-        url = reverse('user:favorite-list')
+        url = reverse('favorite-list')
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_duplicate_favorite(self):
         """测试重复收藏"""
-        url = reverse('user:favorite-list')
+        url = reverse('favorite-list')
         data = {'article_id': self.article.id}
         
         # 第一次收藏
