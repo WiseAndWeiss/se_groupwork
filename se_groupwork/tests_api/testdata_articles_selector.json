@@ -1,0 +1,214 @@
+{
+        "user" : {
+            "username" : "testuser",
+            "password" : "testpassword"
+        },
+        "public_accounts": [
+            {"name": "清华大学1", "fakeid": "T1", "icon_url":"www.yes.com/icon1.jpg"},
+            {"name": "清华大学2", "fakeid": "T2", "icon_url":"www.yes.com/icon2.jpg"},
+            {"name": "自选1", "fakeid": "C1", "icon_url":"www.yes.com/icon3.jpg"},
+            {"name": "自选2", "fakeid": "C2", "icon_url":"www.yes.com/icon4.jpg"}
+        ],
+        "articles":[
+            {
+				"public_account_fakeid": "T1", "title": "行政通知1", "content": "行政通知：关于2022年春季学期选课的通知",
+				"author": "邱宝", "article_url": "1/T1", "cover_url": "www.admin.com/cover1.jpg",
+				"publish_time_delta" : {"days": 2, "hours": 2},
+				"summary": "行政通知：关于2022年春季学期选课的通知", 
+				"tags": "行政通知,教务通知", "key_info": "行政通知,教务通知,选课,2022年春季学期",
+				"tags_vector": "", "semantic_vector": ""
+            },
+            {
+				"public_account_fakeid": "T1", "title": "行政通知2", "content": "行政通知：关于2022年春季学期退补选的通知",
+				"author": "邱宝", "article_url": "2/T1", "cover_url": "www.admin.com/cover2.jpg",
+				"publish_time_delta" : {"days": 1, "hours": 1},
+				"summary": "行政通知：关于2022年春季学期退补选的通知", 
+				"tags": "行政通知,教务通知", "key_info": "行政通知,教务通知,退补选,2022年春季学期",
+				"tags_vector": "", "semantic_vector": ""
+            },
+			{
+				"public_account_fakeid": "T1", "title": "行政通知3", "content": "行政通知：办理退学、休学通道的通知",
+				"author": "邱宝", "article_url": "3/T1", "cover_url": "www.admin.com/cover2.jpg",
+				"publish_time_delta" : {"days": 1, "hours": 2},
+				"summary": "行政通知：办理退学、休学通道的通知", 
+				"tags": "行政通知,教务通知", "key_info": "行政通知,退学,休学,2022年春季学期",
+				"tags_vector": "", "semantic_vector": ""
+            },
+			{
+				"public_account_fakeid": "T1", "title": "行政通知4", "content": "行政通知：关于2022年春季学期期末考试安排的通知",
+				"author": "邱宝", "article_url": "4/T1", "cover_url": "www.admin.com/cover4.jpg",
+				"publish_time_delta": {"days": 2, "hours": 8},
+				"summary": "行政通知：关于2022年春季学期期末考试安排的通知",
+				"tags": "行政通知,教务通知", "key_info": "行政通知,教务通知,期末考试,考场安排",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T1", "title": "行政通知5", "content": "行政通知：2022年劳动节放假安排及注意事项",
+				"author": "邱宝", "article_url": "5/T1", "cover_url": "www.admin.com/cover5.jpg",
+				"publish_time_delta": {"days": 0, "hours": 9},
+				"summary": "行政通知：2022年劳动节放假安排及注意事项",
+				"tags": "行政通知", "key_info": "行政通知,劳动节,放假安排,调课通知,安全提示",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T1", "title": "行政通知6", "content": "行政通知：关于开展2022年春季学期学生体质健康测试的通知",
+				"author": "邱宝", "article_url": "6/T1", "cover_url": "www.admin.com/cover6.jpg",
+				"publish_time_delta": {"days": 0, "hours": 2},
+				"summary": "行政通知：关于开展2022年春季学期学生体质健康测试的通知",
+				"tags": "行政通知,体育通知", "key_info": "行政通知,体质测试,春季学期,测试时间,项目要求",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息1", "content": "校园招聘：XX科技有限公司春季校园招聘公告",
+				"author": "路明", "article_url": "1/T2", "cover_url": "www.job.com/cover1.jpg",
+				"publish_time_delta": {"days": 1, "hours": 5},
+				"summary": "校园招聘：XX科技有限公司春季校园招聘公告",
+				"tags": "就业实习", "key_info": "校招,春季招聘,2022届,技术岗",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息2", "content": "校园招聘：YY金融2022届管培生招聘计划",
+				"author": "路明", "article_url": "2/T2", "cover_url": "www.job.com/cover2.jpg",
+				"publish_time_delta": {"days": 2, "hours": 14},
+				"summary": "校园招聘：YY金融2022届管培生招聘计划，面向经济/金融/数学专业",
+				"tags": "就业实习", "key_info": "校招,管培生,2022届,宣讲会,线下笔试",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息3", "content": "校园招聘：ZZ集团市场营销岗紧急招聘",
+				"author": "路明", "article_url": "3/T2", "cover_url": "www.job.com/cover3.jpg",
+				"publish_time_delta": {"days": 0, "hours": 11},
+				"summary": "校园招聘：ZZ集团市场营销岗紧急招聘，接受应届生投递",
+				"tags": "校招信息,补录,市场营销", "key_info": "校招补录,市场营销,2022届,远程面试",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息4", "content": "校园招聘：WW能源2022届校园招聘（含管培生/技术研发岗）",
+				"author": "路明", "article_url": "4/T2", "cover_url": "www.job.com/cover4.jpg",
+				"publish_time_delta": {"days": 4, "hours": 9},
+				"summary": "校园招聘：WW能源2022届校园招聘，提供落户指标及住房补贴",
+				"tags": "就业实习", "key_info": "央企校招,2022届,技术研发,宣讲会",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息5", "content": "校园招聘：QQ汽车2022届研发类岗位专场",
+				"author": "路明", "article_url": "5/T2", "cover_url": "www.job.com/cover5.jpg",
+				"publish_time_delta": {"days": 3, "hours": 16},
+				"summary": "校园招聘：QQ汽车2022届研发类岗位专场，现场接收简历并初筛",
+				"tags": "就业实习", "key_info": "校招,研发岗,宣讲会,机械自动化",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "T2", "title": "校招信息6", "content": "校园招聘：HH教育集团教师岗招聘公告",
+				"author": "路明", "article_url": "6/T2", "cover_url": "www.job.com/cover6.jpg",
+				"publish_time_delta": {"days": 1, "hours": 7},
+				"summary": "校园招聘：HH教育集团教师岗招聘公告，含中小学各学科",
+				"tags": "就业实习", "key_info": "校招,教师岗,2022届,教师资格证",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动1", "content": "文娱活动：2022年春季校园歌手大赛报名通知",
+				"author": "加七", "article_url": "1/C1", "cover_url": "www.ent.com/cover1.jpg",
+				"publish_time_delta": {"days": 3, "hours": 10},
+				"summary": "文娱活动：2022年春季校园歌手大赛报名启动，不限曲风可组队参赛",
+				"tags": "文娱活动", "key_info": "校园歌手大赛,报名,组队参赛",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动2", "content": "文娱活动：校园戏剧节展演安排及门票领取通知",
+				"author": "加七", "article_url": "2/C1", "cover_url": "www.ent.com/cover2.jpg",
+				"publish_time_delta": {"days": 2, "hours": 16},
+				"summary": "文娱活动：校园戏剧节将于本周末展演，学生可凭学生证免费领票",
+				"tags": "文娱活动", "key_info": "校园戏剧节,展演,门票领取,学生证",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动3", "content": "文娱活动：“春日诗会”主题征文比赛征稿启事",
+				"author": "加七", "article_url": "3/C1", "cover_url": "www.ent.com/cover3.jpg",
+				"publish_time_delta": {"days": 1, "hours": 8},
+				"summary": "文娱活动：“春日诗会”征文比赛征稿，主题围绕春日校园，字数不限",
+				"tags": "文娱活动", "key_info": "春日诗会,征文比赛,征稿",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动4", "content": "文娱活动：校园电影节系列展映之经典影片专场",
+				"author": "加七", "article_url": "4/C1", "cover_url": "www.ent.com/cover4.jpg",
+				"publish_time_delta": {"days": 0, "hours": 14},
+				"summary": "文娱活动：校园电影节经典影片专场今晚开播，地点为学术报告厅",
+				"tags": "文娱活动", "key_info": "校园电影节,经典影片,展映,学术报告厅",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动5", "content": "文娱活动：校园书法绘画展览征集作品通知",
+				"author": "加七", "article_url": "5/C1", "cover_url": "www.ent.com/cover5.jpg",
+				"publish_time_delta": {"days": 4, "hours": 12},
+				"summary": "文娱活动：校园书法绘画展览征集作品，书法、绘画、篆刻类均可投稿",
+				"tags": "文娱活动", "key_info": "书法绘画展览,作品征集,书法,绘画,篆刻",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C1", "title": "文娱活动6", "content": "文娱活动：“校园嘉年华”大型文艺汇演预告",
+				"author": "加七", "article_url": "6/C1", "cover_url": "www.ent.com/cover6.jpg",
+				"publish_time_delta": {"days": 5, "hours": 9},
+				"summary": "文娱活动：“校园嘉年华”文艺汇演下周六举办，含歌舞、小品等多种节目",
+				"tags": "文娱活动", "key_info": "校园嘉年华,文艺汇演,歌舞,小品",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源1", "content": "学习资源：2022年考研数学冲刺复习资料包领取",
+				"author": "Jumping", "article_url": "1/C2", "cover_url": "www.study.com/cover1.jpg",
+				"publish_time_delta": {"days": 3, "hours": 15},
+				"summary": "学习资源：2022年考研数学冲刺复习资料包，含真题解析及模拟题",
+				"tags": "学习资源", "key_info": "考研数学,冲刺复习,资料包",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源2", "content": "学习资源：大学英语四六级高频词汇手册下载",
+				"author": "Jumping", "article_url": "2/C2", "cover_url": "www.study.com/cover2.jpg",
+				"publish_time_delta": {"days": 2, "hours": 7},
+				"summary": "学习资源：大学英语四六级高频词汇手册，附例句及记忆方法",
+				"tags": "学习资源", "key_info": "英语四六级,高频词汇,手册",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源3", "content": "学习资源：专业核心课程线上公开课观看指南",
+				"author": "Jumping", "article_url": "3/C2", "cover_url": "www.study.com/cover3.jpg",
+				"publish_time_delta": {"days": 1, "hours": 11},
+				"summary": "学习资源：各专业核心课程线上公开课汇总，提供观看链接及课程大纲",
+				"tags": "学习资源", "key_info": "核心课程,线上公开课,观看指南",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源4", "content": "学习资源：学术论文写作技巧及参考文献格式指南",
+				"author": "Jumping", "article_url": "4/C2", "cover_url": "www.study.com/cover4.jpg",
+				"publish_time_delta": {"days": 0, "hours": 16},
+				"summary": "学习资源：学术论文写作技巧详解，含参考文献标准格式模板",
+				"tags": "学习资源", "key_info": "学术论文,写作技巧,参考文献,格式模板",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源5", "content": "学习资源：计算机等级考试（二级Python）备考资料",
+				"author": "Jumping", "article_url": "5/C2", "cover_url": "www.study.com/cover5.jpg",
+				"publish_time_delta": {"days": 4, "hours": 8},
+				"summary": "学习资源：计算机二级Python备考资料，含考点梳理及历年真题",
+				"tags": "学习资源", "key_info": "计算机等级考试,二级Python,备考资料,考点梳理",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "学习资源6", "content": "学习资源：跨专业考研专业选择及备考规划讲座回放",
+				"author": "Jumping", "article_url": "6/C2", "cover_url": "www.study.com/cover6.jpg",
+				"publish_time_delta": {"days": 5, "hours": 13},
+				"summary": "学习资源：跨专业考研规划讲座回放，含专业选择建议及备考时间表",
+				"tags": "学习资源", "key_info": "跨专业考研,讲座回放,专业选择,备考规划,时间表",
+				"tags_vector": "", "semantic_vector": ""
+			},
+			{
+				"public_account_fakeid": "C2", "title": "未处理文章1", "content": "xxxxxx",
+				"author": "Jumping", "article_url": "7/C2", "cover_url": "www.study.com/cover6.jpg",
+				"publish_time_delta": {"days": 5, "hours": 13},
+				"summary": "",
+				"tags": "", "key_info": "",
+				"tags_vector": "", "semantic_vector": ""
+			}
+        ]
+    }

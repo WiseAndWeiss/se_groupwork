@@ -52,5 +52,5 @@ urlpatterns = [
 	path('api/articles/campus-latest/', ArticleViewSet.as_view({'get': 'campus_latest'}), name='articles-campus-latest'),
 	path('api/articles/customized-latest/', ArticleViewSet.as_view({'get': 'customized_latest'}), name='articles-customized-latest'),
 	path('api/articles/by-account/', ArticleViewSet.as_view({'get': 'by_account'}), name='articles-by-account'),
-    path('api/articles/filter/', ArticleViewSet.as_view({'get': 'filter'}), name='article-filter'),
+    path('api/articles/filter/', ArticleViewSet.as_view({'post': 'filter'}), name='articles-filter'),
 ]
