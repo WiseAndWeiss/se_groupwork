@@ -119,7 +119,9 @@ SPECTACULAR_SETTINGS = {
     'REDOC_UI_SETTINGS': {
         'hideDownloadButton': False,
         'expandResponses': '200,201',
-    }
+    }, 
+    
+    'SECURITY': [{'bearerAuth': []}],
 }
 
 MIDDLEWARE = [
@@ -192,7 +194,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证优先
+        'rest_framework.authentication.SessionAuthentication',        # Session认证
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

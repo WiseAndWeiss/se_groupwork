@@ -70,7 +70,7 @@ class RegisterView(APIView):
             '登录请求',
             value={
                 'username': 'testuser',
-                'password': 'password123'
+                'password': 'Password123!'
             }
         )
     ]
