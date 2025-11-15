@@ -14,6 +14,7 @@ django.setup()
 
 def main():
     # 步骤1: 通过wxmp_launcher获得登陆的cookies和token
+    
     print("步骤1: 登录微信公众平台获取cookies和token...")
     launcher = WxmpLauncher()
     try:
@@ -40,8 +41,7 @@ def main():
     )
 
     try:
-        mp_json = searcher.get_mp_list(count=5)
-        mp_dict = searcher.process_mp_list(mp_json)
+        mp_dict = searcher.biz_search()
 
         if not mp_dict:
             print("未找到相关公众号，请尝试其他关键词")

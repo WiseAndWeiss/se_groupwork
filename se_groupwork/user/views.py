@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import FavoriteSerializer, HistorySerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
+from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
 from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
@@ -115,7 +115,9 @@ class ProfileView(APIView):
 @extend_schema(
     tags=['订阅管理'],
     methods=['POST'],
+    summary='添加新订阅',
     description='添加新订阅',
+    request=PublicAccountSerializer,
     examples=[
         OpenApiExample(
             '添加订阅',
@@ -126,6 +128,7 @@ class ProfileView(APIView):
 @extend_schema(
     tags=['订阅管理'],
     methods=['DELETE'],
+    summary='清空所有订阅',
     description='清空所有订阅'
 )
 class SubscriptionListView(APIView):
@@ -185,7 +188,9 @@ class SubscriptionDetailView(APIView):
 @extend_schema(
     tags=['收藏管理'],
     methods=['POST'],
+    summary='添加新收藏',
     description='添加新收藏',
+    request=ArticleSerializer,
     examples=[
         OpenApiExample(
             '添加收藏',
@@ -196,6 +201,7 @@ class SubscriptionDetailView(APIView):
 @extend_schema(
     tags=['收藏管理'],
     methods=['DELETE'],
+    summary='清空所有收藏',
     description='清空所有收藏'
 )
 class FavoriteListView(APIView):
@@ -254,7 +260,9 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     methods=['POST'],
+    summary='添加浏览记录',
     description='添加浏览记录',
+    request=ArticleSerializer,
     examples=[
         OpenApiExample(
             '添加记录',
@@ -265,6 +273,7 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     methods=['DELETE'],
+    summary='清空所有历史记录',
     description='清空所有历史记录'
 )
 # 历史记录相关API
@@ -410,7 +419,7 @@ class AvatarUpdateView(APIView):
 
 
 @extend_schema(
-    tags=['用户管理'],
+    tags=['用户资料'],
     summary='修改密码',
     description='修改用户登录密码',
     request=UserPasswordChangeSerializer,

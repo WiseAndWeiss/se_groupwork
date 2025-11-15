@@ -164,13 +164,14 @@ class BizSearcher:
         self.avatar_urls = self.avatar_downloader.download(self.avatar_urls)
         print(mp_dict)
         searcher.save_to_database(mp_dict)
+        return mp_dict
 
 
 # 使用示例
 if __name__ == '__main__':
     # 初始化公众号抓取器
     searcher = BizSearcher(
-        query=""
+        query="清华大学"
     )
     searcher.biz_search()
 

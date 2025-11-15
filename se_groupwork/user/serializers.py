@@ -103,7 +103,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Article  # 关联文章模型
-        fields = '__all__'  # 包含所有字段
+        fields = ['id', 'title', 'author', 'article_url', 'publish_time', 'cover_url', 'summary']   # 包含的字段
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     """订阅关系序列化器
