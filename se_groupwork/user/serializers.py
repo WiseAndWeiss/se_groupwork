@@ -83,7 +83,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User  # 关联用户模型
-        fields = ['id', 'username', 'email', 'avatar', 'bio', 
+        fields = ['id', 'username', 'email', 'phone_number', 'avatar', 'bio', 
                  'subscription_count', 'favorite_count', 'history_count',
                  'date_joined']  # 包含的用户信息字段
 
