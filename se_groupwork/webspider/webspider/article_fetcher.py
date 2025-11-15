@@ -224,7 +224,7 @@ class ArticleFetcher:
                 publish_time = timezone.datetime.fromtimestamp(item.get("create_time", 0))
 
                 # 由于公众号发布文章后很少会修改（正文部分支持修改最多20个字），因此如果数据库已有文章，就不需要爬取其它内容了（降低被封风险）
-                if Article.objects.filter(article_url=article_url).exists():
+                if Article.objects.filter(title=title, publish_time=publish_time).exists():
                     print(f"文章 {title} 已存在，停止爬取")
                     continue
                 

@@ -75,8 +75,10 @@ Thumbs.db
 *.db
 
 # 媒体文件
-webspider/webspider/avatars/
+avatars/
+article_covers/
 *.png
+*.jpg
 
 # 日志文件
 *.log
