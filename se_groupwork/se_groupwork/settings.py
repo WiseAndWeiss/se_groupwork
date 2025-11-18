@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     "django_extensions",
     'rest_framework',
     'rest_framework.authtoken', 
+    'rest_framework_simplejwt',
     'drf_spectacular',
     'webspider',
     'user',
@@ -52,8 +54,16 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -227,3 +237,32 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+DEFAULT_PUBLIC_ACCOUNTS = [
+    "清华大学",
+    "清华紫荆之声", 
+    "清华大学学生会",
+    "清华大学社会实践",
+    "清华大学学生公益",
+    "清华大学学生社团",
+    "清华体育",
+    "清华大学信息服务",
+    "乐学",
+    "学在清华",
+    "清华后勤服务",
+    "清华家园网",
+    "艾生权",
+    "行在清华",
+    "食在清华",
+    "平安清华",
+    "清华时事大讲堂",
+    "文素THU",
+    "清华小五爷园",
+    "清新时报",
+    "水木有礼",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+BASE_URL = 'http://127.0.0.1:8000' 

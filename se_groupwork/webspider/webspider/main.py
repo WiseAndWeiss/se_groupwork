@@ -14,19 +14,21 @@ django.setup()
 
 def main():
     # 步骤1: 通过wxmp_launcher获得登陆的cookies和token
-    print("步骤1: 登录微信公众平台获取cookies和token...")
-    launcher = WxmpLauncher()
-    try:
-        if launcher.login():
-            print("登录成功!")
-        else:
-            print("登录失败，请检查网络连接或二维码扫描")
+    need_cookie = input("是否需要cookie？").strip()
+    if need_cookie != "":
+        print("步骤1: 登录微信公众平台获取cookies和token...")
+        launcher = WxmpLauncher()
+        try:
+            if launcher.login():
+                print("登录成功!")
+            else:
+                print("登录失败，请检查网络连接或二维码扫描")
+                return
+        except Exception as e:
+            print(f"登录过程中发生错误: {e}")
             return
-    except Exception as e:
-        print(f"登录过程中发生错误: {e}")
-        return
-    finally:
-        launcher.close()
+        finally:
+            launcher.close()
 
     # 步骤2: 通过cookies和token以及biz_searcher获取fakeid
     print("\n步骤2: 搜索公众号获取fakeid...")
@@ -40,8 +42,7 @@ def main():
     )
 
     try:
-        mp_json = searcher.get_mp_list(count=5)
-        mp_dict = searcher.process_mp_list(mp_json)
+        mp_dict = searcher.biz_search()
 
         if not mp_dict:
             print("未找到相关公众号，请尝试其他关键词")

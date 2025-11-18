@@ -8,10 +8,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import FavoriteSerializer, HistorySerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
+from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
 from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 # 认证相关API
 @extend_schema(
@@ -115,7 +116,9 @@ class ProfileView(APIView):
 @extend_schema(
     tags=['订阅管理'],
     methods=['POST'],
+    summary='添加新订阅',
     description='添加新订阅',
+    request=PublicAccountSerializer,
     examples=[
         OpenApiExample(
             '添加订阅',
@@ -126,6 +129,7 @@ class ProfileView(APIView):
 @extend_schema(
     tags=['订阅管理'],
     methods=['DELETE'],
+    summary='清空所有订阅',
     description='清空所有订阅'
 )
 class SubscriptionListView(APIView):
@@ -135,7 +139,7 @@ class SubscriptionListView(APIView):
     def get(self, request):
         """获取用户的所有订阅"""
         subscriptions = Subscription.objects.get_user_subscriptions(request.user)
-        serializer = SubscriptionSerializer(subscriptions, many=True)
+        serializer = SubscriptionSerializer(subscriptions, many=True, context={'request': request})
         return Response(serializer.data)
     
     def post(self, request):
@@ -185,7 +189,9 @@ class SubscriptionDetailView(APIView):
 @extend_schema(
     tags=['收藏管理'],
     methods=['POST'],
+    summary='添加新收藏',
     description='添加新收藏',
+    request=ArticleSerializer,
     examples=[
         OpenApiExample(
             '添加收藏',
@@ -196,6 +202,7 @@ class SubscriptionDetailView(APIView):
 @extend_schema(
     tags=['收藏管理'],
     methods=['DELETE'],
+    summary='清空所有收藏',
     description='清空所有收藏'
 )
 class FavoriteListView(APIView):
@@ -254,7 +261,9 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     methods=['POST'],
+    summary='添加浏览记录',
     description='添加浏览记录',
+    request=ArticleSerializer,
     examples=[
         OpenApiExample(
             '添加记录',
@@ -265,6 +274,7 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     methods=['DELETE'],
+    summary='清空所有历史记录',
     description='清空所有历史记录'
 )
 # 历史记录相关API
@@ -275,7 +285,7 @@ class HistoryListView(APIView):
     def get(self, request):
         """获取用户的所有浏览历史"""
         histories = History.objects.get_user_history(request.user)
-        serializer = HistorySerializer(histories, many=True)
+        serializer = HistorySerializer(histories, many=True, context={'request': request})
         return Response(serializer.data)
     
     def post(self, request):
@@ -368,8 +378,17 @@ class UsernameUpdateView(APIView):
 class AvatarUpdateView(APIView):
     """修改头像API"""
     permission_classes = [IsAuthenticated]
-    
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
     def patch(self, request):
+        """使用PATCH方法修改头像"""
+        return self._update_avatar(request)
+    
+    def post(self, request):
+        """使用POST方法修改头像"""
+        return self._update_avatar(request)
+    
+    def _update_avatar(self, request):
         """修改头像"""
         new_avatar = request.FILES.get('avatar')
         
@@ -402,7 +421,7 @@ class AvatarUpdateView(APIView):
                 pass  # 如果删除失败，忽略错误
         
         # 返回更新后的用户信息
-        serializer = UserProfileSerializer(request.user)
+        serializer = UserProfileSerializer(request.user, context={'request': request})
         return Response({
             'message': '头像修改成功',
             'user': serializer.data
@@ -410,7 +429,7 @@ class AvatarUpdateView(APIView):
 
 
 @extend_schema(
-    tags=['用户管理'],
+    tags=['用户资料'],
     summary='修改密码',
     description='修改用户登录密码',
     request=UserPasswordChangeSerializer,
