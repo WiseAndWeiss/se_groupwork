@@ -3,7 +3,7 @@ import os
 
 
 class AvatarDownloader:
-    def __init__(self, save_dir="avatars"):
+    def __init__(self, save_dir="account_avatars"):
         """
         初始化头像下载器
         Args:

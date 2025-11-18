@@ -60,7 +60,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -237,3 +237,32 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+DEFAULT_PUBLIC_ACCOUNTS = [
+    "清华大学",
+    "清华紫荆之声", 
+    "清华大学学生会",
+    "清华大学社会实践",
+    "清华大学学生公益",
+    "清华大学学生社团",
+    "清华体育",
+    "清华大学信息服务",
+    "乐学",
+    "学在清华",
+    "清华后勤服务",
+    "清华家园网",
+    "艾生权",
+    "行在清华",
+    "食在清华",
+    "平安清华",
+    "清华时事大讲堂",
+    "文素THU",
+    "清华小五爷园",
+    "清新时报",
+    "水木有礼",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+BASE_URL = 'http://127.0.0.1:8000' 

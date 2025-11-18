@@ -12,6 +12,7 @@ from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerialize
 from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 # 认证相关API
 @extend_schema(
@@ -138,7 +139,7 @@ class SubscriptionListView(APIView):
     def get(self, request):
         """获取用户的所有订阅"""
         subscriptions = Subscription.objects.get_user_subscriptions(request.user)
-        serializer = SubscriptionSerializer(subscriptions, many=True)
+        serializer = SubscriptionSerializer(subscriptions, many=True, context={'request': request})
         return Response(serializer.data)
     
     def post(self, request):
@@ -284,7 +285,7 @@ class HistoryListView(APIView):
     def get(self, request):
         """获取用户的所有浏览历史"""
         histories = History.objects.get_user_history(request.user)
-        serializer = HistorySerializer(histories, many=True)
+        serializer = HistorySerializer(histories, many=True, context={'request': request})
         return Response(serializer.data)
     
     def post(self, request):
@@ -377,8 +378,17 @@ class UsernameUpdateView(APIView):
 class AvatarUpdateView(APIView):
     """修改头像API"""
     permission_classes = [IsAuthenticated]
-    
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
     def patch(self, request):
+        """使用PATCH方法修改头像"""
+        return self._update_avatar(request)
+    
+    def post(self, request):
+        """使用POST方法修改头像"""
+        return self._update_avatar(request)
+    
+    def _update_avatar(self, request):
         """修改头像"""
         new_avatar = request.FILES.get('avatar')
         
@@ -411,7 +421,7 @@ class AvatarUpdateView(APIView):
                 pass  # 如果删除失败，忽略错误
         
         # 返回更新后的用户信息
-        serializer = UserProfileSerializer(request.user)
+        serializer = UserProfileSerializer(request.user, context={'request': request})
         return Response({
             'message': '头像修改成功',
             'user': serializer.data
