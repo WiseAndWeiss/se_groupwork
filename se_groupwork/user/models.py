@@ -7,6 +7,9 @@ from django.conf import settings
 
 from webspider.models import PublicAccount,Article
 
+def user_avatar_path(instance, filename):
+    # 文件将上传到 MEDIA_ROOT/avatars/user_<id>
+    return f'avatars/{instance.id}/{filename}'
 
 class UserManager(BaseUserManager):
     """自定义用户管理器"""
@@ -76,7 +79,7 @@ class User(AbstractBaseUser):
     )
     avatar = models.ImageField(
         _('头像'),
-        upload_to='avatars/',
+        upload_to=user_avatar_path,
         blank=True,
         null=True,
         help_text=_('用户头像图片')

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import TokenRefreshView
 
 app_name = 'user'  # 命名空间，方便反向解析
 
@@ -8,7 +9,8 @@ urlpatterns = [
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/login/', views.LoginView.as_view(), name='login'),
     path('auth/profile/', views.ProfileView.as_view(), name='profile'),
-    
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     # 订阅管理
     path('subscriptions/', views.SubscriptionListView.as_view(), name='subscription-list'),
     path('subscriptions/<int:pk>/', views.SubscriptionDetailView.as_view(), name='subscription-detail'),

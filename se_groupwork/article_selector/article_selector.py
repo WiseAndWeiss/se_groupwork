@@ -17,9 +17,8 @@ def sort_articles_by_preference(user, articles):
 
 
 def get_campus_accounts():
-    #TODO: 等待公众号数据库完善
     accounts = PublicAccount.objects.filter(
-        name__contains='清华大学'
+        is_default=True
     )
     return list(accounts)
 

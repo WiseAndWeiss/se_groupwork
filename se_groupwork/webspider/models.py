@@ -5,7 +5,7 @@ models.py:用于规定爬虫数据库中数据表的格式
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 
@@ -19,14 +19,19 @@ class PublicAccount(models.Model):
         max_length=30,
         verbose_name='公众号名称',
     )
-    icon_url = models.TextField(
+    icon = models.ImageField(
+        upload_to='account_avatars/',  # 图片将保存在 media/account_avatars/ 目录下
         blank=True,
-        verbose_name='图标URL',
+        verbose_name='图标',
     )
     fakeid = models.CharField(
         max_length=30,
         blank=True,
         verbose_name='Biz标识',
+    )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name='是否默认公众号',
     )
     last_crawl_time = models.DateTimeField(
         null=True,
@@ -104,7 +109,8 @@ class Article(models.Model):
         default=list,
         verbose_name="语义向量"
     )
-    cover_url = models.TextField(
+    cover = models.ImageField(
+        upload_to='article_covers/',
         blank=True,
         verbose_name='封面URL',
     )
@@ -113,7 +119,7 @@ class Article(models.Model):
         verbose_name = '微信文章'
         verbose_name_plural = '微信文章'
         ordering = ['-publish_time']
-        unique_together = ['public_account', 'article_url']
+        unique_together = ['public_account', 'publish_time']
 
 
 class Cookies(models.Model):
@@ -166,3 +172,12 @@ def update_account_crawl_time(sender, instance, created, **kwargs):
     instance.public_account.last_crawl_time = timezone.localtime(timezone.now())
     instance.public_account.save(update_fields=['last_crawl_time'])
 
+@receiver(pre_save, sender=PublicAccount)
+def auto_set_default_status(sender, instance, **kwargs):
+    """
+    信号：在保存公众号前，自动设置是否为默认公众号
+    避免使用post_save防止递归调用
+    """
+    # 检查公众号名称是否在默认名单中
+    default_accounts = getattr(settings, 'DEFAULT_PUBLIC_ACCOUNTS', [])
+    instance.is_default = instance.name in default_accounts

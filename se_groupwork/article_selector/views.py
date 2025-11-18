@@ -80,7 +80,7 @@ class ArticleViewSet(viewsets.ViewSet):
         ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(all_articles) < 21
         all_articles = all_articles[:20]
-        serializer = ArticleSerializer(all_articles, many=True)
+        serializer = ArticleSerializer(all_articles, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
             'reach_end': reached_end
@@ -105,7 +105,7 @@ class ArticleViewSet(viewsets.ViewSet):
             publish_time__gte=timezone.now() - timedelta(days=3)
         ).exclude(summary='')
         recommended_articles = sort_articles_by_preference(request.user, recent_articles)[:8]
-        serializer = ArticleSerializer(recommended_articles, many=True)
+        serializer = ArticleSerializer(recommended_articles, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
             'reach_end': True
@@ -136,11 +136,12 @@ class ArticleViewSet(viewsets.ViewSet):
         campus_accounts = get_campus_accounts()
         campus_articles = Article.objects.filter(
             public_account__in=campus_accounts
-        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
+          ).order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(campus_articles) < 21
         campus_articles = campus_articles[:20]
-        serializer = ArticleSerializer(campus_articles, many=True)
+        serializer = ArticleSerializer(campus_articles, many=True, context={'request': request})
         return Response({
+            'start_rank': start_rank,
             'articles': serializer.data,
             'reach_end': reached_end
         })
@@ -174,7 +175,7 @@ class ArticleViewSet(viewsets.ViewSet):
         ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(customized_articles) < 21
         customized_articles = customized_articles[:20]
-        serializer = ArticleSerializer(customized_articles, many=True)
+        serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
             'reach_end': reached_end
@@ -217,7 +218,7 @@ class ArticleViewSet(viewsets.ViewSet):
             ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
             reached_end = len(account_articles) < 21
             account_articles = account_articles[:20]
-            serializer = ArticleSerializer(account_articles, many=True)
+            serializer = ArticleSerializer(account_articles, many=True, context={'request': request})
             return Response({
                 'articles': serializer.data,
                 'reach_end': reached_end
@@ -235,7 +236,7 @@ class ArticleViewSet(viewsets.ViewSet):
             "application/json": {
                 "type": "object",
                 "properties": {
-                    "accounts_id": {
+                    "account_names": {
                         "type": "array",
                         "items": {"type": "string"},
                         "description": "公众号ID列表（可选，默认使用用户关联的公众号）"
@@ -283,7 +284,7 @@ class ArticleViewSet(viewsets.ViewSet):
     def filter(self, request):
         """
         指定筛选条件获取文章列表
-        POST /api/articles/filtered/
+        POST /api/articles/filter/
         """
         serializer = ArticlesFilterSerializer(data=request.data)
         if not serializer.is_valid():
@@ -294,9 +295,9 @@ class ArticleViewSet(viewsets.ViewSet):
         data = serializer.validated_data
         queryset = None
         
-        accounts_id = data.get('accounts_id')
-        if accounts_id:
-            account_list = PublicAccount.objects.filter(id__in=accounts_id)
+        account_names = data.get('account_names')
+        if account_names:
+            account_list = PublicAccount.objects.filter(name__in=account_names)
         else:
             account_list = get_accounts_by_user(request.user)
         queryset = Article.objects.filter(
@@ -306,9 +307,12 @@ class ArticleViewSet(viewsets.ViewSet):
         date_from = data.get('date_from')
         if date_from:
             queryset = queryset.filter(publish_time__gte=date_from)
+            
         date_to = data.get('date_to')
         if date_to:
-            queryset = queryset.filter(publish_time__lt=date_to)
+            date_to_next = date_to + timedelta(days=1)
+            queryset = queryset.filter(publish_time__lt=date_to_next.strftime('%Y-%m-%d'))
+
         
         tags = data.get('tags')
         if tags:
@@ -318,9 +322,11 @@ class ArticleViewSet(viewsets.ViewSet):
             queryset = queryset.filter(tag_query)
 
         search_content = data.get('search_content')
-        if search_content:
-            # TODO: 实现搜索功能
-            pass
+        if search_content:  # 筛选逻辑：如果关键词在标题/摘要/内容中出现，则将其返回
+            search_query = Q()
+            for field in ['title', 'summary', 'content']:
+                search_query |= Q(**{f'{field}__icontains': search_content})
+            queryset = queryset.filter(search_query)
 
         if len(queryset) == 0 or queryset is None:
             return Response(
@@ -334,7 +340,7 @@ class ArticleViewSet(viewsets.ViewSet):
 
         reached_end = len(queryset) < limit
         queryset = queryset[:limit]
-        serializer = ArticleSerializer(queryset, many=True)
+        serializer = ArticleSerializer(queryset, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
             'reach_end': reached_end
