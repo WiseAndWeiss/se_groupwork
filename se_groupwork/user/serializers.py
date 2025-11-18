@@ -3,6 +3,9 @@ from django.contrib.auth import authenticate
 from .models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from .param_validate import validate_credentials, check_password_strength, check_phone_number
+from article_selector.serializers import ArticleSerializer
+from django.conf import settings
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """用户注册序列化器
@@ -10,16 +13,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     - 包含密码确认字段，确保两次输入一致
     """
     password = serializers.CharField(write_only=True)  # 密码字段，只用于写入不返回
-    password_confirm = serializers.CharField(write_only=True)  # 密码确认字段，只用于写入
+    password_confirm = serializers.CharField(write_only=True, required=False)  # 密码确认字段，只用于写入
 
     class Meta:
         model = User  # 指定关联的Django模型
         fields = ['username', 'email', 'password', 'password_confirm', 'avatar', 'bio']  # 序列化器包含的字段
 
     def validate(self, data):
-        # 1. 检查密码一致性
-        if data['password'] != data['password_confirm']:
-            raise serializers.ValidationError("两次密码不一致")
+         # 检查是否提供了password_confirm字段
+        password_confirm = data.get('password_confirm')
+        
+        # 1. 如果有提供：检查密码一致性
+        if password_confirm is not None:
+            if data['password'] != data['password_confirm']:
+                raise serializers.ValidationError("两次密码不一致")
         
         # 2. 调用检验函数
         validation_result = validate_credentials(data['username'], data['password'])
@@ -38,7 +45,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         - 使用UserManager的create_user方法创建用户
         - 返回新创建的用户对象
         """
-        validated_data.pop('password_confirm')  # 移除密码确认字段，避免保存到数据库时报错
+        # validated_data.pop('password_confirm')  # 移除密码确认字段，避免保存到数据库时报错
         # 创建新用户，记录用户名、密码
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -81,29 +88,57 @@ class UserProfileSerializer(serializers.ModelSerializer):
     - 用于序列化用户个人信息
     - 包含用户的基本信息和统计信息
     """
+    avatar = serializers.SerializerMethodField()  # 添加自定义头像字段
+
     class Meta:
         model = User  # 关联用户模型
         fields = ['id', 'username', 'email', 'phone_number', 'avatar', 'bio', 
                  'subscription_count', 'favorite_count', 'history_count',
                  'date_joined']  # 包含的用户信息字段
+        
+    def get_avatar(self, obj):
+        """生成完整的头像URL"""
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            else:
+                # 如果没有request上下文，返回相对路径
+                return f"{settings.BASE_URL}{obj.avatar.url}"
+        return None
 
 class PublicAccountSerializer(serializers.ModelSerializer):
     """公众号序列化器
     - 用于序列化公众号信息
     - 包含公众号的所有字段
     """
+    icon = serializers.SerializerMethodField()  # 添加自定义图标字段
+    is_subscribed = serializers.SerializerMethodField()
+
     class Meta:
         model = PublicAccount  # 关联公众号模型
         fields = '__all__'  # 包含所有字段
 
-class ArticleSerializer(serializers.ModelSerializer):
-    """文章序列化器
-    - 用于序列化文章信息
-    - 包含文章的所有字段
-    """
-    class Meta:
-        model = Article  # 关联文章模型
-        fields = ['id', 'title', 'author', 'article_url', 'publish_time', 'cover_url', 'summary']   # 包含的字段
+    def get_icon(self, obj):
+        """生成完整的图标URL"""
+        if obj.icon:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.icon.url)
+            else:
+                # 如果没有request上下文，返回相对路径
+                return f"{settings.BASE_URL}{obj.icon.url}"
+        return None
+    
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            subscription = Subscription.objects.filter(
+                user=request.user, 
+                public_account=obj
+            ).first()  # 使用first()获取第一个匹配的记录
+            return subscription.id if subscription else 0
+        return 0
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     """订阅关系序列化器
@@ -111,7 +146,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     - 包含订阅信息和关联的公众号详情
     """
     public_account = PublicAccountSerializer(read_only=True)  # 嵌套序列化公众号信息，只读
-    
+
     class Meta:
         model = Subscription  # 关联订阅模型
         fields = ['id', 'public_account', 'subscribe_at', 'is_active']  # 包含的订阅信息字段
@@ -133,7 +168,7 @@ class HistorySerializer(serializers.ModelSerializer):
     - 包含浏览历史和关联的文章详情
     """
     article = ArticleSerializer(read_only=True)  # 嵌套序列化文章信息，只读
-    
+
     class Meta:
         model = History  # 关联历史模型
         fields = ['id', 'article', 'viewed_at']  # 包含的历史信息字段

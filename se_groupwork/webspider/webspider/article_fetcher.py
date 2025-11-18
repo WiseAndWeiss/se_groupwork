@@ -15,7 +15,7 @@ import bs4
 import os
 import django
 import sys
-from avatar_downloader import AvatarDownloader
+from webspider.webspider.avatar_downloader import AvatarDownloader
 # 定位到项目根目录（manage.py所在目录）
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
@@ -39,7 +39,7 @@ class ArticleFetcher:
         self.public_account, _ = PublicAccount.objects.get_or_create(fakeid=fakeid)
         self.url = "https://mp.weixin.qq.com/cgi-bin/appmsg"
         self.scraper = cloudscraper.create_scraper()
-        self.avatar_downloader = AvatarDownloader(save_dir="article_covers")
+        self.avatar_downloader = AvatarDownloader(save_dir="media/article_covers")
 
         # 初始化参数和headers
         self.params = {
@@ -162,6 +162,7 @@ class ArticleFetcher:
         try:
             response = self.scraper.get(article_url, headers=headers)
             soup = bs4.BeautifulSoup(response.text, 'html.parser')
+
             # 提取信息
             result = {}
             title = soup.find(attrs={'property':'og:title'})['content']
@@ -169,6 +170,7 @@ class ArticleFetcher:
             link = soup.find(attrs={'property':'og:url'})['content']
             content = soup.find('div', class_='rich_media_content').get_text()
             remote_cover_url = soup.find(attrs={'property':'og:image'})['content']
+
             # 提取文章封面
             local_cover_url = self.get_cover(remote_cover_url, title)
             result.update({
@@ -176,7 +178,7 @@ class ArticleFetcher:
                 'author': author, 
                 'content': content, 
                 'title': title,
-                'cover_url': local_cover_url
+                'cover': local_cover_url
             })
             
             return result
@@ -237,10 +239,11 @@ class ArticleFetcher:
                         'title': title,
                         'publish_time': publish_time,
                         'content': result['content'],
-                        'cover_url': result['cover_url'],
+                        'cover': result['cover'],
                         'author': result['author']
                     }
                 )
+
                 if created:
                     print(f"✅ 已保存文章链接: {title}")
                 else:
@@ -259,11 +262,13 @@ class ArticleFetcher:
             return
         print(f"共有 {total_count} 篇文章")
         n = min(total_count, n)
+
         # 获取文章列表
         content_list = self.get_content_list(n)
         if not content_list:
             print("获取文章列表失败")
             return
+        
         # 保存到数据库
         self.save_to_database(content_list)
 
@@ -273,7 +278,7 @@ if __name__ == '__main__':
 
     # 初始化文章抓取器
     fetcher = ArticleFetcher(
-        fakeid='MzA4OTIyMzgxMw=='
+        fakeid='MzA3OTE0MjQzMw=='
     )
 
     print(fetcher.cookies)

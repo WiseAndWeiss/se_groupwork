@@ -29,9 +29,7 @@ def delete_user_preferences(sender, instance, **kwargs):
 def update_preference_by_new_default_account(sender, instance, created, **kwargs):
     if created:
         account = instance
-        # TODO: 等待默认字段完善
-        # if account.is_default:
-        if "清华大学" in account.name:
+        if account.is_default:
             for pref in Preference.objects.all():
                 if account.id not in pref.account_preference:
                     lenth = len(pref.account_preference)
@@ -44,9 +42,7 @@ def update_preference_by_new_default_account(sender, instance, created, **kwargs
 @receiver(post_delete, sender=PublicAccount)
 def update_preference_by_delete_default_account(sender, instance, **kwargs):
     account = instance
-    # TODO: 等待默认字段完善
-    # if account.is_default:
-    if "清华大学" in account.name:
+    if account.is_default:
         for pref in Preference.objects.all():
             if account.id in pref.account_preference:
                 cur_aprefer_value = pref.account_preference[account.id]

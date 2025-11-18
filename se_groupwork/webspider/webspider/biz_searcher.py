@@ -5,7 +5,8 @@ import time
 import random
 import json
 from typing import List, Dict, Any
-from avatar_downloader import AvatarDownloader
+from webspider.webspider.avatar_downloader import AvatarDownloader
+from django.core.files import File
 
 # 添加Django环境设置
 import os
@@ -143,29 +144,58 @@ class BizSearcher:
         """
         try:
             for nickname, fakeid in mp_dict.items():
+                local_icon_path = self.avatar_urls.get(nickname)
+
                 # 检查是否已存在相同fakeid的公众号
                 account, created = PublicAccount.objects.get_or_create(
                     fakeid=fakeid,
                     defaults={
-                        'name': nickname,
-                        'icon_url': self.avatar_urls[nickname],
+                        'name': nickname
                     }
                 )
+
                 if created:
+                    self._save_icon_to_imagefield(account, local_icon_path)
                     print(f"✅ 已保存公众号: {nickname} (fakeid: {fakeid})")
                 else:
                     print(f"⚠️  公众号已存在: {nickname} (fakeid: {fakeid})")
         except Exception as e:
             print(f"保存到数据库失败: {e}")
 
-    def biz_search(self):
-        mp_json = searcher.get_mp_list()
-        mp_dict = searcher.process_mp_list(mp_json)
-        self.avatar_urls = self.avatar_downloader.download(self.avatar_urls)
-        print(mp_dict)
-        searcher.save_to_database(mp_dict)
-        return mp_dict
+    def _save_icon_to_imagefield(self, account, image_path):
+        """
+        将本地图片保存到ImageField
+        """
+        try:
+            # 如果账号已经有头像，先删除旧文件
+            if account.icon and account.icon.name:
+                account.icon.delete(save=False)
 
+            # 获取文件扩展名
+            ext = os.path.splitext(image_path)[1]  # 包含点号，如 .png
+            if not ext:
+                ext = '.png'  # 默认扩展名
+                
+            # 创建安全的文件名（使用公众号名称）
+            safe_name = ''.join(c for c in account.name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            filename = f"{safe_name}{ext}"
+            
+            with open(image_path, 'rb') as f:
+                # 保存时指定文件名
+                account.icon.save(filename, f, save=True)
+                
+            print(f"✅ 已保存头像: {account.name} -> {filename}")
+            
+        except Exception as e:
+            print(f"❌ 保存头像失败 {account.name}: {str(e)}")
+
+    def biz_search(self):
+        mp_json = self.get_mp_list()
+        mp_dict = self.process_mp_list(mp_json)
+        self.avatar_urls = self.avatar_downloader.download(self.avatar_urls)
+        self.save_to_database(mp_dict)
+        return mp_dict
+    
 
 # 使用示例
 if __name__ == '__main__':
