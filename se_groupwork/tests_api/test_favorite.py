@@ -16,7 +16,6 @@ class FavoriteTests(TestCase):
         self.public_account = PublicAccount.objects.create(
             name='测试公众号',
             fakeid='test_fakeid_123',
-            icon_url='http://example.com/icon.jpg'
         )
         
         self.article = Article.objects.create(

@@ -58,13 +58,13 @@ class TaskManager:
     def _worker(self, article_msg) -> None:
         """线程工作函数，用于控制并发和调用处理函数"""
         try:
+            print(f"开始任务：{article_msg['title']}")
             # 获得信号量许可（控制并发数）
             self.semaphore.acquire()
             resp = entry(article_msg)
             if resp is None:
                 self.result.append({"id": article_msg["id"], "summary": "", "keyinfo": [], "tags": [], "semantic_vector": [], "tags_vector": []})
             # 更新数据库
-            print(f"开始任务：{article_msg['title']}")
             self.result.append(resp | {"id": article_msg["id"]})
         finally:
             # 释放信号量许可

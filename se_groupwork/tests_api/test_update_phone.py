@@ -17,7 +17,7 @@ class PhoneUpdateTests(TestCase):
             phone_number='13800138000'
         )
         self.client.force_authenticate(user=self.user)
-        self.url = '/api/auth/update/phone/'
+        self.url = '/api/user/update/phone/'
 
     def test_change_phone_success(self):
         """测试成功修改手机号"""
