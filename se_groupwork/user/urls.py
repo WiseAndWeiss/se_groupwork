@@ -14,11 +14,13 @@ urlpatterns = [
     # 订阅管理
     path('subscriptions/', views.SubscriptionListView.as_view(), name='subscription-list'),
     path('subscriptions/<int:pk>/', views.SubscriptionDetailView.as_view(), name='subscription-detail'),
-    
+    path('subscriptions/search/', views.SearchSubscriptionListView.as_view(), name='subscription-search'),
+
     # 收藏管理
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
     path('favorites/<int:pk>/', views.FavoriteDetailView.as_view(), name='favorite-detail'),
-    
+    path('favorites/search/', views.SearchFavoriteListView.as_view(), name='favorite-search'),
+
     # 浏览历史
     path('history/', views.HistoryListView.as_view(), name='history-list'),
     path('history/<int:pk>/', views.HistoryDetailView.as_view(), name='history-detail'),
