@@ -68,7 +68,7 @@ class Article(models.Model):
         verbose_name='所属公众号'
     )
     title = models.CharField(
-        max_length=200,
+        max_length=30,
         verbose_name='文章标题'
     )
     content = models.TextField(
@@ -76,7 +76,7 @@ class Article(models.Model):
         verbose_name='文章内容'
     )
     author = models.CharField(
-        max_length=200,
+        max_length=20,
         blank=True,
         verbose_name='作者'
     )
@@ -97,7 +97,7 @@ class Article(models.Model):
         verbose_name='关键信息'
     )
     tags = models.CharField(
-        max_length=200,
+        max_length=20,
         blank=True,
         verbose_name='标签'
     )
@@ -130,7 +130,7 @@ class Cookies(models.Model):
         verbose_name="Cookies"
     )
     token = models.CharField(
-        max_length=100,
+        max_length=20,
         verbose_name="Token"
     )
     created_at = models.DateTimeField(

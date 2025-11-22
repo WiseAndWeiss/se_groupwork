@@ -71,7 +71,7 @@ class User(AbstractBaseUser):
     )
     phone_number = models.CharField(
         _('手机号'),
-        max_length=20,
+        max_length=11,
         blank=True,
         error_messages={
             'unique': _("该手机号已被占用。"),
