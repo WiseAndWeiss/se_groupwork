@@ -7,6 +7,7 @@ import json
 from typing import List, Dict, Any
 from webspider.webspider.avatar_downloader import AvatarDownloader
 from django.core.files import File
+from django.conf import settings
 
 # 添加Django环境设置
 import os
@@ -34,7 +35,8 @@ class BizSearcher:
         self.cookies = json.loads(self.cookies)  # 转化为requests可以使用的形式
         self.query = query  # 搜索的内容
         self.avatar_urls = {}  # 存放图片的地址
-        self.avatar_downloader = AvatarDownloader()
+        self.avatar_downloader = AvatarDownloader(save_dir=os.path.join(settings.MEDIA_ROOT, 'icons'))
+
         # 初始化参数和headers
         self.params = {
             "token": self.token,
@@ -171,20 +173,20 @@ class BizSearcher:
             if account.icon and account.icon.name:
                 account.icon.delete(save=False)
 
-            # 获取文件扩展名
-            ext = os.path.splitext(image_path)[1]  # 包含点号，如 .png
-            if not ext:
-                ext = '.png'  # 默认扩展名
+            # 直接设置ImageField的路径，而不是重新保存文件
+            if image_path and os.path.exists(image_path):
+                # 获取相对于MEDIA_ROOT的路径
+                if image_path.startswith(settings.MEDIA_ROOT):
+                    relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
+                else:
+                    # 如果图片不在MEDIA_ROOT下，需要移动或复制
+                    relative_path = os.path.join('icons', os.path.basename(image_path))
                 
-            # 创建安全的文件名（使用公众号名称）
-            safe_name = ''.join(c for c in account.name if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            filename = f"{safe_name}{ext}"
-            
-            with open(image_path, 'rb') as f:
-                # 保存时指定文件名
-                account.icon.save(filename, f, save=True)
-                
-            print(f"✅ 已保存头像: {account.name} -> {filename}")
+                account.icon.name = relative_path
+                account.save()
+                print(f"✅ 已设置头像: {account.name} -> {relative_path}")
+            else:
+                print(f"⚠️ 头像文件不存在: {image_path}")
             
         except Exception as e:
             print(f"❌ 保存头像失败 {account.name}: {str(e)}")
@@ -201,7 +203,7 @@ class BizSearcher:
 if __name__ == '__main__':
     # 初始化公众号抓取器
     searcher = BizSearcher(
-        query="清华大学"
+        query="华侨"
     )
-    searcher.biz_search()
+    print(searcher.biz_search())
 

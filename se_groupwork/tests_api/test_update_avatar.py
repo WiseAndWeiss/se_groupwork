@@ -20,7 +20,7 @@ class AvatarUpdateTests(TestCase):
             password='TestPass123!'
         )
         self.client.force_authenticate(user=self.user)
-        self.url = '/api/auth/update/avatar/'
+        self.url = '/api/user/update/avatar/'
 
     def create_test_image(self, format='JPEG', size=(100, 100), filename='test.jpg'):
         """创建测试图片"""

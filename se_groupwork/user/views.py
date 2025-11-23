@@ -13,23 +13,20 @@ from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from user.param_validate import check_username
 
 # 认证相关API
 @extend_schema(
     tags=['用户认证'],
     summary='用户注册',
     description='创建新用户并返回JWT令牌',
+    methods=['POST'],
     request=UserRegistrationSerializer,
+    responses={
+        201: OpenApiResponse(description='用户注册成功'),
+        400: OpenApiResponse(description='注册信息无效')
+    },
     examples=[
-        OpenApiExample(
-            '弱密码注册请求',
-            value={
-                'username': 'testuser',
-                'email': 'test@example.com',
-                'password': 'password123',
-                'password_confirm': 'password123'
-            }
-        ),
         OpenApiExample(
             '正常注册请求',
             value={
@@ -65,7 +62,12 @@ class RegisterView(APIView):
     tags=['用户认证'], 
     summary='用户登录',
     description='用户登录获取JWT令牌',
+    methods=['POST'],
     request=UserLoginSerializer,
+    responses={
+        200: OpenApiResponse(description='登录成功'),
+        400: OpenApiResponse(description='登录信息无效')
+    },
     examples=[
         OpenApiExample(
             '登录请求',
@@ -95,7 +97,12 @@ class LoginView(APIView):
 @extend_schema(
     tags=['用户资料'],
     summary='获取用户资料', 
-    description='获取当前登录用户的详细信息'
+    description='获取当前登录用户的详细信息',
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取用户资料'),
+        401: OpenApiResponse(description='未授权访问')
+    }
 )
 class ProfileView(APIView):
     """用户资料API"""
@@ -111,14 +118,23 @@ class ProfileView(APIView):
     tags=['订阅管理'],
     summary='订阅列表',
     description='获取用户的公众号订阅列表',
-    methods=['GET']
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取订阅列表'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 @extend_schema(
     tags=['订阅管理'],
-    methods=['POST'],
     summary='添加新订阅',
     description='添加新订阅',
+    methods=['POST'],
     request=PublicAccountSerializer,
+    responses={
+        201: OpenApiResponse(description='订阅创建成功'),
+        400: OpenApiResponse(description='已经订阅过该公众号'),
+        404: OpenApiResponse(description='公众号不存在')
+    },
     examples=[
         OpenApiExample(
             '添加订阅',
@@ -128,9 +144,13 @@ class ProfileView(APIView):
 )
 @extend_schema(
     tags=['订阅管理'],
-    methods=['DELETE'],
     summary='清空所有订阅',
-    description='清空所有订阅'
+    description='清空所有订阅',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='所有订阅已清空'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 class SubscriptionListView(APIView):
     """订阅列表API - 处理列表和创建操作"""
@@ -159,11 +179,59 @@ class SubscriptionListView(APIView):
         Subscription.objects.clear_user_subscriptions(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    
+@extend_schema(
+    tags=['订阅管理'],
+    summary='在订阅中查询符合query的订阅',
+    description='在订阅中查询符合query的订阅，如果查询参数为空则返回所有订阅',
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取订阅列表'),
+    },
+    parameters=[
+            OpenApiParameter(
+                name="name",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="公众号名称",
+                required=False,
+                examples=[OpenApiExample(name="name", value="清华大学")]
+            )
+        ],
+)
+class SearchSubscriptionListView(APIView):
+    """
+    在已订阅的公众号中查询符合query的公众号
+    GET /api/subscriptions/search/?name=xxx
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """获取特定的公众号"""
+        name = request.query_params.get('name', '').strip()
+        user = request.user
+
+        # 获取用户的所有订阅
+        subscriptions = Subscription.objects.get_user_subscriptions(user)
+
+        # 如果name不为空，则进行过滤
+        if name:
+            subscriptions = subscriptions.filter(public_account__name__icontains=name)
+
+        serializer = SubscriptionSerializer(subscriptions, many=True, context={'request': request})
+
+        return Response(serializer.data)
+
 
 @extend_schema(
     tags=['订阅管理'],
     summary='删除订阅',
     description='删除特定的订阅关系',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='单条订阅已删除'),
+        404: OpenApiResponse(description='未找到订阅信息')
+    },
     parameters=[
         OpenApiParameter(name='pk', description='订阅ID', type=int)
     ]
@@ -184,14 +252,23 @@ class SubscriptionDetailView(APIView):
     tags=['收藏管理'],
     summary='收藏列表',
     description='获取用户的文章收藏列表',
-    methods=['GET']
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取收藏列表'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 @extend_schema(
     tags=['收藏管理'],
-    methods=['POST'],
     summary='添加新收藏',
     description='添加新收藏',
+    methods=['POST'],
     request=ArticleSerializer,
+    responses={
+        201: OpenApiResponse(description='收藏创建成功'),
+        400: OpenApiResponse(description='已经收藏过该文章'),
+        404: OpenApiResponse(description='文章不存在')
+    },
     examples=[
         OpenApiExample(
             '添加收藏',
@@ -201,9 +278,13 @@ class SubscriptionDetailView(APIView):
 )
 @extend_schema(
     tags=['收藏管理'],
-    methods=['DELETE'],
     summary='清空所有收藏',
-    description='清空所有收藏'
+    description='清空所有收藏',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='所有收藏已清空'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 class FavoriteListView(APIView):
     """收藏列表API - 处理列表和创建操作"""
@@ -235,8 +316,57 @@ class FavoriteListView(APIView):
 
 @extend_schema(
     tags=['收藏管理'],
+    summary='在收藏中查询符合query的收藏',
+    description='在收藏中查询符合query的文章',
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取收藏列表'),
+        401: OpenApiResponse(description='未授权访问')
+    },
+    parameters=[
+            OpenApiParameter(
+                name="title",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="文章标题",
+                required=True,
+                examples=[OpenApiExample(name="title", value="清华")]
+            )
+        ],
+)
+class SearchFavoriteListView(APIView):
+    """
+    在收藏中中查询符合query的公众号
+    GET /api/favorites/search/?title=xxx
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """获取特定的公众号"""
+        title = request.query_params.get('title', '').strip()
+        user = request.user
+
+        # 先获取用户的所有收藏
+        favorites = Favorite.objects.get_user_favorites(user)
+
+        # 如果title不为空，则进行过滤
+        if title:
+            favorites = favorites.filter(article__title__icontains=title)
+
+        serializer = FavoriteSerializer(favorites, many=True, context={'request': request})
+
+        return Response(serializer.data)
+    
+
+@extend_schema(
+    tags=['收藏管理'],
     summary='删除收藏',
     description='删除特定的收藏记录',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='单条收藏已删除'),
+        404: OpenApiResponse(description='未找到收藏信息')
+    },
     parameters=[
         OpenApiParameter(name='pk', description='收藏ID', type=int)
     ]
@@ -256,14 +386,23 @@ class FavoriteDetailView(APIView):
     tags=['历史记录'],
     summary='历史记录列表',
     description='获取用户的文章浏览历史',
-    methods=['GET']
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取历史记录'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 @extend_schema(
     tags=['历史记录'],
-    methods=['POST'],
     summary='添加浏览记录',
     description='添加浏览记录',
+    methods=['POST'],
     request=ArticleSerializer,
+    responses={
+        200: OpenApiResponse(description='浏览记录更新时间'),
+        201: OpenApiResponse(description='浏览记录创建成功'),
+        404: OpenApiResponse(description='文章不存在')
+    },
     examples=[
         OpenApiExample(
             '添加记录',
@@ -273,9 +412,13 @@ class FavoriteDetailView(APIView):
 )
 @extend_schema(
     tags=['历史记录'],
-    methods=['DELETE'],
     summary='清空所有历史记录',
-    description='清空所有历史记录'
+    description='清空所有历史记录',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='所有历史记录已清空'),
+        401: OpenApiResponse(description='未授权访问')
+    },
 )
 # 历史记录相关API
 class HistoryListView(APIView):
@@ -315,6 +458,11 @@ class HistoryListView(APIView):
     tags=['历史记录'],
     summary='删除历史记录',
     description='删除特定的浏览记录',
+    methods=["DELETE"],
+    responses={
+        204: OpenApiResponse(description='单条历史记录已删除'),
+        404: OpenApiResponse(description='未找到历史记录信息')
+    },
     parameters=[
         OpenApiParameter(name='pk', description='记录ID', type=int)
     ]
@@ -334,7 +482,12 @@ class HistoryDetailView(APIView):
     tags=['用户资料'],
     summary='修改用户名',
     description='修改当前用户的用户名',
+    methods=["PATCH"],
     request=UserProfileSerializer,
+    responses={
+        200: OpenApiResponse(description='用户名修改成功'),
+        400: OpenApiResponse(description='用户名无效或已被占用')
+    },
     examples=[
         OpenApiExample(
             '修改用户名',
@@ -358,6 +511,11 @@ class UsernameUpdateView(APIView):
         if User.objects.filter(username=new_username).exclude(id=request.user.id).exists():
             return Response({'error': '该用户名已被占用'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # 检查用户名是否符合规则
+        validated, error = check_username(new_username)
+        if not validated:
+            return Response({'error':error}, status=status.HTTP_400_BAD_REQUEST)
+
         # 更新用户名
         request.user.username = new_username
         request.user.save()
@@ -373,7 +531,12 @@ class UsernameUpdateView(APIView):
 @extend_schema(
     tags=['用户资料'],
     summary='修改头像',
-    description='上传新的头像图片'
+    description='上传新的头像图片',
+    methods=['PATCH', 'POST'],
+    responses={
+        200: OpenApiResponse(description='头像修改成功'),
+        400: OpenApiResponse(description='头像文件无效')
+    }
 )
 class AvatarUpdateView(APIView):
     """修改头像API"""
@@ -433,13 +596,17 @@ class AvatarUpdateView(APIView):
     summary='修改密码',
     description='修改用户登录密码',
     request=UserPasswordChangeSerializer,
+    responses={
+        200: OpenApiResponse(description='密码修改成功'),
+        400: OpenApiResponse(description='密码信息无效')
+    },
     examples=[
         OpenApiExample(
             '修改密码',
             value={
-                'old_password': 'oldpassword123',
-                'new_password': 'newpassword456',
-                'confirm_password': 'newpassword456'
+                'old_password': 'oldPassword123',
+                'new_password': 'newPassword456',
+                'confirm_password': 'newPassword456'
             }
         )
     ]
@@ -477,6 +644,11 @@ class PasswordChangeView(APIView):
     summary='修改邮箱',
     description='修改用户邮箱地址',
     request=UserEmailChangeSerializer,
+    methods=['POST'],
+    responses={
+        200: OpenApiResponse(description='邮箱修改成功'),
+        400: OpenApiResponse(description='邮箱信息无效')
+    },
     examples=[
         OpenApiExample(
             '修改邮箱',
@@ -511,7 +683,12 @@ class EmailChangeView(APIView):
     tags=['用户资料'],
     summary='修改手机号',
     description='修改用户手机号码',
+    methods=['POST'],
     request=UserPhoneChangeSerializer,
+    responses={
+        200: OpenApiResponse(description='手机号修改成功'),
+        400: OpenApiResponse(description='手机号信息无效')
+    },
     examples=[
         OpenApiExample(
             '修改手机号',

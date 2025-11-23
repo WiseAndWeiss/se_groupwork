@@ -15,7 +15,6 @@ class SubscriptionTests(TestCase):
         self.public_account = PublicAccount.objects.create(
             name='测试公众号',
             fakeid='test_fakeid_123',
-            icon_url='http://example.com/icon.jpg'
         )
 
     def test_create_subscription(self):

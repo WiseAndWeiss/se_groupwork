@@ -35,9 +35,10 @@ urlpatterns = [
     path('api/articles/recommended/', ArticleViewSet.as_view({'get': 'recommended'}), name='articles-recommended'),
 	path('api/articles/campus-latest/', ArticleViewSet.as_view({'get': 'campus_latest'}), name='articles-campus-latest'),
 	path('api/articles/customized-latest/', ArticleViewSet.as_view({'get': 'customized_latest'}), name='articles-customized-latest'),
+    path('api/articles/customized-latest/search', ArticleViewSet.as_view({'get': 'search_customized_latest'}), name='articles-customized-latest-search'),
 	path('api/articles/by-account/', ArticleViewSet.as_view({'get': 'by_account'}), name='articles-by-account'),
     path('api/articles/filter/', ArticleViewSet.as_view({'post': 'filter'}), name='articles-filter'),
-	
+
     # API文档
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

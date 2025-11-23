@@ -3,6 +3,7 @@ from article_selector.models import Preference
 from webspider.models import Article, PublicAccount
 from user.models import User, Subscription
 
+# 获取推荐文章
 def sort_articles_by_preference(user, articles):
     unsorted_articles = []
     for article in articles:
@@ -15,20 +16,21 @@ def sort_articles_by_preference(user, articles):
     sorted_articles = [article["article"] for article in sorted_articles]
     return sorted_articles
 
-
+# 获取校内公众号
 def get_campus_accounts():
     accounts = PublicAccount.objects.filter(
         is_default=True
     )
     return list(accounts)
 
+# 获取用户的订阅公众号
 def get_customized_accounts(user):
     accounts = PublicAccount.objects.filter(
         subscription__user=user
     )
     return list(accounts)
 
-
+# 获取用户的订阅公众号 + 校内公众号
 def get_accounts_by_user(user):
     customized_accounts = get_customized_accounts(user)
     campus_accounts = get_campus_accounts()
