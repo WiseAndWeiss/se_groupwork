@@ -116,10 +116,14 @@ class SearchNewAccountListView(APIView):
 
         # 调用 BizSearcher 爬取公众号信息
         biz_searcher = BizSearcher(name)
-        biz_searcher.biz_search()
+        mp_dict = biz_searcher.biz_search()
+
+        # 如果爬虫没有返回结果，返回空列表
+        if not mp_dict:
+            return Response([])
 
         # 从数据库中获取公众号信息
-        accounts = Subscription.objects.filter(public_account_name__icontains=name)
-        serializer = SubscriptionSerializer(accounts, many=True, context={'request': request})
+        accounts = PublicAccount.objects.filter(name__in=mp_dict.keys())
+        serializer = PublicAccountSerializer(accounts, many=True, context={'request': request})
 
-        return Response({serializer.data})
+        return Response(serializer.data)
