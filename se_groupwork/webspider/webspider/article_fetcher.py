@@ -1,6 +1,7 @@
 """
 文章信息获取器：通过公众号的fakeid获取文章的url，再通过url获取文章的content
 """
+from django.conf import settings
 import requests
 import math
 from tqdm import tqdm
@@ -39,7 +40,7 @@ class ArticleFetcher:
         self.public_account, _ = PublicAccount.objects.get_or_create(fakeid=fakeid)
         self.url = "https://mp.weixin.qq.com/cgi-bin/appmsg"
         self.scraper = cloudscraper.create_scraper()
-        self.avatar_downloader = AvatarDownloader(save_dir="media/article_covers")
+        self.avatar_downloader = AvatarDownloader(save_dir="media/covers")
 
         # 初始化参数和headers
         self.params = {
@@ -239,17 +240,44 @@ class ArticleFetcher:
                         'title': title,
                         'publish_time': publish_time,
                         'content': result['content'],
-                        'cover': result['cover'],
                         'author': result['author']
                     }
                 )
 
                 if created:
+                    self._save_cover_to_imagefield(article, result['cover'])
                     print(f"✅ 已保存文章链接: {title}")
                 else:
                     print(f"⚠️ 文章链接已存在: {title}")
         except Exception as e:
             print(f"保存到数据库失败: {e}")
+
+    def _save_cover_to_imagefield(self, article, image_path):
+        """
+        将本地图片保存到ImageField
+        """
+        try:
+            # 如果文章已经有封面，先删除旧文件
+            if article.cover and article.cover.name:
+                article.cover.delete(save=False)
+
+            # 直接设置ImageField的路径，而不是重新保存文件
+            if image_path and os.path.exists(image_path):
+                # 获取相对于MEDIA_ROOT的路径
+                if image_path.startswith(settings.MEDIA_ROOT):
+                    relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
+                else:
+                # 如果图片不在MEDIA_ROOT下，需要移动或复制
+                    relative_path = os.path.join('covers', os.path.basename(image_path))
+                
+                article.cover.name = relative_path
+                article.save()
+                print(f"✅ 已设置头像: {article.title} -> {relative_path}")
+            else:
+                print(f"⚠️ 头像文件不存在: {image_path}")
+            
+        except Exception as e:
+            print(f"❌ 保存封面失败 {article.title}: {str(e)}")
 
     def fetch_articles(self, n: int):
         """
@@ -278,7 +306,7 @@ if __name__ == '__main__':
 
     # 初始化文章抓取器
     fetcher = ArticleFetcher(
-        fakeid='MzA3OTE0MjQzMw=='
+        fakeid='MjM5MjAxNDM4MA=='
     )
 
     print(fetcher.cookies)

@@ -20,7 +20,7 @@ class PublicAccount(models.Model):
         verbose_name='公众号名称',
     )
     icon = models.ImageField(
-        upload_to='account_avatars/',  # 图片将保存在 media/account_avatars/ 目录下
+        upload_to='icons/',  # 图片将保存在 media/account_avatars/ 目录下
         blank=True,
         verbose_name='图标',
     )
@@ -68,7 +68,7 @@ class Article(models.Model):
         verbose_name='所属公众号'
     )
     title = models.CharField(
-        max_length=30,
+        max_length=50,
         verbose_name='文章标题'
     )
     content = models.TextField(
@@ -110,7 +110,7 @@ class Article(models.Model):
         verbose_name="语义向量"
     )
     cover = models.ImageField(
-        upload_to='article_covers/',
+        upload_to='covers/',
         blank=True,
         verbose_name='封面URL',
     )
