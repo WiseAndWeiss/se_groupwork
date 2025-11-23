@@ -183,11 +183,10 @@ class SubscriptionListView(APIView):
 @extend_schema(
     tags=['订阅管理'],
     summary='在订阅中查询符合query的订阅',
-    description='在订阅中查询符合query的订阅',
+    description='在订阅中查询符合query的订阅，如果查询参数为空则返回所有订阅',
     methods=['GET'],
     responses={
         200: OpenApiResponse(description='成功获取订阅列表'),
-        400: OpenApiResponse(description='未提供参数')
     },
     parameters=[
             OpenApiParameter(
@@ -195,7 +194,7 @@ class SubscriptionListView(APIView):
                 type=str,
                 location=OpenApiParameter.QUERY,
                 description="公众号名称",
-                required=True,
+                required=False,
                 examples=[OpenApiExample(name="name", value="清华大学")]
             )
         ],
@@ -210,17 +209,15 @@ class SearchSubscriptionListView(APIView):
     def get(self, request):
         """获取特定的公众号"""
         name = request.query_params.get('name', '').strip()
+        user = request.user
 
-        if not name:
-            return Response(
-                {'error': '请提供公众号名称参数'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # 获取用户的所有订阅
+        subscriptions = Subscription.objects.get_user_subscriptions(user)
 
-        # 先获取用户的订阅，再从中找到符合query的公众号
-        subscriptions = Subscription.objects.get_user_subscriptions(request.user).filter(
-            public_account__name__icontains=name 
-        )
+        # 如果name不为空，则进行过滤
+        if name:
+            subscriptions = subscriptions.filter(public_account__name__icontains=name)
+
         serializer = SubscriptionSerializer(subscriptions, many=True, context={'request': request})
 
         return Response(serializer.data)
@@ -349,16 +346,13 @@ class SearchFavoriteListView(APIView):
         title = request.query_params.get('title', '').strip()
         user = request.user
 
-        if not title:
-            return Response(
-                {'error': '请提供标题参数'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # 先获取用户的所有收藏
+        favorites = Favorite.objects.get_user_favorites(user)
 
-        # 先获取用户的订阅，再从中找到符合query的公众号
-        favorites = Favorite.objects.get_user_favorites(request.user).filter(
-            article__title__icontains=title
-        )
+        # 如果title不为空，则进行过滤
+        if title:
+            favorites = favorites.filter(article__title__icontains=title)
+
         serializer = FavoriteSerializer(favorites, many=True, context={'request': request})
 
         return Response(serializer.data)
