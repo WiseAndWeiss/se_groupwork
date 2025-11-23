@@ -16,7 +16,7 @@ class PasswordUpdateTests(TestCase):
             password='OldPass123!'
         )
         self.client.force_authenticate(user=self.user)
-        self.url = '/api/auth/update/password/'
+        self.url = '/api/user/update/password/'
 
     def test_change_password_success(self):
         """测试成功修改密码"""

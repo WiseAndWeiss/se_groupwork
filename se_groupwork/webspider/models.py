@@ -20,7 +20,7 @@ class PublicAccount(models.Model):
         verbose_name='公众号名称',
     )
     icon = models.ImageField(
-        upload_to='account_avatars/',  # 图片将保存在 media/account_avatars/ 目录下
+        upload_to='icons/',  # 图片将保存在 media/account_avatars/ 目录下
         blank=True,
         verbose_name='图标',
     )
@@ -68,7 +68,7 @@ class Article(models.Model):
         verbose_name='所属公众号'
     )
     title = models.CharField(
-        max_length=200,
+        max_length=50,
         verbose_name='文章标题'
     )
     content = models.TextField(
@@ -76,7 +76,7 @@ class Article(models.Model):
         verbose_name='文章内容'
     )
     author = models.CharField(
-        max_length=200,
+        max_length=20,
         blank=True,
         verbose_name='作者'
     )
@@ -97,7 +97,7 @@ class Article(models.Model):
         verbose_name='关键信息'
     )
     tags = models.CharField(
-        max_length=200,
+        max_length=20,
         blank=True,
         verbose_name='标签'
     )
@@ -110,7 +110,7 @@ class Article(models.Model):
         verbose_name="语义向量"
     )
     cover = models.ImageField(
-        upload_to='article_covers/',
+        upload_to='covers/',
         blank=True,
         verbose_name='封面URL',
     )
@@ -130,7 +130,7 @@ class Cookies(models.Model):
         verbose_name="Cookies"
     )
     token = models.CharField(
-        max_length=100,
+        max_length=20,
         verbose_name="Token"
     )
     created_at = models.DateTimeField(

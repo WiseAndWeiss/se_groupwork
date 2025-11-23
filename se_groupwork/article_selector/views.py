@@ -182,6 +182,63 @@ class ArticleViewSet(viewsets.ViewSet):
         })
     
     @extend_schema(
+        summary="搜索最新自选咨询文章",
+        description="按发布时间倒序获取自选公众号的最新文章，支持分页加载（每次20条）",
+        parameters=[
+            OpenApiParameter(
+                name="start_rank",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="起始偏移量（用于分页，默认0）",
+                required=False,
+                examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+            ),
+            OpenApiParameter(
+                name="search_content",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="搜索内容",
+                required=False,
+                examples=[OpenApiExample(name="search_content", value="清华")]
+            )
+        ],
+        responses=response_format
+    )
+    @action(detail=False, methods=['get'])
+    def search_customized_latest(self, request):
+        """
+        获取最新自选咨询文章列表
+        GET /api/articles/customized-latest/search/?start_rank=0&name=..
+        """
+        start_rank = int(request.query_params.get('start_rank', 0))
+        search_content = request.query_params.get('search_content', '').strip()
+
+        # 根据用户的自选偏好获取文章
+        customized_accounts = get_customized_accounts(request.user)
+
+        # 基础查询：自选公众号且排除空summary
+        base_query = Article.objects.filter(
+            public_account__in=customized_accounts
+        ).exclude(summary='')
+
+        # 如果有搜索内容，添加搜索条件（多字段模糊搜索）
+        if search_content:
+            base_query = base_query.filter(
+                Q(summary__icontains=search_content) |
+                Q(title__icontains=search_content) |
+                Q(content__icontains=search_content)
+            )
+
+        customized_articles = base_query.order_by('-publish_time')[start_rank:start_rank+21]
+        reached_end = len(customized_articles) < 21
+        customized_articles = customized_articles[:20]
+        serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
+        return Response({
+            'articles': serializer.data,
+            'reach_end': reached_end
+        })
+    
+    @extend_schema(
         summary="获取指定公众号的最新文章",
         description="按发布时间倒序获取单个公众号的文章，支持分页加载（每次20条）",
         parameters=[

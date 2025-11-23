@@ -17,7 +17,7 @@ class EmailUpdateTests(TestCase):
             email='old@example.com'
         )
         self.client.force_authenticate(user=self.user)
-        self.url = '/api/auth/update/email/'
+        self.url = '/api/user/update/email/'
 
     def test_change_email_success(self):
         """测试成功修改邮箱"""

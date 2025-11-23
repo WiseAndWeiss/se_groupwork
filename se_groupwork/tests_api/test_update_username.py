@@ -17,7 +17,7 @@ class UsernameUpdateTests(TestCase):
             email='test@example.com'
         )
         self.client.force_authenticate(user=self.user)
-        self.url = '/api/auth/update/username/'
+        self.url = '/api/user/update/username/'
 
     def test_update_username_success(self):
         """测试成功修改用户名"""
@@ -73,24 +73,24 @@ class EdgeCasesTestCase(TestCase):
             email='edge@example.com'
         )
         self.client.force_authenticate(user=self.user)
+        self.url = '/api/user/update/username/'
 
     def test_very_long_username(self):
         """测试超长用户名"""
         # 创建刚好20个字符的用户名（边界值）
         valid_username = 'a' * 20
-        response = self.client.patch('/api/auth/update/username/', {'new_username': valid_username})
+        response = self.client.patch(self.url, {'new_username': valid_username})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         # 创建21个字符的用户名（应该失败）
         invalid_username = 'a' * 21
-        response = self.client.patch('/api/auth/update/username/', {'new_username': invalid_username})
-        # 注意：这个测试假设后端有长度验证，如果没有，需要添加
+        response = self.client.patch(self.url, {'new_username': invalid_username})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_special_characters_in_username(self):
         """测试用户名中的下划线 """
         data = {'new_username': 'user_name123'}
-        response = self.client.patch('/api/auth/update/username/', data)
+        response = self.client.patch(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_case_sensitive_username(self):
@@ -100,5 +100,5 @@ class EdgeCasesTestCase(TestCase):
         
         # 尝试修改为小写版本（应该成功，因为用户名是大小写敏感的）
         data = {'new_username': 'testuser_modified'}
-        response = self.client.patch('/api/auth/update/username/', data)
+        response = self.client.patch(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
