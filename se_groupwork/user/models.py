@@ -145,7 +145,7 @@ class SubscriptionManager(models.Manager):
         subscription = self.create(user=user, public_account=public_account)
         return subscription
     
-    # 删除所有用户的订阅
+    # 删除用户的所有订阅
     def clear_user_subscriptions(self, user):
         self.filter(user=user).delete()
 
@@ -168,7 +168,7 @@ class Subscription(models.Model):
         PublicAccount, 
         on_delete=models.CASCADE
     )
-    subscribe_at = models.DateTimeField(
+    subscribed_at = models.DateTimeField(
         auto_now_add=True
     )
     is_active = models.BooleanField(default=True)
@@ -177,8 +177,11 @@ class Subscription(models.Model):
 
     class Meta:
         unique_together = [('user', 'public_account')]  # 防止重复订阅
-        ordering = ['-subscribe_at']  # 按照订阅创建顺序排列，最新创建的订阅在前面
-
+        ordering = ['-subscribed_at']  # 按照订阅创建顺序排列，最新创建的订阅在前面
+        indexes = [
+            models.Index(fields=['user', '-subscribed_at']),
+            # models.Index(fields=['user', 'public_account']),  # unique_together已自动创建
+        ]
     def __str__(self):
         return f"{self.user} -> {self.public_account}"
     
@@ -199,7 +202,7 @@ class FavoriteManager(models.Manager):
         favorite = self.create(user=user, article=article)
         return favorite
     
-    # 删除所有用户的收藏
+    # 删除用户的所有收藏
     def clear_user_favorites(self, user):
         self.filter(user=user).delete()
     
@@ -231,7 +234,10 @@ class Favorite(models.Model):
     class Meta:
         unique_together = [('user', 'article')]  # 防止重复收藏
         ordering = ['-favorited_at']  # 按照收藏时间排列，最新收藏的在前面
-
+        indexes = [
+            models.Index(fields=['user', '-favorited_at']),
+            # models.Index(fields=['user', 'article']),  # unique_together已自动创建
+        ]
     def __str__(self):
         return f"{self.user} favorited {self.article}"
     
@@ -282,7 +288,11 @@ class History(models.Model):
     objects = HistoryManager()
 
     class Meta:
+        unique_together = [('user', 'article')]  # 重复历史记录只能更新原有的时间，而非创建新的历史记录
         ordering = ['-viewed_at']  # 按照浏览时间排列，最新浏览的在前面
-
+        indexes = [
+            models.Index(fields=['user', '-viewed_at']),
+            # models.Index(fields=['user', 'article']),  # unique_together已自动创建
+        ]
     def __str__(self):
         return f"{self.user} viewed {self.article}"
