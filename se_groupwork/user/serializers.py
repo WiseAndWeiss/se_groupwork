@@ -149,7 +149,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription  # 关联订阅模型
-        fields = ['id', 'public_account', 'subscribe_at', 'is_active']  # 包含的订阅信息字段
+        fields = ['id', 'public_account', 'subscribed_at', 'is_active']  # 包含的订阅信息字段
 
 class FavoriteSerializer(serializers.ModelSerializer):
     """收藏序列化器
