@@ -1,6 +1,7 @@
 """
 文章信息获取器：通过公众号的fakeid获取文章的url，再通过url获取文章的content
 """
+import warnings
 from django.conf import settings
 import requests
 import math
@@ -212,6 +213,9 @@ class ArticleFetcher:
         Args:
             content_list：包含title、link、publish_time、cover_url等信息
         """
+        # 由于django和mysql存在时区不同会出现警告，为了便于使用选择忽视警告。
+        warnings.filterwarnings("ignore", category=RuntimeWarning, 
+                            message="DateTimeField.*received a naive datetime")
         try:
             for item in content_list:
                 article_url = item.get("link", "")
