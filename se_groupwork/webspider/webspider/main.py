@@ -1,15 +1,6 @@
 from wxmp_launcher import WxmpLauncher
 from biz_searcher import BizSearcher
 from article_fetcher import ArticleFetcher
-# 添加Django环境设置
-import os
-import django
-import sys
-# 定位到项目根目录（manage.py所在目录）
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "se_groupwork.settings")
-django.setup()
 
 
 def main():

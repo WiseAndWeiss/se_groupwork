@@ -6,19 +6,8 @@ import random
 import json
 from typing import List, Dict, Any
 from webspider.webspider.avatar_downloader import AvatarDownloader
-from django.core.files import File
 from django.conf import settings
-
-# 添加Django环境设置
 import os
-import sys
-import django
-# 定位到项目根目录（manage.py所在目录）
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "se_groupwork.settings")
-django.setup()
-# 导入Django模型
 from webspider.models import PublicAccount, Cookies
 
 

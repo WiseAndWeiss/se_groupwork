@@ -14,15 +14,7 @@ import cloudscraper
 import bs4
 # 添加Django环境设置
 import os
-import django
-import sys
 from webspider.webspider.avatar_downloader import AvatarDownloader
-# 定位到项目根目录（manage.py所在目录）
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "se_groupwork.settings")
-django.setup()
-# 导入Django模型
 from webspider.models import Article, Cookies, PublicAccount
 
 
