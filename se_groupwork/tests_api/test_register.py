@@ -3,12 +3,6 @@ import sys
 import django
 from django.test import TestCase
 from django.urls import reverse
-
-# 设置Django环境
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
-django.setup()
-
 from rest_framework import status
 from rest_framework.test import APITestCase
 from user.models import User
