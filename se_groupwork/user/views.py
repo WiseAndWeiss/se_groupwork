@@ -1,4 +1,5 @@
 import os
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth import update_session_auth_hash
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
+from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
 from user.models import User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
@@ -245,6 +246,121 @@ class SubscriptionDetailView(APIView):
         subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
         Subscription.objects.delete_subscription(subscription)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    tags=['订阅管理'],
+    summary='排序订阅',
+    description='将订阅的公众号按用户需要的顺序排序',
+    methods=['POST'],
+    request=SubscriptionSortSerializer,
+    responses={
+        200: OpenApiResponse(description='成功进行排序'),
+        400: OpenApiResponse(description='请求数据格式错误'),
+        404: OpenApiResponse(description='未找到订阅信息')
+    },
+    examples=[
+        OpenApiExample(
+            '排序订阅示例',
+            value={
+                "orders": [
+                    {"subscription_id": 1, "order": 2},
+                    {"subscription_id": 2, "order": 1},
+                    {"subscription_id": 3, "order": 3}
+                ]
+            }
+        )
+    ]
+)
+class SortSubscriptionListView(APIView):
+    """
+    将订阅的公众号按用户需要的顺序排序
+    GET /api/subscriptions/sort/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """
+        更新用户订阅的排序顺序
+        """
+        orders_data = request.data.get('orders', [])
+        
+        # 验证请求数据
+        if not isinstance(orders_data, list):
+            return Response(
+                {'error': 'orders 必须是数组格式'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not orders_data:
+            return Response(
+                {'error': 'orders 不能为空'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 提取订阅ID列表
+        subscription_ids = [item.get('subscription_id') for item in orders_data if item.get('subscription_id')]
+        
+        if not subscription_ids:
+            return Response(
+                {'error': '未提供有效的订阅ID'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            with transaction.atomic():
+                # 获取当前用户的所有相关订阅
+                user_subscriptions = Subscription.objects.filter(
+                    user=request.user, 
+                    id__in=subscription_ids
+                )
+                
+                # 检查是否所有订阅ID都有效
+                found_ids = set(user_subscriptions.values_list('id', flat=True))
+                requested_ids = set(subscription_ids)
+                
+                if found_ids != requested_ids:
+                    missing_ids = requested_ids - found_ids
+                    return Response(
+                        {
+                            'error': f'以下订阅ID不存在或不属于当前用户: {missing_ids}',
+                            'valid_ids': list(found_ids)
+                        }, 
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # 创建订阅ID到对象的映射
+                subscription_map = {sub.id: sub for sub in user_subscriptions}
+                
+                # 更新排序顺序
+                for order_item in orders_data:
+                    subscription_id = order_item.get('subscription_id')
+                    order = order_item.get('order')
+                    
+                    if subscription_id in subscription_map and order is not None:
+                        subscription = subscription_map[subscription_id]
+                        subscription.order = order
+                        subscription.save(update_fields=['order'])
+                
+                # 返回更新后的订阅列表
+                updated_subscriptions = Subscription.objects.filter(
+                    user=request.user, 
+                    is_active=True
+                ).order_by('order', '-subscribed_at')
+                
+                serializer = SubscriptionSerializer(updated_subscriptions, many=True)
+                
+                return Response({
+                    'success': True,
+                    'message': '订阅排序更新成功',
+                    'subscriptions': serializer.data
+                }, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {'error': f'排序更新失败: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # 收藏相关API

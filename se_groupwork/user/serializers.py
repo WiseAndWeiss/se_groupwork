@@ -149,7 +149,16 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription  # 关联订阅模型
-        fields = ['id', 'public_account', 'subscribed_at', 'is_active']  # 包含的订阅信息字段
+        fields = ['id', 'public_account', 'subscribed_at', 'order', 'is_active']  # 包含的订阅信息字段
+
+class SubscriptionOrderSerializer(serializers.Serializer):
+    """单个订阅排序序列化器"""
+    subscription_id = serializers.IntegerField()
+    order = serializers.IntegerField(min_value=0)
+
+class SubscriptionSortSerializer(serializers.Serializer):
+    """订阅排序请求序列化器"""
+    orders = SubscriptionOrderSerializer(many=True)
 
 class FavoriteSerializer(serializers.ModelSerializer):
     """收藏序列化器

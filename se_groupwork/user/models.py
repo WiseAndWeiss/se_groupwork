@@ -1,9 +1,10 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.conf import settings
+
 
 from webspider.models import PublicAccount,Article
 
@@ -132,7 +133,7 @@ class User(AbstractBaseUser):
 class SubscriptionManager(models.Manager):
     """自定义订阅管理器"""
 
-    # 获取用户的所有订阅
+    # 获取用户的所有订阅公众号
     def get_user_subscriptions(self, user):
         return self.filter(user=user).select_related('public_account')
     
@@ -140,9 +141,11 @@ class SubscriptionManager(models.Manager):
     def is_subscribed(self, user, public_account): 
         return self.filter(user=user, public_account=public_account).exists()
     
-    # 创建订阅并更新用户的订阅计数
+    # 创建订阅，更新其排序值
     def create_subscription(self, user, public_account):
-        subscription = self.create(user=user, public_account=public_account)
+        # 获取当前最大排序值
+        max_order = self.filter(user=user).aggregate(models.Max('order'))['order__max'] or 0
+        subscription = self.create(user=user, public_account=public_account, order=max_order + 1)
         return subscription
     
     # 删除用户的所有订阅
@@ -152,6 +155,17 @@ class SubscriptionManager(models.Manager):
     # 删除订阅并更新用户的订阅计数
     def delete_subscription(self, subscription):
         subscription.delete()
+    
+    # 批量更新订阅排序顺序
+    def update_order(self, user, subscription_orders):
+        subscriptions = self.filter(user=user, id__in=subscription_orders.keys())
+        
+        with transaction.atomic():
+            for subscription in subscriptions:
+                new_order = subscription_orders.get(str(subscription.id))
+                if new_order is not None:
+                    subscription.order = new_order
+                    subscription.save(update_fields=['order'])
 
 
 class Subscription(models.Model):
@@ -171,14 +185,19 @@ class Subscription(models.Model):
     subscribed_at = models.DateTimeField(
         auto_now_add=True
     )
+    order = models.PositiveIntegerField(
+        default=0, 
+        verbose_name=_('排序顺序')
+    )
     is_active = models.BooleanField(default=True)
     
     objects = SubscriptionManager()
 
     class Meta:
         unique_together = [('user', 'public_account')]  # 防止重复订阅
-        ordering = ['-subscribed_at']  # 按照订阅创建顺序排列，最新创建的订阅在前面
+        ordering = ['order','-subscribed_at']  # 先按排序顺序，再按订阅时间排序
         indexes = [
+            models.Index(fields=['user', 'order']),
             models.Index(fields=['user', '-subscribed_at']),
             # models.Index(fields=['user', 'public_account']),  # unique_together已自动创建
         ]

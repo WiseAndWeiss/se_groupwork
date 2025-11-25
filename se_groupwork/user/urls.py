@@ -15,6 +15,7 @@ urlpatterns = [
     path('subscriptions/', views.SubscriptionListView.as_view(), name='subscription-list'),
     path('subscriptions/<int:pk>/', views.SubscriptionDetailView.as_view(), name='subscription-detail'),
     path('subscriptions/search/', views.SearchSubscriptionListView.as_view(), name='subscription-search'),
+    path('subscriptions/sort/', views.SortSubscriptionListView.as_view(), name='subscription-sort'),
 
     # 收藏管理
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
