@@ -1,6 +1,7 @@
 """
 文章信息获取器：通过公众号的fakeid获取文章的url，再通过url获取文章的content
 """
+import re
 import warnings
 from django.conf import settings
 import requests
@@ -17,7 +18,7 @@ import bs4
 import os
 from webspider.webspider.avatar_downloader import AvatarDownloader
 from webspider.models import Article, Cookies, PublicAccount
-
+import html
 
 class ArticleFetcher:
     def __init__(self, fakeid: str = None):
@@ -162,7 +163,19 @@ class ArticleFetcher:
             title = soup.find(attrs={'property':'og:title'})['content']
             author = soup.find(attrs={'property':'og:article:author'})['content']
             link = soup.find(attrs={'property':'og:url'})['content']
-            content = soup.find('div', class_='rich_media_content').get_text()
+
+            content = soup.find('div', class_='rich_media_content')
+            if content: # 1.文章有正文（不是纯图片）：直接提取正文
+                content = content.get_text()
+            else: # 2.文章无正文：提取摘要
+                meta_desc = soup.find('meta', attrs={'name': 'description'})
+                if meta_desc and meta_desc.get('content'):
+                    content = html.unescape(meta_desc['content'])
+                    content = self._clean_text(content)
+                else:
+                    content = ""
+            # print(f"content:{content}")
+
             remote_cover_url = soup.find(attrs={'property':'og:image'})['content']
 
             # 提取文章封面
@@ -180,6 +193,46 @@ class ArticleFetcher:
             print(f"获取文章内容失败: {e}")
             return "获取文章内容失败", ""
 
+    def _clean_text(self, text: str) -> str:
+        """清理HTML文本内容"""
+        if not text:
+            return ""
+        
+        # 1. 解码HTML实体
+        text = html.unescape(text)
+        
+        # 2. 移除HTML标签
+        text = re.sub(r'<[^>]+>', '', text)
+        
+        # 3. 处理特殊字符和空白
+        # 将 \x0a 转换为实际换行符
+        text = text.replace('\\x0a', '\n')
+        
+        # 处理其他常见的转义序列
+        escape_sequences = {
+            '\\x26': '&',
+            '\\x22': '"',
+            '\\x27': "'",
+            '\\x3c': '<',
+            '\\x3e': '>',
+            '\\x5c': '\\',
+            '\\x26quot;': '"',
+            '\\x26lt;': '<',
+            '\\x26gt;': '>',
+            '\\x26amp;': '&'
+        }
+        
+        for esc, char in escape_sequences.items():
+            text = text.replace(esc, char)
+        
+        # 4. 规范化空白字符
+        # 将多个连续空白字符（包括换行）合并为一个空格
+        text = re.sub(r'\s+', ' ', text)
+        
+        # 5. 移除首尾空白
+        text = text.strip()
+        
+        return text
 
     def get_cover(self, img_url: str, article_title: str) -> str:
         """
