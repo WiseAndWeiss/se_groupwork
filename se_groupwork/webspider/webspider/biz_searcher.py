@@ -77,7 +77,7 @@ class BizSearcher:
         page = math.ceil(count / per_page)
         content_list = []
 
-        for i in tqdm(range(page), desc="获取文章列表"):
+        for i in tqdm(range(page), desc="获取公众号列表"):
             self.params["begin"] = str(i * per_page)
 
             try:
@@ -89,7 +89,6 @@ class BizSearcher:
                     timeout=30
                 )
                 content_json = response.json()
-                print(content_json)
 
                 if self.is_validated(content_json):
                     content_list.extend(content_json.get("list", []))
@@ -101,7 +100,8 @@ class BizSearcher:
             except Exception as e:
                 print(f"获取第{i + 1}页失败: {e}")
                 continue
-
+        
+        print(content_list)
         return content_list
 
     def process_mp_list(self, json_data: List[Dict[str, Any]]) -> Dict[str, Any]:
