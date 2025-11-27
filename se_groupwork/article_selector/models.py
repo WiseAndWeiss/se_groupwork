@@ -6,26 +6,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from user.models import User, Subscription
 from webspider.models import PublicAccount, Article
-
-
-TAGS_DICT = {
-    "文娱活动":     np.array([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "学术讲座论坛": np.array([0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "赛事招募":     np.array([0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "体育赛事":     np.array([0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "志愿实践":     np.array([0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0]),
-    "红色党建活动": np.array([0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]),
-    "组织招募":     np.array([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0]),
-    "其他活动":     np.array([0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]),
-    "重大事项":     np.array([0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]),
-    "校内生活告示": np.array([0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]),
-    "行政通知":     np.array([0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]),
-    "教务通知":     np.array([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0]),
-    "其他通知":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),
-    "学习资源":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0]),
-    "就业实习":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]),
-    "权益服务":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]),
-}
+from remoteAI.remoteAI.tags import TAGS
 
 # Create your models here.
 class PreferenceManager(models.Manager):
@@ -78,7 +59,7 @@ class PreferenceManager(models.Manager):
         return preferences
 
 
-    def add_user(self, user, account_preference={}, tag_preference=[0.0625]*16, keyword_preference=[0.01]*100):
+    def add_user(self, user, account_preference={}, tag_preference=[1/len(TAGS)]*len(TAGS), keyword_preference=[0.01]*100):
         """
         在偏好表中添加用户
         :param user: 用户
@@ -91,45 +72,6 @@ class PreferenceManager(models.Manager):
         return preferences
 
 
-    def add_subscription(self, user, account):
-        """
-        在偏好表中添加用户订阅
-        :param user: 用户
-        :param account: 公众号
-        :return: 用户偏好
-        """
-        item = self.get_user_preferences(user)
-        lenth = len(item.account_preference)  
-        # 新赋权重1/(lenth + 1)，保持总权重和为1
-        if account.id not in item.account_preference:
-            for id in item.account_preference:
-                item.account_preference[id] *= (1 - 1/(lenth + 1))
-            item.account_preference[account.id] = 1/(lenth + 1)
-        item.save()
-        return item
-    
-
-    def remove_subscription(self, user, account):
-        """
-        在偏好表中移除用户订阅
-        :param user: 用户
-        :param account: 公众号
-        :return: 用户偏好
-        """
-        item = self.get_user_preferences(user)
-        lenth = len(item.account_preference)
-        # 移除权重，保持总权重和为1
-        if account.id in item.account_preference:
-            if lenth == 1:
-                del item.account_preference[account.id]
-            else:
-                delta = item.account_preference[account.id]/(lenth - 1)
-                del item.account_preference[account.id]
-                for id in item.account_preference:
-                    item.account_preference[id] += delta
-            item.save()
-        return item
-
     def update_preference_by_article(self, user, article, alpha=0.1):
         """
         根据用户行为更新用户偏好
@@ -141,18 +83,26 @@ class PreferenceManager(models.Manager):
         item = self.get_user_preferences(user)
         # 更新公众号偏好
         account_id = str(article.public_account.id)
-        if account_id in item.account_preference:
-            for id in item.account_preference:
-                item.account_preference[id] *= (1 - alpha)
-            item.account_preference[account_id] += alpha
+        if len(item.account_preference) == 0:
+            item.account_preference = {account_id: 1}
         else:
-            # TODO: 日志警告
-            print("Error: account_id not in item.account_preference")
-            pass
+            if account_id in item.account_preference:
+                item.account_preference[account_id] *= (1 - alpha)
+            else:
+                item.account_preference[account_id] = 1/10
+            tar = 1 - item.account_preference[account_id]
+            cur = 0
+            for id in item.account_preference:
+                if item.account_preference[id] < 1/20:
+                    del item.account_preference[id]
+                else:
+                    cur += item.account_preference[id]
+            for id in item.account_preference:
+                item.account_preference[id] = item.account_preference[id]/cur * tar
         # 更新标签偏好
         tags_vector = np.array(article.tags_vector)
         tag_preference_vector = np.array(item.tag_preference)
-        if tags_vector.shape[0] == 16 and tag_preference_vector.shape[0] == 16:
+        if tags_vector.shape[0] == len(TAGS) and tag_preference_vector.shape[0] == len(TAGS):
             tag_preference_vector = (1 - alpha) * tag_preference_vector + alpha * tags_vector
             item.tag_preference = tag_preference_vector.tolist()
         # 更新关键词偏好
@@ -172,9 +122,11 @@ class PreferenceManager(models.Manager):
         if account_id in preference.account_preference:
             score += preference.account_preference[account_id]
         # 计算标签偏好
+        tags = article.tags
+        if "重大" in tags:  score += 0.5
         tags_vector = np.array(article.tags_vector)
         tag_preference_vector = np.array(preference.tag_preference)
-        if tags_vector.shape[0] == 16 and tag_preference_vector.shape[0] == 16:
+        if tags_vector.shape[0] == len(TAGS) and tag_preference_vector.shape[0] == len(TAGS):
             score += np.dot(tags_vector, tag_preference_vector)
         # 计算关键词偏好
         semantic_vector = np.array(article.semantic_vector)
