@@ -2,6 +2,7 @@
 文章信息获取器：通过公众号的fakeid获取文章的url，再通过url获取文章的content
 """
 import re
+from urllib.parse import parse_qs, urlparse, urlunparse
 import warnings
 from django.conf import settings
 import requests
@@ -274,16 +275,18 @@ class ArticleFetcher:
                 article_url = item.get("link", "")
                 title = item.get("title", "")
                 publish_time = timezone.datetime.fromtimestamp(item.get("create_time", 0))
+                # 去除chksm 
+                cleaned_article_url = self._remove_chksm(article_url)
 
                 # 由于公众号发布文章后很少会修改（正文部分支持修改最多20个字），因此如果数据库已有文章，就不需要爬取其它内容了（降低被封风险）
-                if Article.objects.filter(title=title, publish_time=publish_time).exists():
+                if Article.objects.filter(article_url = cleaned_article_url).exists():
                     print(f"文章 {title} 已存在，停止爬取")
                     continue
                 
                 result = self.get_article_content(article_url)
 
                 article, created = Article.objects.get_or_create(
-                    article_url=result['link'],
+                    article_url=cleaned_article_url,
                     defaults={
                         'public_account': self.public_account,
                         'title': title,
@@ -300,6 +303,21 @@ class ArticleFetcher:
                     print(f"⚠️ 文章链接已存在: {title}")
         except Exception as e:
             print(f"保存到数据库失败: {e}")
+
+    def _remove_chksm(self, url):
+        parsed = urlparse(url)
+        query_dict = parse_qs(parsed.query)
+        
+        # 移除chksm参数
+        if 'chksm' in query_dict:
+            del query_dict['chksm']
+        
+        # 重新构建查询字符串
+        new_query = '&'.join([f"{k}={v[0]}" for k, v in query_dict.items()])
+        
+        # 构建新的URL
+        new_parsed = parsed._replace(query=new_query)
+        return urlunparse(new_parsed)
 
     def _save_cover_to_imagefield(self, article, image_path):
         """

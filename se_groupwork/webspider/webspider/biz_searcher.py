@@ -101,7 +101,7 @@ class BizSearcher:
                 print(f"获取第{i + 1}页失败: {e}")
                 continue
         
-        print(content_list)
+        # print(content_list)
         return content_list
 
     def process_mp_list(self, json_data: List[Dict[str, Any]]) -> Dict[str, Any]:
