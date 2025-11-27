@@ -29,9 +29,6 @@ def tags_vectorize(tags):
         if tag in TAGS:
             rank = TAGS.index(tag)
             tags_vector[rank] = 1
-    norm = np.linalg.norm(tags_vector)
-    if norm != 0:
-        tags_vector = tags_vector / norm
     return tags_vector.tolist()
 
 

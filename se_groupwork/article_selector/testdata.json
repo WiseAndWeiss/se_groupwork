@@ -1,5 +1,5 @@
 {
-    "users":[
+    "users": [
         {
             "username": "毕业生",
             "password": "testpass123",
@@ -16,44 +16,42 @@
             "email": "testuser3@example.com"
         }
     ],
-    "accounts":[
+    "accounts": [
         {
-            "name":"职业发展",
-            "icon_url": "https://example.com/icon1.jpg",
-            "fakeid": "fakeid1",
-            "last_crawl_time": "2023-01-01 00:00:00",
-            "created_at": "2023-01-01 00:00:00"
+            "name": "职业发展",
+            "icon": "icon1.jpg",
+            "fakeid": "fakeid1"
         },
         {
-            "name":"清华大学教务",
-            "icon_url": "https://example.com/icon2.jpg",
-            "fakeid": "fakeid2",
-            "last_crawl_time": "2023-01-01 00:00:00",
-            "created_at": "2023-01-01 00:00:00"
+            "name": "学在清华",
+            "icon": "icon2.jpg",
+            "fakeid": "fakeid2"
         },
         {
-            "name":"清华大学体育",
-            "icon_url": "https://example.com/icon3.jpg",
-            "fakeid": "fakeid3",
-            "last_crawl_time": "2023-01-01 00:00:00",
-            "created_at": "2023-01-01 00:00:00"
+            "name": "清华体育",
+            "icon": "icon3.jpg",
+            "fakeid": "fakeid3"
         }
     ],
-    "articles" : [
+    "articles": [
         {
-            "public_account" : 1,
-            "title" : "2025 春招全流程攻略：简历优化 + 笔试刷题 + 无领导小组面试技巧",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example1",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "就业实习,权益服务",
+            "public_account": 1,
+            "title": "2025 春招全流程攻略：简历优化 + 笔试刷题 + 无领导小组面试技巧",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example1",
+            "publish_time": "2025-10-6 17:01",
+            "summary": "balabala",
+            "tags": [
+                "资源",
+                "就业"
+            ],
             "key_info": "春招,简历优化,2025毕业生,求职攻略",
             "tags_vector": [
                 0.0,
                 0.0,
                 0.0,
                 0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -64,8 +62,11 @@
                 0.0,
                 0.0,
                 0.0,
-                0.7071067811865475,
-                0.7071067811865475
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
             ],
             "semantic_vector": [
                 -0.021792761981487274,
@@ -171,17 +172,23 @@
             ]
         },
         {
-            "public_account" : 1,
-            "title" : "国企 / 互联网 / 外企怎么选？毕业生薪资待遇 + 发展前景对比分析",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example2",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "就业实习",
+            "public_account": 1,
+            "title": "国企 / 互联网 / 外企怎么选？毕业生薪资待遇 + 发展前景对比分析",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example2",
+            "publish_time": "2025-10-6 17:02",
+            "summary": "balabala",
+            "tags": [
+                "资源",
+                "就业"
+            ],
             "key_info": "毕业生择业,薪资对比,职业发展路径,求职决策",
             "tags_vector": [
                 0.0,
                 0.0,
+                0.0,
+                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -195,6 +202,7 @@
                 0.0,
                 0.0,
                 1.0,
+                0.0,
                 0.0
             ],
             "semantic_vector": [
@@ -301,20 +309,21 @@
             ]
         },
         {
-            "public_account" : 2,
-            "title" : "2025 春季学期选课补选通知：补选时间 + 操作流程 + 余量查询",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example3",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "教务通知",
+            "public_account": 2,
+            "title": "2025 春季学期选课补选通知：补选时间 + 操作流程 + 余量查询",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example3",
+            "publish_time": "2025-10-6 17:03",
+            "summary": "balabala",
+            "tags": [
+                "通知",
+                "教务"
+            ],
             "key_info": "春季学期,选课补选,补选时间,教务通知",
             "tags_vector": [
                 0.0,
                 0.0,
-                0.0,
-                0.0,
-                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -322,6 +331,12 @@
                 0.0,
                 0.0,
                 1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
                 0.0,
                 0.0,
                 0.0,
@@ -431,17 +446,21 @@
             ]
         },
         {
-            "public_account" : 2,
-            "title" : "学籍异动办理须知：转专业 / 休学 / 复学申请材料及审批流程",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example4",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "行政通知,教务通知",
+            "public_account": 2,
+            "title": "学籍异动办理须知：转专业 / 休学 / 复学申请材料及审批流程",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example4",
+            "publish_time": "2025-10-6 17:04",
+            "summary": "balabala",
+            "tags": [
+                "通知",
+                "行政"
+            ],
             "key_info": "学籍异动,转专业,休学,申请材料,教务信息",
             "tags_vector": [
                 0.0,
                 0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -449,9 +468,12 @@
                 0.0,
                 0.0,
                 0.0,
+                1.0,
                 0.0,
-                0.7071067811865475,
-                0.7071067811865475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
                 0.0,
                 0.0,
                 0.0,
@@ -559,19 +581,20 @@
                 -0.10030030459165573,
                 0.2210872918367386
             ]
-
         },
         {
-            "public_account" : 3,
-            "title" : "校园杯篮球联赛 2025 赛季报名启动！组队要求 + 赛程安排公布",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example5",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "赛事招募",
+            "public_account": 3,
+            "title": "校园杯篮球联赛 2025 赛季报名启动！组队要求 + 赛程安排公布",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example5",
+            "publish_time": "2025-10-6 17:05",
+            "summary": "balabala",
+            "tags": [
+                "比赛",
+                "体育"
+            ],
             "key_info": "校园杯,篮球联赛,报名启动,赛程安排",
             "tags_vector": [
-                0.0,
                 0.0,
                 1.0,
                 0.0,
@@ -579,6 +602,11 @@
                 0.0,
                 0.0,
                 0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -692,23 +720,30 @@
             ]
         },
         {
-            "public_account" : 3,
-            "title" : "羽毛球单打挑战赛招募！冠军可获校级证书 + 运动装备奖励",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example6",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "体育赛事",
+            "public_account": 3,
+            "title": "羽毛球单打挑战赛招募！冠军可获校级证书 + 运动装备奖励",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example6",
+            "publish_time": "2025-10-6 17:06",
+            "summary": "balabala",
+            "tags": [
+                "比赛",
+                "体育"
+            ],
             "key_info": "羽毛球挑战赛,运动装备,校内比赛,运动员",
             "tags_vector": [
-                0.0,
-                0.0,
                 0.0,
                 1.0,
                 0.0,
                 0.0,
                 0.0,
                 0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -822,19 +857,23 @@
             ]
         },
         {
-            "public_account" : 1,
-            "title" : "秋招失利别慌！春招补录机会清单 + 投递策略，附内推渠道汇总",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example7",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "就业实习,权益服务",
+            "public_account": 1,
+            "title": "秋招失利别慌！春招补录机会清单 + 投递策略，附内推渠道汇总",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example7",
+            "publish_time": "2025-10-6 17:07",
+            "summary": "balabala",
+            "tags": [
+                "就业",
+                "资源"
+            ],
             "key_info": "春招补录、秋招失利、投递策略、内推渠道、毕业生补招",
             "tags_vector": [
                 0.0,
                 0.0,
                 0.0,
                 0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -845,8 +884,11 @@
                 0.0,
                 0.0,
                 0.0,
-                0.7071067811865475,
-                0.7071067811865475
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
             ],
             "semantic_vector": [
                 0.0833018347620964,
@@ -952,20 +994,22 @@
             ]
         },
         {
-            "public_account" : 2,
-            "title" : "2025 春季学期补考 / 重修报名通知：时间节点 + 流程 + 备考建议",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example8",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "教务通知",
+            "public_account": 2,
+            "title": "2025 春季学期补考 / 重修报名通知：时间节点 + 流程 + 备考建议",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example8",
+            "publish_time": "2025-10-6 17:08",
+            "summary": "balabala",
+            "tags": [
+                "通知",
+                "教务",
+                "重大"
+            ],
             "key_info": "补考报名,重修流程,教务通知",
             "tags_vector": [
                 0.0,
                 0.0,
-                0.0,
-                0.0,
-                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -973,6 +1017,12 @@
                 0.0,
                 0.0,
                 1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
                 0.0,
                 0.0,
                 0.0,
@@ -1082,23 +1132,30 @@
             ]
         },
         {
-            "public_account" : 3,
-            "title" : "2025 校内体育比赛奖项设置 + 积分规则：团体冠军 + 个人奖项详解",
-            "content" : "balabala",
-            "article_url" : "https://mp.weixin.qq.com/example9",
-            "publish_time" : "2025-10-6 17:00",
-            "summary" : "balabala",
-            "tags": "体育赛事",
+            "public_account": 3,
+            "title": "2025 校内体育比赛奖项设置 + 积分规则：团体冠军 + 个人奖项详解",
+            "content": "balabala",
+            "article_url": "https://mp.weixin.qq.com/example9",
+            "publish_time": "2025-10-6 17:09",
+            "summary": "balabala",
+            "tags": [
+                "比赛",
+                "体育"
+            ],
             "key_info": "体育比赛奖项,积分规则,团体冠军,个人奖项,校内赛事规则",
             "tags_vector": [
-                0.0,
-                0.0,
                 0.0,
                 1.0,
                 0.0,
                 0.0,
                 0.0,
                 0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -1215,11 +1272,15 @@
     "subscriptions": [
         {
             "user": 1,
-            "accounts": [1]
+            "accounts": [
+                1
+            ]
         },
         {
             "user": 2,
-            "accounts": [1]
+            "accounts": [
+                1
+            ]
         },
         {
             "user": 3,
@@ -1229,32 +1290,49 @@
     "browses": [
         {
             "user": 1,
-            "articles": [1,2]
+            "articles": [
+                1,
+                2
+            ]
         },
         {
             "user": 2,
-            "articles": [3,4]
+            "articles": [
+                3,
+                4
+            ]
         },
         {
             "user": 3,
-            "articles": [5,6]
+            "articles": [
+                5,
+                6
+            ]
         }
     ],
     "favorites": [
         {
             "user": 1,
-            "articles": [2]
+            "articles": [
+                2
+            ]
         },
         {
             "user": 2,
-            "articles": [3]
+            "articles": [
+                3
+            ]
         },
         {
             "user": 3,
-            "articles": [5]
+            "articles": [
+                5
+            ]
         }
     ],
     "test": [
-        7,8,9
+        7,
+        8,
+        9
     ]
 }

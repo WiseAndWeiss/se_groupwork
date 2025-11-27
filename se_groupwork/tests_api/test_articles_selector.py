@@ -37,7 +37,7 @@ class ArticleSelectorTests(TestCase):
             del article_info['publish_time_delta']
             article_info['publish_time'] = pt
             if article_info['summary'] != '':
-                tags = article_info['tags'].split(',')
+                tags = article_info['tags']
                 article_info['tags_vector'] = tags_vectorize(tags)
                 keywords = article_info['key_info'].split(',')
                 article_info['semantic_vector'] = keywords_vectorize(keywords)
@@ -146,14 +146,12 @@ class ArticleSelectorTests(TestCase):
         # 测试
         require ={
             'account_id': PublicAccount.objects.get(fakeid='T1').id,
-            'tags': ['教务通知'],
+            'tags': ['通知'],
             'date_from': (timezone.now() - timedelta(days=1)).date().strftime('%Y-%m-%d'),
             'date_to': (timezone.now() + timedelta(days=1)).date().strftime('%Y-%m-%d')
         }
         date_from = timezone.datetime.strptime(require['date_from'], '%Y-%m-%d')
-        date_from = timezone.make_aware(date_from)
         date_to = timezone.datetime.strptime(require['date_to'], '%Y-%m-%d')
-        date_to = timezone.make_aware(date_to)
         response = self.client.post(
             reverse('articles-filter'),
             data=json.dumps(require),
@@ -161,10 +159,10 @@ class ArticleSelectorTests(TestCase):
         )
         # 检查
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['articles']), 2)
+        self.assertEqual(len(response.data['articles']), 4)
         for article in response.data['articles']:
             self.assertTrue('T1' in article['article_url'])
-            self.assertTrue('教务通知' in article['tags'])
+            self.assertTrue('通知' in article['tags'])
             self.assertTrue(date_from <= timezone.datetime.fromisoformat(article['publish_time']))
             self.assertTrue(date_to >= timezone.datetime.fromisoformat(article['publish_time']))
         
