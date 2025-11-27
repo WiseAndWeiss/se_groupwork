@@ -65,7 +65,8 @@ class TaskManager:
             if resp is None:
                 self.result.append({"id": article_msg["id"], "summary": "", "keyinfo": [], "tags": [], "semantic_vector": [], "tags_vector": []})
             # 更新数据库
-            self.result.append(resp | {"id": article_msg["id"]})
+            else:
+                self.result.append(resp | {"id": article_msg["id"]})
         finally:
             # 释放信号量许可
             self.semaphore.release()
@@ -91,7 +92,7 @@ class TaskManager:
         
         # 3. 更新数据库
         for item in self.result:
-            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=",".join(item["tags"]), tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
+            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=item["tags"], tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
         self.result = []
         self.print_table_to_json("result.json")
         return True

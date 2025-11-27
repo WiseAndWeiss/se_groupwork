@@ -96,9 +96,8 @@ class Article(models.Model):
         blank=True,
         verbose_name='关键信息'
     )
-    tags = models.CharField(
-        max_length=20,
-        blank=True,
+    tags = models.JSONField(
+        default=list,
         verbose_name='标签'
     )
     tags_vector = models.JSONField(
