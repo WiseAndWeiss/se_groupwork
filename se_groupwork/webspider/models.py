@@ -53,6 +53,7 @@ class PublicAccount(models.Model):
         indexes = [
             models.Index(fields=['name']),
             models.Index(fields=['fakeid']),
+            models.Index(fields=['is_default']),  # 筛选默认公众号会用到
         ]
 
 
@@ -120,6 +121,10 @@ class Article(models.Model):
         verbose_name_plural = '微信文章'
         ordering = ['-publish_time']
         unique_together = ['public_account', 'article_url']
+        indexes = [
+            models.Index(fields=['-publish_time']),  # 获取最新文章会用到
+            models.Index(fields=['public_account','-publish_time']),  # 获取公众号的最新文章会用到
+        ]
 
 
 class Cookies(models.Model):
