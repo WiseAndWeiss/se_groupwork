@@ -16,4 +16,4 @@ class Command(BaseCommand):
             biz_searcher.biz_search()  
             self.stdout.write(self.style.SUCCESS(f'成功搜索到公众号"{account_name}"有关信息！'))
         except Exception as e:
-            self.strdout.write(self.style.ERROR(f'搜索公众号"{account_name}"时出错: {str(e)}'))
+            self.stdout.write(self.style.ERROR(f'搜索公众号"{account_name}"时出错: {str(e)}'))
