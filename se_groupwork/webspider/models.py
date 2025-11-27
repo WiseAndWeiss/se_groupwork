@@ -119,7 +119,7 @@ class Article(models.Model):
         verbose_name = '微信文章'
         verbose_name_plural = '微信文章'
         ordering = ['-publish_time']
-        unique_together = ['public_account', 'publish_time']
+        unique_together = ['public_account', 'article_url']
 
 
 class Cookies(models.Model):
