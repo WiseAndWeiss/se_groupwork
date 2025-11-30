@@ -144,14 +144,51 @@ class ArticleSelectorTests(TestCase):
         Subscription.objects.create_subscription(self.user, account_c1)
         Subscription.objects.create_subscription(self.user, account_c2)
         # 测试
-        require ={
-            'account_id': PublicAccount.objects.get(fakeid='T1').id,
+        require_1 ={
+            'accounts_id': [PublicAccount.objects.get(fakeid='T1').id, PublicAccount.objects.get(fakeid='C1').id],
+            'range': 'd',
             'tags': ['通知'],
             'date_from': (timezone.now() - timedelta(days=1)).date().strftime('%Y-%m-%d'),
             'date_to': (timezone.now() + timedelta(days=1)).date().strftime('%Y-%m-%d')
         }
-        date_from = timezone.datetime.strptime(require['date_from'], '%Y-%m-%d')
-        date_to = timezone.datetime.strptime(require['date_to'], '%Y-%m-%d')
+        require_2 = {
+            'accounts_id': [PublicAccount.objects.get(fakeid='C1').id],
+            'range': 'd'
+        }
+        date_from = timezone.datetime.strptime(require_1['date_from'], '%Y-%m-%d')
+        date_to = timezone.datetime.strptime(require_1['date_to'], '%Y-%m-%d')
+        response_1 = self.client.post(
+            reverse('articles-filter'),
+            data=json.dumps(require_1),
+            content_type='application/json'
+        )
+        response_2 = self.client.post(
+            reverse('articles-filter'),
+            data=json.dumps(require_2),
+            content_type='application/json'
+        )
+        # 检查
+        self.assertEqual(response_1.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response_1.data['articles']), 4)
+        for article in response_1.data['articles']:
+            self.assertTrue('T1' in article['article_url'])
+            self.assertTrue('通知' in article['tags'])
+            self.assertTrue(date_from <= timezone.datetime.fromisoformat(article['publish_time']))
+            self.assertTrue(date_to >= timezone.datetime.fromisoformat(article['publish_time']))
+        self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
+        
+
+    def test_search_api(self):
+        '''测试search API'''
+        # 准备数据
+        account_c1 = PublicAccount.objects.get(fakeid='C1')
+        account_c2 = PublicAccount.objects.get(fakeid='C2')
+        Subscription.objects.create_subscription(self.user, account_c1)
+        Subscription.objects.create_subscription(self.user, account_c2)
+        # 测试
+        require = {
+            'search_content': '2022'
+        }
         response = self.client.post(
             reverse('articles-filter'),
             data=json.dumps(require),
@@ -159,10 +196,3 @@ class ArticleSelectorTests(TestCase):
         )
         # 检查
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['articles']), 4)
-        for article in response.data['articles']:
-            self.assertTrue('T1' in article['article_url'])
-            self.assertTrue('通知' in article['tags'])
-            self.assertTrue(date_from <= timezone.datetime.fromisoformat(article['publish_time']))
-            self.assertTrue(date_to >= timezone.datetime.fromisoformat(article['publish_time']))
-        

@@ -19,3 +19,4 @@ class Command(BaseCommand):
         count = options['count']
 
         #TODO 分别处理各个公众号的未处理文章
+        manager = TaskManager(target_accounts_name=account_names, max_article_num=count, max_semaphore=10)
