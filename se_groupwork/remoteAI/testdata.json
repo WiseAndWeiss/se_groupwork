@@ -2,14 +2,14 @@
 	"account" : [
 		{
 			"name": "学生清华",
-			"icon_url": "https://example.com/icon1.jpg",
+			"icon": "icon1.jpg",
 			"fakeid": "fakeid1",
 			"last_crawl_time": "2023-01-01 00:00:00",
 			"created_at": "2023-01-01 00:00:00"
 		},
 		{
 			"name": "软小宣",
-			"icon_url": "https://example.com/icon2.jpg",
+			"icon": "icon2.jpg",
 			"fakeid": "fakeid2",
 			"last_crawl_time": "2023-01-01 00:00:00",
 			"created_at": "2023-01-01 00:00:00"
