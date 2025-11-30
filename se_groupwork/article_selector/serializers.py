@@ -37,6 +37,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 class ArticlesFilterSerializer(serializers.Serializer):
     start_rank = serializers.IntegerField(default=0, min_value=0)
     limit = serializers.IntegerField(default=20, min_value=1, max_value=50)
+    range = serializers.ChoiceField(choices=['a','d','c'], default='a', help_text='公众号范围:a-all、d-default、c-custom')
     accounts_id = serializers.ListField(child=serializers.IntegerField(), required=False)
     tags = serializers.ListField(child=serializers.CharField(), required=False)
     date_from = serializers.DateField(required=False, format="%Y-%m-%dT%H:%M:%S.%f%z")
