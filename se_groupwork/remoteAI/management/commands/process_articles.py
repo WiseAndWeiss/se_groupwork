@@ -5,7 +5,7 @@ class Command(BaseCommand):
     help = '处理未摘要的文章'
 
     def handle(self, *args, **options):
-        manager = TaskManager()
+        manager = TaskManager(max_semaphore=10)
         result = manager.startrun()
         if result:
             self.stdout.write(self.style.SUCCESS('任务执行成功！'))
