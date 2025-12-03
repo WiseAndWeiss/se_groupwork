@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
-from user.models import User, Subscription, Favorite, History
+from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
+from user.models import Collection, User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -363,6 +363,131 @@ class SortSubscriptionListView(APIView):
             )
 
 
+# 收藏夹相关API
+@extend_schema(
+    tags=['收藏管理'],
+    summary='收藏夹列表',
+    description='获取用户的收藏夹列表',
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取收藏夹列表'),
+        401: OpenApiResponse(description='未授权访问')
+    },
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='添加新收藏夹',
+    description='添加新收藏夹',
+    methods=['POST'],
+    request=CollectionCreateSerializer,
+    responses={
+        201: OpenApiResponse(description='收藏创建成功'),
+        400: OpenApiResponse(description='存在同名文件夹'),
+        401: OpenApiResponse(description='未授权访问')
+    },
+    examples=[
+        OpenApiExample(
+            '添加收藏夹',
+            value={
+                "name": "收藏夹",
+                "description": "收藏夹"
+            }
+        )
+    ]
+)
+class CollectionListView(APIView):
+    """收藏夹列表API"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        collections = Collection.objects.get_user_collections(request.user)
+        serializer = CollectionSerializer(collections, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = CollectionCreateSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            collection = Collection.objects.create_collection(
+                user=request.user, 
+                name=serializer.validated_data['name'],
+                description=serializer.validated_data.get('description', '')  # 可选字段
+            )
+            return Response(
+                CollectionSerializer(collection).data, 
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@extend_schema(
+    tags=['收藏管理'],
+    summary='获取收藏夹内容',
+    description='获取特定收藏夹的内容',
+    methods=['GET'],
+    responses={
+        200: CollectionSerializer,
+        404: OpenApiResponse(description='未找到收藏夹')
+    }
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='更新收藏夹信息',
+    description='更新特定收藏夹的信息',
+    methods=['PUT'],
+    request=CollectionCreateSerializer,
+    responses={
+        200: CollectionSerializer,
+        204: OpenApiResponse(description='收藏夹已更新'),
+        404: OpenApiResponse(description='未找到收藏夹')
+    },
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='删除收藏夹',
+    description='删除特定收藏夹',
+    methods=['DELETE'],
+    responses={
+        200: CollectionSerializer,
+        204: OpenApiResponse(description='收藏夹已删除'),
+        404: OpenApiResponse(description='未找到收藏夹')
+    }
+)
+class CollectionDetailView(APIView):
+    """收藏夹详情API"""
+    permission_classes = [IsAuthenticated]
+    
+    
+    def get(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        favorites = Favorite.objects.get_collection_favorites(collection)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        serializer = CollectionCreateSerializer(
+            collection, 
+            data=request.data, 
+            context={'request': request},
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(CollectionSerializer(collection).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        if collection.is_default:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            collection.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # 收藏相关API
 @extend_schema(
     tags=['收藏管理'],
@@ -388,7 +513,10 @@ class SortSubscriptionListView(APIView):
     examples=[
         OpenApiExample(
             '添加收藏',
-            value={'article_id': 1}
+            value={
+                'article_id': 1,
+                'collection_id': 1
+            }
         )
     ]
 )
@@ -415,12 +543,17 @@ class FavoriteListView(APIView):
     def post(self, request):
         """创建新的收藏"""
         article_id = request.data.get('article_id')
+        collection_id = request.data.get('collection_id')  # 新增收藏夹参数
         article = get_object_or_404(Article, pk=article_id)
-        
+        # 收藏唯一性
         if Favorite.objects.is_favorited(request.user, article):
             return Response({'error': '已经收藏过该文章'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = Favorite.objects.create_favorite(request.user, article)
+        # 如果没有指定收藏夹，添加到默认收藏夹
+        collection = None
+        if collection_id:
+            collection = get_object_or_404(Collection, pk=collection_id, user=request.user)
+
+        favorite = Favorite.objects.create_favorite(request.user, article, collection)
         serializer = FavoriteSerializer(favorite)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -428,6 +561,48 @@ class FavoriteListView(APIView):
         """清空当前用户的所有收藏"""
         Favorite.objects.clear_user_favorites(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    tags=['收藏管理'],
+    summary='移动收藏',
+    description='将收藏移动到其它收藏夹',
+    methods=['POST'],
+    request=FavoriteMoveSerializer,
+    responses={
+        200: OpenApiResponse(description='所有收藏已清空'),
+        400: OpenApiResponse(description='未指定收藏夹'),
+        401: OpenApiResponse(description='未授权访问'),
+        404: OpenApiResponse(description='未找到收藏/收藏夹')
+    },
+    examples=[
+        OpenApiExample(
+            '移动收藏',
+            value={
+                'collection_id': 1
+            }
+        )
+    ]
+)
+class FavoriteMoveView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        """将收藏移动到其他收藏夹"""
+        favorite = get_object_or_404(Favorite, pk=pk, user=request.user)
+        new_collection_id = request.data.get('collection_id')
+        
+        if not new_collection_id:
+            return Response({'error': '必须指定目标收藏夹'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        new_collection = get_object_or_404(Collection, pk=new_collection_id, user=request.user)
+        
+        try:
+            favorite = Favorite.objects.move_favorite(favorite, new_collection)
+            serializer = FavoriteSerializer(favorite)
+            return Response(serializer.data)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(
@@ -483,9 +658,6 @@ class SearchFavoriteListView(APIView):
         204: OpenApiResponse(description='单条收藏已删除'),
         404: OpenApiResponse(description='未找到收藏信息')
     },
-    parameters=[
-        OpenApiParameter(name='pk', description='收藏ID', type=int)
-    ]
 )
 class FavoriteDetailView(APIView):
     """收藏详情API - 处理单个收藏的操作"""

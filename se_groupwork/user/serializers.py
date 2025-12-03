@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Subscription, Favorite, History
+from .models import Collection, User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from .param_validate import validate_credentials, check_password_strength, check_phone_number
 from article_selector.serializers import ArticleSerializer
 from django.conf import settings
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -166,10 +168,38 @@ class FavoriteSerializer(serializers.ModelSerializer):
     - 包含收藏信息和关联的文章详情
     """
     article = ArticleSerializer(read_only=True)  # 嵌套序列化文章信息，只读
-    
+
     class Meta:
         model = Favorite  # 关联收藏模型
         fields = ['id', 'article', 'favorited_at']  # 包含的收藏信息字段
+
+class CollectionSerializer(serializers.ModelSerializer):
+    """收藏夹序列化器（只显示概要信息）"""
+    favorite_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Collection
+        fields = ['id', 'name', 'description', 'is_default', 'order', 'favorite_count']
+
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_favorite_count(self, obj) -> int:
+        return obj.favorites.count()
+        
+class CollectionCreateSerializer(serializers.ModelSerializer):
+    """创建收藏夹序列化器"""
+    class Meta:
+        model = Collection
+        fields = ['name', 'description']
+    
+    def validate_name(self, value):
+        user = self.context['request'].user
+        if Collection.objects.filter(user=user, name=value).exists():
+            raise serializers.ValidationError("收藏夹名称已存在")
+        return value
+
+class FavoriteMoveSerializer(serializers.Serializer):
+    """收藏移动序列化器"""
+    collection_id = serializers.IntegerField(required=True, min_value=1)
 
 class HistorySerializer(serializers.ModelSerializer):
     """浏览历史序列化器

@@ -107,6 +107,7 @@ class User(AbstractBaseUser):
 
     # 统计信息
     subscription_count = models.IntegerField(_('订阅公众号数'), default=0)
+    collection_count = models.IntegerField(_('收藏夹数'), default=0)
     favorite_count = models.IntegerField(_('收藏文章数'), default=0)
     history_count = models.IntegerField(_('活跃浏览历史数'), default=0)
 
@@ -205,6 +206,104 @@ class Subscription(models.Model):
         return f"{self.user} -> {self.public_account}"
     
 
+class CollectionManager(models.Manager):
+    """自定义收藏夹管理器"""
+
+    # 获取用户的所有收藏夹
+    def get_user_collections(self, user):
+        return self.filter(user=user).prefetch_related('favorites')
+    
+    # 获取用户特定的收藏夹
+    def get_user_collection(self, user, collection_id):
+        return self.get(user=user, id=collection_id)
+
+    # 创建新的收藏夹
+    def create_collection(self, user, name, description=''):
+        # 获取当前最大排序值
+        max_order = self.filter(user=user).aggregate(models.Max('order'))['order__max'] or 0 
+        collection = self.create(
+            user=user, 
+            name=name,
+            description=description,
+            order=max_order + 1,
+        )
+        return collection
+
+    # 删除收藏夹,以及其中的所有收藏
+    def delete_collection(self, collection):
+        collection.favorites.all().delete()
+        collection.delete()
+
+    # 检查用户是否已有同名收藏夹
+    def collection_exists(self, user, name):
+        return self.filter(user=user, name=name).exists()
+
+class Collection(models.Model):
+    """
+    用户的收藏夹
+    图例：用户A-收藏夹-收藏A,收藏B,...
+    当用户删除时，收藏夹自动删除
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        verbose_name=_('所属用户')
+    )
+    name = models.CharField(
+        _('收藏夹名称'),
+        max_length=50,
+        help_text=_('收藏夹名称，不超过50个字符')
+    )
+    description = models.TextField(
+        _('收藏夹描述'),
+        blank=True,
+        max_length=100,
+        help_text=_('收藏夹描述，最多100字')
+    )
+    created_at = models.DateTimeField(
+        _('创建时间'),
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        _('更新时间'),
+        auto_now=True
+    )
+    is_default = models.BooleanField(
+        _('是否为默认收藏夹'),
+        default=False
+    )
+    order = models.PositiveIntegerField(
+        _('排序顺序'),
+        default=0
+    )
+    favorite_count = models.IntegerField(_('收藏文章数'), default=0)
+
+    objects = CollectionManager()
+
+    class Meta:
+        verbose_name = _('收藏夹')
+        verbose_name_plural = _('收藏夹')
+        unique_together = [('user', 'name')]  # 同一用户下收藏夹名称唯一
+        ordering = ['order', '-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_default']),  # 获取默认收藏夹
+            # models.Index(fields=['user', 'name']),  # unique_together已自动创建
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name}"
+    
+    def get_favorite_count(self):
+        """获取收藏夹中的文章数量"""
+        return self.favorites.count()
+    
+    def delete(self, *args, **kwargs):
+        """防止删除默认收藏夹"""
+        if self.is_default:
+            raise ValueError("默认收藏夹不可删除")
+        super().delete(*args, **kwargs)
+
+
 class FavoriteManager(models.Manager):
     """自定义收藏管理器"""
 
@@ -217,8 +316,19 @@ class FavoriteManager(models.Manager):
         return self.filter(user=user, article=article).exists()
     
     # 创建收藏并更新用户的收藏计数
-    def create_favorite(self, user, article):
-        favorite = self.create(user=user, article=article)
+    def create_favorite(self, user, article, collection):
+        # 如果没有指定收藏夹，则使用默认收藏夹（如果没有，则会自动创建）
+        if not collection:
+           collection, created = Collection.objects.get_or_create(
+                user=user,
+                is_default=True,
+                defaults={
+                    'name': "默认收藏夹",
+                    'order': 0
+                }
+            )
+            
+        favorite = self.create(user=user, article=article, collection=collection)
         return favorite
     
     # 删除用户的所有收藏
@@ -229,16 +339,47 @@ class FavoriteManager(models.Manager):
     def delete_favorite(self, favorite):
         favorite.delete()
 
+    # 获取收藏夹中的所有收藏
+    def get_collection_favorites(self, collection):
+        return self.filter(collection=collection)
+
+    # 移动收藏到其他收藏夹，并手动更新计数
+    def move_favorite(self, favorite, new_collection):
+        old_collection = favorite.collection 
+
+        favorite.collection = new_collection
+        favorite.save(update_fields=['collection'])
+
+        if old_collection:
+            old_collection.favorite_count = max(0, old_collection.favorite_count - 1)
+            old_collection.save(update_fields=['favorite_count'])
+        
+        new_collection.favorite_count += 1
+        new_collection.save(update_fields=['favorite_count'])
+
+        return favorite
+
+    # 删除收藏夹的所有收藏
+    def clear_collection_favorites(self, collection):
+        self.filter(collection=collection).delete()
 
 class Favorite(models.Model):
     """
     用户收藏的文章
     图例：用户A-收藏-文章A
-    当用户/文章删除时，收藏记录自动删除
+    当用户/文章/收藏夹删除时，收藏记录自动删除
     """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE
+    )
+    collection = models.ForeignKey(
+        Collection,
+        on_delete=models.CASCADE,
+        related_name='favorites',
+        verbose_name=_('所属收藏夹'),
+        null=True,
+        blank=True
     )
     article = models.ForeignKey(
         Article, 
@@ -255,11 +396,21 @@ class Favorite(models.Model):
         ordering = ['-favorited_at']  # 按照收藏时间排列，最新收藏的在前面
         indexes = [
             models.Index(fields=['user', '-favorited_at']),
+            models.Index(fields=['collection', '-favorited_at']),
             # models.Index(fields=['user', 'article']),  # unique_together已自动创建
         ]
+        verbose_name = _('收藏记录')
+        verbose_name_plural = _('收藏记录')
+
     def __str__(self):
-        return f"{self.user} favorited {self.article}"
+        return f"{self.user} favorited {self.article} in {self.collection}"
     
+    def save(self, *args, **kwargs):
+        # 自动设置user为collection的user
+        if not self.user_id:
+            self.user = self.collection.user
+        super().save(*args, **kwargs)
+
 
 class HistoryManager(models.Manager):
     """自定义浏览历史管理器"""
