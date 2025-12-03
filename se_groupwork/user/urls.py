@@ -15,10 +15,14 @@ urlpatterns = [
     path('subscriptions/', views.SubscriptionListView.as_view(), name='subscription-list'),
     path('subscriptions/<int:pk>/', views.SubscriptionDetailView.as_view(), name='subscription-detail'),
     path('subscriptions/search/', views.SearchSubscriptionListView.as_view(), name='subscription-search'),
+    path('subscriptions/sort/', views.SortSubscriptionListView.as_view(), name='subscription-sort'),
 
     # 收藏管理
+    path('collections/', views.CollectionListView.as_view(), name='collection-list'),
+    path('collections/<int:pk>', views.CollectionDetailView.as_view(), name='collection-detail'),
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
     path('favorites/<int:pk>/', views.FavoriteDetailView.as_view(), name='favorite-detail'),
+    path('favorites/<int:pk>/move/', views.FavoriteMoveView.as_view(), name='favorite-move'),
     path('favorites/search/', views.SearchFavoriteListView.as_view(), name='favorite-search'),
 
     # 浏览历史

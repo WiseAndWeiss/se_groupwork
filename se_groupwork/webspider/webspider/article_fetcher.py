@@ -1,6 +1,9 @@
 """
 文章信息获取器：通过公众号的fakeid获取文章的url，再通过url获取文章的content
 """
+import re
+from urllib.parse import parse_qs, urlparse, urlunparse
+import warnings
 from django.conf import settings
 import requests
 import math
@@ -14,17 +17,9 @@ import cloudscraper
 import bs4
 # 添加Django环境设置
 import os
-import django
-import sys
 from webspider.webspider.avatar_downloader import AvatarDownloader
-# 定位到项目根目录（manage.py所在目录）
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "se_groupwork.settings")
-django.setup()
-# 导入Django模型
 from webspider.models import Article, Cookies, PublicAccount
-
+import html
 
 class ArticleFetcher:
     def __init__(self, fakeid: str = None):
@@ -169,7 +164,19 @@ class ArticleFetcher:
             title = soup.find(attrs={'property':'og:title'})['content']
             author = soup.find(attrs={'property':'og:article:author'})['content']
             link = soup.find(attrs={'property':'og:url'})['content']
-            content = soup.find('div', class_='rich_media_content').get_text()
+
+            content = soup.find('div', class_='rich_media_content')
+            if content: # 1.文章有正文（不是纯图片）：直接提取正文
+                content = content.get_text()
+            else: # 2.文章无正文：提取摘要
+                meta_desc = soup.find('meta', attrs={'name': 'description'})
+                if meta_desc and meta_desc.get('content'):
+                    content = html.unescape(meta_desc['content'])
+                    content = self._clean_text(content)
+                else:
+                    content = ""
+            # print(f"content:{content}")
+
             remote_cover_url = soup.find(attrs={'property':'og:image'})['content']
 
             # 提取文章封面
@@ -187,6 +194,46 @@ class ArticleFetcher:
             print(f"获取文章内容失败: {e}")
             return "获取文章内容失败", ""
 
+    def _clean_text(self, text: str) -> str:
+        """清理HTML文本内容"""
+        if not text:
+            return ""
+        
+        # 1. 解码HTML实体
+        text = html.unescape(text)
+        
+        # 2. 移除HTML标签
+        text = re.sub(r'<[^>]+>', '', text)
+        
+        # 3. 处理特殊字符和空白
+        # 将 \x0a 转换为实际换行符
+        text = text.replace('\\x0a', '\n')
+        
+        # 处理其他常见的转义序列
+        escape_sequences = {
+            '\\x26': '&',
+            '\\x22': '"',
+            '\\x27': "'",
+            '\\x3c': '<',
+            '\\x3e': '>',
+            '\\x5c': '\\',
+            '\\x26quot;': '"',
+            '\\x26lt;': '<',
+            '\\x26gt;': '>',
+            '\\x26amp;': '&'
+        }
+        
+        for esc, char in escape_sequences.items():
+            text = text.replace(esc, char)
+        
+        # 4. 规范化空白字符
+        # 将多个连续空白字符（包括换行）合并为一个空格
+        text = re.sub(r'\s+', ' ', text)
+        
+        # 5. 移除首尾空白
+        text = text.strip()
+        
+        return text
 
     def get_cover(self, img_url: str, article_title: str) -> str:
         """
@@ -220,21 +267,26 @@ class ArticleFetcher:
         Args:
             content_list：包含title、link、publish_time、cover_url等信息
         """
+        # 由于django和mysql存在时区不同会出现警告，为了便于使用选择忽视警告。
+        warnings.filterwarnings("ignore", category=RuntimeWarning, 
+                            message="DateTimeField.*received a naive datetime")
         try:
             for item in content_list:
                 article_url = item.get("link", "")
                 title = item.get("title", "")
                 publish_time = timezone.datetime.fromtimestamp(item.get("create_time", 0))
+                # 去除chksm 
+                cleaned_article_url = self._remove_chksm(article_url)
 
                 # 由于公众号发布文章后很少会修改（正文部分支持修改最多20个字），因此如果数据库已有文章，就不需要爬取其它内容了（降低被封风险）
-                if Article.objects.filter(title=title, publish_time=publish_time).exists():
+                if Article.objects.filter(article_url = cleaned_article_url).exists():
                     print(f"文章 {title} 已存在，停止爬取")
                     continue
                 
                 result = self.get_article_content(article_url)
 
                 article, created = Article.objects.get_or_create(
-                    article_url=result['link'],
+                    article_url=cleaned_article_url,
                     defaults={
                         'public_account': self.public_account,
                         'title': title,
@@ -251,6 +303,21 @@ class ArticleFetcher:
                     print(f"⚠️ 文章链接已存在: {title}")
         except Exception as e:
             print(f"保存到数据库失败: {e}")
+
+    def _remove_chksm(self, url):
+        parsed = urlparse(url)
+        query_dict = parse_qs(parsed.query)
+        
+        # 移除chksm参数
+        if 'chksm' in query_dict:
+            del query_dict['chksm']
+        
+        # 重新构建查询字符串
+        new_query = '&'.join([f"{k}={v[0]}" for k, v in query_dict.items()])
+        
+        # 构建新的URL
+        new_parsed = parsed._replace(query=new_query)
+        return urlunparse(new_parsed)
 
     def _save_cover_to_imagefield(self, article, image_path):
         """
