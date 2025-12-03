@@ -6,7 +6,10 @@ import random
 import json
 from typing import List, Dict, Any
 from webspider.webspider.avatar_downloader import AvatarDownloader
+from django.core.files import File
 from django.conf import settings
+
+# 添加Django环境设置
 import os
 from webspider.models import PublicAccount, Cookies
 

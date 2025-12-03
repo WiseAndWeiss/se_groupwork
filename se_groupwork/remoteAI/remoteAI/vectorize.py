@@ -3,27 +3,10 @@ from sklearn.random_projection import GaussianRandomProjection
 import numpy as np
 import json
 
-local_model_path = 'remoteAI/all-MiniLM-L6-v2'
-model = SentenceTransformer(local_model_path)
+from remoteAI.remoteAI.tags import TAGS
 
-TAGS_DICT = {
-    "文娱活动":     np.array([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "学术讲座论坛": np.array([0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "赛事招募":     np.array([0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "体育赛事":     np.array([0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0]),
-    "志愿实践":     np.array([0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0]),
-    "红色党建活动": np.array([0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0]),
-    "组织招募":     np.array([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0]),
-    "其他活动":     np.array([0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]),
-    "重大事项":     np.array([0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]),
-    "校内生活告示": np.array([0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]),
-    "行政通知":     np.array([0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]),
-    "教务通知":     np.array([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0]),
-    "其他通知":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),
-    "学习资源":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0]),
-    "就业实习":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]),
-    "权益服务":     np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]),
-}
+local_model_path = './remoteAI/all-MiniLM-L6-v2'
+model = SentenceTransformer(local_model_path)
 
 def vectorize(text):
     vector = model.encode(text)
@@ -41,51 +24,49 @@ def keywords_vectorize(keywords):
 
 
 def tags_vectorize(tags):
-    tags_vector = np.zeros(16)
+    tags_vector = np.zeros(len(TAGS))
     for tag in tags:
-        if tag in TAGS_DICT:
-            tags_vector += TAGS_DICT[tag]
-    norm = np.linalg.norm(tags_vector)
-    if norm != 0:
-        tags_vector = tags_vector / norm
+        if tag in TAGS:
+            rank = TAGS.index(tag)
+            tags_vector[rank] = 1
     return tags_vector.tolist()
 
 
 data = [
     {
-        "tags": "就业实习,权益服务",
+        "tags": ["就业", "招聘"],
         "keyinfo": "春招,简历优化,2025毕业生,求职攻略"
     },
     {
-        "tags": "就业实习",
+        "tags": ["就业", "资源"],
         "keyinfo": "毕业生择业,薪资对比,职业发展路径,求职决策"
     },
     {
-        "tags": "教务通知",
+        "tags": ["教务", "通知"],
         "keyinfo": "春季学期,选课补选,补选时间,教务通知"
     },
     {
-        "tags": "行政通知,教务通知",
+        "tags": ["教务", "通知"],
         "keyinfo": "学籍异动,转专业,休学,申请材料,教务信息"
     },
     {
-        "tags": "赛事招募",
+        "tags": ["体育", "比赛"],
         "keyinfo": "校园杯,篮球联赛,报名启动,赛程安排"
     },
     {
-        "tags": "体育赛事",
+        "tags": ["体育", "比赛"],
         "keyinfo": "羽毛球挑战赛,运动装备,校内比赛,运动员"
     },
     {
-        "tags": "就业实习,权益服务",
+        "tags": ["就业", "资源"],
         "keyinfo": "春招补录、秋招失利、投递策略、内推渠道、毕业生补招"
     },
     {
-        "tags": "教务通知",
+        "tags": ["教务", "通知"],
         "keyinfo": "补考报名,重修流程,教务通知"
     },
     {
-        "tags": "体育赛事",
+        "tags": ["体育", "比赛"],
         "keyinfo": "体育比赛奖项,积分规则,团体冠军,个人奖项,校内赛事规则"
     }
 ]
@@ -96,7 +77,7 @@ if __name__ == '__main__':
     print("Already loaded model")
     result = []
     for item in data:
-        tags = item['tags'].split(',')
+        tags = item['tags']
         keyinfo = item['keyinfo'].split(',')
         tags_vector = tags_vectorize(tags)
         keyinfo_vector = keywords_vectorize(keyinfo)

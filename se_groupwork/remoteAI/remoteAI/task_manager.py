@@ -4,11 +4,13 @@ from remoteAI.remoteAI.article_ai_serializer import entry
 from webspider.models import Article, PublicAccount
 
 class TaskManager:
-    def __init__(self):
+    def __init__(self, target_accounts_name = None, max_article_num = None, max_semaphore=5):
         # 最大并发线程数限制为5
-        self.semaphore = threading.Semaphore(5)
+        self.semaphore = threading.Semaphore(max_semaphore)
         self.task_pool = []
         self.result = []
+        self.target_accounts_name = target_accounts_name
+        self.max_article_num = max_article_num
 
     def print_table_to_json(self, save_path):
         """打印数据表"""
@@ -36,10 +38,23 @@ class TaskManager:
 
     def get_all_tasks_id(self) -> bool:
         """获取所有未处理任务的ID"""
-        unprocessed_tasks = Article.objects.filter(summary="").values_list('id', flat=True)
-        unprocessed_tasks = list(unprocessed_tasks)
-        self.task_pool = unprocessed_tasks
-        if len(unprocessed_tasks) == 0:
+        alltasks = Article.objects.filter(summary="").order_by('-publish_time')
+        target_ids = []
+        if self.target_accounts_name is not None:
+            if self.max_article_num is not None:
+                for name in self.target_accounts_name:
+                    target_ids += list(alltasks.filter(public_account__name=name).order_by('-publish_time')[:self.max_article_num].values_list('id', flat=True))
+            else:
+                for name in self.target_accounts_name:
+                    target_ids += list(alltasks.filter(public_account__name=name).order_by('-publish_time').values_list('id', flat=True))
+        else:
+            if self.max_article_num is not None:
+                target_ids = list(alltasks.order_by('-publish_time')[:self.max_article_num].values_list('id', flat=True))
+            else:
+                target_ids = list(alltasks.order_by('-publish_time').values_list('id', flat=True))
+        target_ids = list(set(target_ids))
+        self.task_pool = target_ids
+        if len(self.task_pool) == 0:
             return False
         else: 
             return True
@@ -65,7 +80,8 @@ class TaskManager:
             if resp is None:
                 self.result.append({"id": article_msg["id"], "summary": "", "keyinfo": [], "tags": [], "semantic_vector": [], "tags_vector": []})
             # 更新数据库
-            self.result.append(resp | {"id": article_msg["id"]})
+            else:
+                self.result.append(resp | {"id": article_msg["id"]})
         finally:
             # 释放信号量许可
             self.semaphore.release()
@@ -91,7 +107,7 @@ class TaskManager:
         
         # 3. 更新数据库
         for item in self.result:
-            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=",".join(item["tags"]), tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
+            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=item["tags"], tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
         self.result = []
         self.print_table_to_json("result.json")
         return True

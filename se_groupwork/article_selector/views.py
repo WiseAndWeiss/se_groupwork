@@ -293,10 +293,14 @@ class ArticleViewSet(viewsets.ViewSet):
             "application/json": {
                 "type": "object",
                 "properties": {
-                    "account_names": {
+                    "accounts_id": {
                         "type": "array",
-                        "items": {"type": "string"},
+                        "items": {"type": "integer"},
                         "description": "公众号ID列表（可选，默认使用用户关联的公众号）"
+                    },
+                    "range": {
+                        "choices": ["a", "b"],
+                        "description": "筛选范围：a-all全部, d-default默认，c-custom自选"
                     },
                     "date_from": {
                         "type": "string",
@@ -352,11 +356,26 @@ class ArticleViewSet(viewsets.ViewSet):
         data = serializer.validated_data
         queryset = None
         
-        account_names = data.get('account_names')
-        if account_names:
-            account_list = PublicAccount.objects.filter(name__in=account_names)
+        range = data.get('range')
+        if range == 'a':
+            all_accounts = get_accounts_by_user(request.user)
+        elif range == 'd':
+            all_accounts = get_campus_accounts()
         else:
-            account_list = get_accounts_by_user(request.user)
+            all_accounts = get_customized_accounts()
+        all_accounts_id = [a.id for a in all_accounts]
+
+        accounts_id = data.get('accounts_id')
+        if accounts_id:
+            accounts_id = [id for id in accounts_id if id in all_accounts_id]
+            account_list = PublicAccount.objects.filter(id__in=accounts_id)
+            if len(account_list) == 0:
+                return Response(
+                    {'error': '公众号不存在'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            account_list = all_accounts
         queryset = Article.objects.filter(
             public_account__in=account_list,
         ).exclude(summary='')
