@@ -1,4 +1,5 @@
 import os
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth import update_session_auth_hash
@@ -8,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ArticleSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer
-from user.models import User, Subscription, Favorite, History
+from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
+from user.models import Collection, User, Subscription, Favorite, History
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -247,6 +248,246 @@ class SubscriptionDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(
+    tags=['订阅管理'],
+    summary='排序订阅',
+    description='将订阅的公众号按用户需要的顺序排序',
+    methods=['POST'],
+    request=SubscriptionSortSerializer,
+    responses={
+        200: OpenApiResponse(description='成功进行排序'),
+        400: OpenApiResponse(description='请求数据格式错误'),
+        404: OpenApiResponse(description='未找到订阅信息')
+    },
+    examples=[
+        OpenApiExample(
+            '排序订阅示例',
+            value={
+                "orders": [
+                    {"subscription_id": 1, "order": 2},
+                    {"subscription_id": 2, "order": 1},
+                    {"subscription_id": 3, "order": 3}
+                ]
+            }
+        )
+    ]
+)
+class SortSubscriptionListView(APIView):
+    """
+    将订阅的公众号按用户需要的顺序排序
+    GET /api/subscriptions/sort/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """
+        更新用户订阅的排序顺序
+        """
+        orders_data = request.data.get('orders', [])
+        
+        # 验证请求数据
+        if not isinstance(orders_data, list):
+            return Response(
+                {'error': 'orders 必须是数组格式'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not orders_data:
+            return Response(
+                {'error': 'orders 不能为空'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # 提取订阅ID列表
+        subscription_ids = [item.get('subscription_id') for item in orders_data if item.get('subscription_id')]
+        
+        if not subscription_ids:
+            return Response(
+                {'error': '未提供有效的订阅ID'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            with transaction.atomic():
+                # 获取当前用户的所有相关订阅
+                user_subscriptions = Subscription.objects.filter(
+                    user=request.user, 
+                    id__in=subscription_ids
+                )
+                
+                # 检查是否所有订阅ID都有效
+                found_ids = set(user_subscriptions.values_list('id', flat=True))
+                requested_ids = set(subscription_ids)
+                
+                if found_ids != requested_ids:
+                    missing_ids = requested_ids - found_ids
+                    return Response(
+                        {
+                            'error': f'以下订阅ID不存在或不属于当前用户: {missing_ids}',
+                            'valid_ids': list(found_ids)
+                        }, 
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # 创建订阅ID到对象的映射
+                subscription_map = {sub.id: sub for sub in user_subscriptions}
+                
+                # 更新排序顺序
+                for order_item in orders_data:
+                    subscription_id = order_item.get('subscription_id')
+                    order = order_item.get('order')
+                    
+                    if subscription_id in subscription_map and order is not None:
+                        subscription = subscription_map[subscription_id]
+                        subscription.order = order
+                        subscription.save(update_fields=['order'])
+                
+                # 返回更新后的订阅列表
+                updated_subscriptions = Subscription.objects.filter(
+                    user=request.user, 
+                    is_active=True
+                ).order_by('order', '-subscribed_at')
+                
+                serializer = SubscriptionSerializer(updated_subscriptions, many=True)
+                
+                return Response({
+                    'success': True,
+                    'message': '订阅排序更新成功',
+                    'subscriptions': serializer.data
+                }, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {'error': f'排序更新失败: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+# 收藏夹相关API
+@extend_schema(
+    tags=['收藏管理'],
+    summary='收藏夹列表',
+    description='获取用户的收藏夹列表',
+    methods=['GET'],
+    responses={
+        200: OpenApiResponse(description='成功获取收藏夹列表'),
+        401: OpenApiResponse(description='未授权访问')
+    },
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='添加新收藏夹',
+    description='添加新收藏夹',
+    methods=['POST'],
+    request=CollectionCreateSerializer,
+    responses={
+        201: OpenApiResponse(description='收藏创建成功'),
+        400: OpenApiResponse(description='存在同名文件夹'),
+        401: OpenApiResponse(description='未授权访问')
+    },
+    examples=[
+        OpenApiExample(
+            '添加收藏夹',
+            value={
+                "name": "收藏夹",
+                "description": "收藏夹"
+            }
+        )
+    ]
+)
+class CollectionListView(APIView):
+    """收藏夹列表API"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        collections = Collection.objects.get_user_collections(request.user)
+        serializer = CollectionSerializer(collections, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = CollectionCreateSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            collection = Collection.objects.create_collection(
+                user=request.user, 
+                name=serializer.validated_data['name'],
+                description=serializer.validated_data.get('description', '')  # 可选字段
+            )
+            return Response(
+                CollectionSerializer(collection).data, 
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@extend_schema(
+    tags=['收藏管理'],
+    summary='获取收藏夹内容',
+    description='获取特定收藏夹的内容',
+    methods=['GET'],
+    responses={
+        200: CollectionSerializer,
+        404: OpenApiResponse(description='未找到收藏夹')
+    }
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='更新收藏夹信息',
+    description='更新特定收藏夹的信息',
+    methods=['PUT'],
+    request=CollectionCreateSerializer,
+    responses={
+        200: CollectionSerializer,
+        204: OpenApiResponse(description='收藏夹已更新'),
+        404: OpenApiResponse(description='未找到收藏夹')
+    },
+)
+@extend_schema(
+    tags=['收藏管理'],
+    summary='删除收藏夹',
+    description='删除特定收藏夹',
+    methods=['DELETE'],
+    responses={
+        200: CollectionSerializer,
+        204: OpenApiResponse(description='收藏夹已删除'),
+        404: OpenApiResponse(description='未找到收藏夹')
+    }
+)
+class CollectionDetailView(APIView):
+    """收藏夹详情API"""
+    permission_classes = [IsAuthenticated]
+    
+    
+    def get(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        favorites = Favorite.objects.get_collection_favorites(collection)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        serializer = CollectionCreateSerializer(
+            collection, 
+            data=request.data, 
+            context={'request': request},
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(CollectionSerializer(collection).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        collection = get_object_or_404(Collection, id=pk, user=request.user)
+        if collection.is_default:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            collection.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # 收藏相关API
 @extend_schema(
     tags=['收藏管理'],
@@ -272,7 +513,10 @@ class SubscriptionDetailView(APIView):
     examples=[
         OpenApiExample(
             '添加收藏',
-            value={'article_id': 1}
+            value={
+                'article_id': 1,
+                'collection_id': 1
+            }
         )
     ]
 )
@@ -299,12 +543,17 @@ class FavoriteListView(APIView):
     def post(self, request):
         """创建新的收藏"""
         article_id = request.data.get('article_id')
+        collection_id = request.data.get('collection_id')  # 新增收藏夹参数
         article = get_object_or_404(Article, pk=article_id)
-        
+        # 收藏唯一性
         if Favorite.objects.is_favorited(request.user, article):
             return Response({'error': '已经收藏过该文章'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = Favorite.objects.create_favorite(request.user, article)
+        # 如果没有指定收藏夹，添加到默认收藏夹
+        collection = None
+        if collection_id:
+            collection = get_object_or_404(Collection, pk=collection_id, user=request.user)
+
+        favorite = Favorite.objects.create_favorite(request.user, article, collection)
         serializer = FavoriteSerializer(favorite)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -312,6 +561,48 @@ class FavoriteListView(APIView):
         """清空当前用户的所有收藏"""
         Favorite.objects.clear_user_favorites(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    tags=['收藏管理'],
+    summary='移动收藏',
+    description='将收藏移动到其它收藏夹',
+    methods=['POST'],
+    request=FavoriteMoveSerializer,
+    responses={
+        200: OpenApiResponse(description='所有收藏已清空'),
+        400: OpenApiResponse(description='未指定收藏夹'),
+        401: OpenApiResponse(description='未授权访问'),
+        404: OpenApiResponse(description='未找到收藏/收藏夹')
+    },
+    examples=[
+        OpenApiExample(
+            '移动收藏',
+            value={
+                'collection_id': 1
+            }
+        )
+    ]
+)
+class FavoriteMoveView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        """将收藏移动到其他收藏夹"""
+        favorite = get_object_or_404(Favorite, pk=pk, user=request.user)
+        new_collection_id = request.data.get('collection_id')
+        
+        if not new_collection_id:
+            return Response({'error': '必须指定目标收藏夹'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        new_collection = get_object_or_404(Collection, pk=new_collection_id, user=request.user)
+        
+        try:
+            favorite = Favorite.objects.move_favorite(favorite, new_collection)
+            serializer = FavoriteSerializer(favorite)
+            return Response(serializer.data)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(
@@ -367,9 +658,6 @@ class SearchFavoriteListView(APIView):
         204: OpenApiResponse(description='单条收藏已删除'),
         404: OpenApiResponse(description='未找到收藏信息')
     },
-    parameters=[
-        OpenApiParameter(name='pk', description='收藏ID', type=int)
-    ]
 )
 class FavoriteDetailView(APIView):
     """收藏详情API - 处理单个收藏的操作"""

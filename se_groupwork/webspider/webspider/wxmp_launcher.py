@@ -5,19 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urlparse, parse_qs
 from PIL import Image
-from config import PATH_QRCODE, PATH_ERROR_SCREENSHOT
+from webspider.webspider.config import PATH_QRCODE, PATH_ERROR_SCREENSHOT
 import json
-
-# 添加Django环境设置
 import os
-import django
-import sys
-# 定位到项目根目录（manage.py所在目录）
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "se_groupwork.settings")
-django.setup()
-# 导入Django模型
 from webspider.models import Cookies
 
 
