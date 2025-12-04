@@ -570,7 +570,6 @@ class FavoriteListView(APIView):
     methods=['POST'],
     request=FavoriteMoveSerializer,
     responses={
-        200: OpenApiResponse(description='所有收藏已清空'),
         400: OpenApiResponse(description='未指定收藏夹'),
         401: OpenApiResponse(description='未授权访问'),
         404: OpenApiResponse(description='未找到收藏/收藏夹')
