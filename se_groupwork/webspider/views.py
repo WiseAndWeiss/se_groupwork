@@ -109,10 +109,12 @@ class SearchNewAccountListView(APIView):
         
         # 安全性：确保数据库中没有该公众号再去爬取，减少爬虫负担
         if PublicAccount.objects.filter(name=name).exists():
-            return Response(
-                {'error': '该公众号已存在'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            accounts = PublicAccount.objects.filter(name__icontains=name)
+            serializer = PublicAccountSerializer(accounts, many=True, context={'request': request})
+            return Response({
+                'count': accounts.count(),
+                'public_accounts': serializer.data
+            })
 
         # 调用 BizSearcher 爬取公众号信息
         biz_searcher = BizSearcher(name)

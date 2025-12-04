@@ -10,7 +10,7 @@ from django.db.models import Q
 class TaskManager:
     def __init__(self):
         # 最大并发线程数限制为5
-        self.semaphore = threading.Semaphore(5)
+        self.semaphore = threading.Semaphore(3)
         self.task_pool = []
         self.result = []
 
@@ -40,6 +40,10 @@ class TaskManager:
         unprocessed_tasks = PublicAccount.objects.filter(
             Q(last_crawl_time__lt=ten_hours_ago) | Q(last_crawl_time__isnull=True)
         ).values_list('fakeid', flat=True)
+
+        unprocessed_tasks = unprocessed_tasks.filter(
+            Q(is_default=True) | Q(subscription_count__gt=0)
+        )
 
         unprocessed_tasks = list(unprocessed_tasks)
         self.task_pool = unprocessed_tasks
