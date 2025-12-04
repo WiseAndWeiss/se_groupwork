@@ -92,12 +92,12 @@ class PreferenceManager(models.Manager):
                 item.account_preference[account_id] = 1/10
             tar = 1 - item.account_preference[account_id]
             cur = 0
-            for id in item.account_preference:
+            for id in list(item.account_preference.keys()):
                 if item.account_preference[id] < 1/20:
                     del item.account_preference[id]
                 else:
                     cur += item.account_preference[id]
-            for id in item.account_preference:
+            for id in list(item.account_preference.keys()):
                 item.account_preference[id] = item.account_preference[id]/cur * tar
         # 更新标签偏好
         tags_vector = np.array(article.tags_vector)
