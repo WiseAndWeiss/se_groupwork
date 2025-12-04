@@ -43,6 +43,15 @@ class PublicAccount(models.Model):
         verbose_name='创建时间'
     )
 
+    article_count = models.IntegerField(
+        verbose_name='文章数', 
+        default=0
+    )
+    subscription_count = models.IntegerField(
+        verbose_name='被订阅数', 
+        default=0
+    )
+
     def __str__(self):
         return f"{self.name} ({self.fakeid or '无微信号'})"
 
