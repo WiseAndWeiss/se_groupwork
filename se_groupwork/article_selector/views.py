@@ -136,7 +136,7 @@ class ArticleViewSet(viewsets.ViewSet):
         campus_accounts = get_campus_accounts()
         campus_articles = Article.objects.filter(
             public_account__in=campus_accounts
-          ).order_by('-publish_time')[start_rank:start_rank+21]
+          ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(campus_articles) < 21
         campus_articles = campus_articles[:20]
         serializer = ArticleSerializer(campus_articles, many=True, context={'request': request})
@@ -293,13 +293,12 @@ class ArticleViewSet(viewsets.ViewSet):
             "application/json": {
                 "type": "object",
                 "properties": {
-                    "accounts_id": {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                        "description": "公众号ID列表（可选，默认使用用户关联的公众号）"
+                    "account_names": {
+                        "type": "string",
+                        "description": "公众号名称"
                     },
                     "range": {
-                        "choices": ["a", "b"],
+                        "choices": ["a", "d", "c"],
                         "description": "筛选范围：a-all全部, d-default默认，c-custom自选"
                     },
                     "date_from": {
@@ -355,20 +354,18 @@ class ArticleViewSet(viewsets.ViewSet):
             )
         data = serializer.validated_data
         queryset = None
-        
+
         range = data.get('range')
         if range == 'a':
             all_accounts = get_accounts_by_user(request.user)
         elif range == 'd':
             all_accounts = get_campus_accounts()
         else:
-            all_accounts = get_customized_accounts()
-        all_accounts_id = [a.id for a in all_accounts]
+            all_accounts = get_customized_accounts(request.user)
 
-        accounts_id = data.get('accounts_id')
-        if accounts_id:
-            accounts_id = [id for id in accounts_id if id in all_accounts_id]
-            account_list = PublicAccount.objects.filter(id__in=accounts_id)
+        account_names = data.get('account_names')
+        if account_names:
+            account_list = PublicAccount.objects.filter(name__in=account_names)
             if len(account_list) == 0:
                 return Response(
                     {'error': '公众号不存在'},
