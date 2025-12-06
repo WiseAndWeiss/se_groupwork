@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 from remoteAI.remoteAI.task_manager import TaskManager
+from webspider.models import Article
+import json
 
 class Command(BaseCommand):
     help = '处理特定公众号的未摘要的文章'
@@ -16,11 +18,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         account_names = options['account_names']
-        max_count = options['max_count']
-
+        count = options['max_count']
         #TODO 分别处理各个公众号的未处理文章
-        manager = TaskManager(target_accounts_name=account_names, max_article_num=max_count, max_semaphore=10)
-        result = manager.startrun()
+        manager = TaskManager(max_workers=50)
+        manager.startrun(target_accounts_name=account_names, max_count=count)
         if result:
             self.stdout.write(self.style.SUCCESS('任务执行成功！'))
         else:
