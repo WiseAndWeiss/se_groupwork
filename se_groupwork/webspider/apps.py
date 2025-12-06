@@ -6,4 +6,4 @@ class WebspiderConfig(AppConfig):
     name = 'webspider'
     def ready(self):
         # 导入信号处理程序
-        import se_groupwork.webspider.signals
+        import webspider.signals
