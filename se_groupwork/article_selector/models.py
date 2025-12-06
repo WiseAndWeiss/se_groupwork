@@ -92,7 +92,8 @@ class PreferenceManager(models.Manager):
                 item.account_preference[account_id] = 1/10
             tar = 1 - item.account_preference[account_id]
             cur = 0
-            for id in item.account_preference:
+            account_preference_origin_key = list(item.account_preference.keys())
+            for id in account_preference_origin_key:
                 if item.account_preference[id] < 1/20:
                     del item.account_preference[id]
                 else:
