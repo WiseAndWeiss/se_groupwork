@@ -98,7 +98,7 @@ class PreferenceManager(models.Manager):
                     del item.account_preference[id]
                 else:
                     cur += item.account_preference[id]
-            for id in item.account_preference:
+            for id in list(item.account_preference.keys()):
                 item.account_preference[id] = item.account_preference[id]/cur * tar
         # 更新标签偏好
         tags_vector = np.array(article.tags_vector)

@@ -19,7 +19,7 @@ urlpatterns = [
 
     # 收藏管理
     path('collections/', views.CollectionListView.as_view(), name='collection-list'),
-    path('collections/<int:pk>', views.CollectionDetailView.as_view(), name='collection-detail'),
+    path('collections/<int:pk>/', views.CollectionDetailView.as_view(), name='collection-detail'),
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
     path('favorites/<int:pk>/', views.FavoriteDetailView.as_view(), name='favorite-detail'),
     path('favorites/<int:pk>/move/', views.FavoriteMoveView.as_view(), name='favorite-move'),
