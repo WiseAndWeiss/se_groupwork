@@ -26,7 +26,7 @@ def ai_summarize_article(content):
 	你可以任意思考和输出，但最终的结论输出内容请组织为以下json格式，记得用```json和```包裹：
 	```json
 	{
-		"keyinfo": ["关键词1", "关键词2", "..."],
+		"key_info": ["关键词1", "关键词2", "..."],
 		"summary": "这里是文章的简洁摘要。",
 		"tags": ["分类标签1", "分类标签2", "..."],
 		"relevant_time": "MM-DD HH:MM",   # 可选，例如活动的时间，通知的截止时间等，如无相关时间信息则留空字符串
@@ -71,11 +71,18 @@ def ai_summarize_article(content):
 
 
 def entry(article_msg):
-	for i in range(3):
+	for retry in range(3):
 		ai_resp = ai_summarize_article(json.dumps(article_msg, ensure_ascii=False, indent=4))
-		if ai_resp is not None:
-			print(ai_resp)
-			ai_resp["semantic_vector"] = keywords_vectorize(ai_resp["keyinfo"])
-			ai_resp["tags_vector"] = tags_vectorize(ai_resp["tags"])
-			return ai_resp
+		success_flag = True
+		success_flag &= (ai_resp is not None)
+		success_flag &= ("summary" in ai_resp)
+		success_flag &= ("key_info" in ai_resp)
+		success_flag &= ("tags" in ai_resp)
+		if not success_flag:
+			print(f"[Retry {retry}] For {article_msg['title']}")
+			continue
+		print(ai_resp)
+		ai_resp["semantic_vector"] = keywords_vectorize(ai_resp["key_info"])
+		ai_resp["tags_vector"] = tags_vectorize(ai_resp["tags"])
+		return ai_resp
 	return None
