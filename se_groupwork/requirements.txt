@@ -12,3 +12,4 @@ json
 numpy
 sentence-transformers
 scikit-learn
+meilisearch
