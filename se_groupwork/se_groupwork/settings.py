@@ -172,7 +172,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'se',      # 数据库名
         'USER': 'root',           # 数据库用户
-        'PASSWORD': os.getenv('MYSQL_PASSWORD'),       # 数据库密码
+        'PASSWORD': '3213',       # 数据库密码
         'HOST': 'localhost',              # 数据库地址
         'PORT': '3306',                   # 数据库端口
         'OPTIONS': {
@@ -271,3 +271,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 BASE_URL = 'http://127.0.0.1:8000' 
+
+# Meilisearch 配置
+MEILISEARCH_HOST = 'http://localhost:7700'
+MEILISEARCH_API_KEY = None
+MEILISEARCH_INDEX_NAME = 'articles'
+
