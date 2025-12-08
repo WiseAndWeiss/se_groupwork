@@ -1,0 +1,103 @@
+<!-- 加载动画组件 -->
+<loading showLoading="{{showLoadingAnimation}}" />
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">首页</view>
+</view>
+
+<!-- 轮播图固定，卡片单独滚动 -->
+<view class="home-container">
+  <!-- 轮播图区域 -->
+  <view class="banner-section">
+    <view wx:if="{{isSwiperLoading}}" class="swiper-loading">
+      <text>加载中...</text>
+    </view>
+    
+    <swiper
+      wx:else
+      circular="{{true}}"
+      current="{{current}}"
+      autoplay="{{autoplay}}"
+      duration="{{duration}}"
+      interval="{{interval}}"
+      indicator-dots="{{false}}"
+      indicator-color="#ccc"
+      indicator-active-color="#7b2ff7"
+      bindchange="onChange"
+      class="native-swiper"
+    >
+      <block wx:for="{{swiperList}}" wx:key="id" wx:for-index="index">
+        <swiper-item class="swiper-item">
+          <!-- 轮播图背景图 -->
+          <image 
+            src="{{item.cover}}" 
+            mode="aspectFill" 
+            class="swiper-img"
+            bindload="onImageLoad"
+            bindtap="onSwiperTap"
+            data-index="{{index}}"
+          />
+          <image 
+            class="collect-icon"
+            src="{{item.is_favorited ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}"
+            bindtap="handleCollect" 
+            data-index="{{index}}" 
+            mode="widthFix"
+          />
+          <!-- 轮播图文字区域 -->
+          <view class="swiper-desc" data-index="{{index}}">
+          <view class="text-container title-container">
+            <text class="title-text">{{item.title}}</text>
+          </view>
+          <!-- 增加 .scroll-wrapper 内层容器，分离显示窗口与滚动内容 -->
+          <view class="text-container summary-container">
+           <view class="unique-scroll scroll-wrapper">
+             <text class="summary-text"style="--item-padding: {{item.padding_right}}rpx"
+             >{{item.summary}}</text>
+           </view>
+          </view>
+        </view>
+        </swiper-item>
+      </block>
+    </swiper>
+
+    <!-- 自定义dot指示器（核心） -->
+    <view class="custom-dot-container">
+      <block wx:for="{{swiperList}}" wx:key="id" wx:for-index="index">
+        <view class="custom-dot {{current === index ? 'custom-dot-active' : ''}}"></view>
+      </block>
+    </view>
+
+  </view>
+
+  <!-- 卡片区域 -->
+  
+    <view class="latest-news-title">
+      <text>最新消息</text>
+    </view>
+    <article-list 
+    list="{{selectionList}}" 
+    emptyText="暂无最新动态"
+    bind:loadmore="handleLoadMore" 
+    />
+</view>
+
+<!-- 底部导航栏：不变 -->
+<view class="tab-bar">
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">订阅</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

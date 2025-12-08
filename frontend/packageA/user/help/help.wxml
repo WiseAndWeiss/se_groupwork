@@ -1,0 +1,6 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">帮助中心</view>
+</view>

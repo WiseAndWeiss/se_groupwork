@@ -1,0 +1,160 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">修改个人信息</view>
+</view>
+
+<!-- 个人信息列表 -->
+<view class="info-list">
+  <!-- 头像项 -->
+  <view class="info-item" bindtap="showAvatarModal">
+    <view class="info-label">头像</view>
+    <view class="info-content">
+      <image class="avatar-img" src="{{form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+
+  <!-- 用户名项 -->
+  <view class="info-item" bindtap="showUsernameModal">
+    <view class="info-label">昵称</view>
+    <view class="info-content">
+      <text>{{form.username || '请设置昵称'}}</text>
+      <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+
+  <!-- 邮箱项 -->
+  <view class="info-item" bindtap="showEmailModal">
+    <view class="info-label">邮箱</view>
+    <view class="info-content">
+      <text>{{form.email || '请设置邮箱'}}</text>
+      <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+
+  <!-- 手机号项 -->
+  <view class="info-item" bindtap="showPhoneModal">
+    <view class="info-label">手机号</view>
+    <view class="info-content">
+      <text>{{form.phone_number || '请设置手机号'}}</text>
+      <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+
+  <!-- 密码修改项 -->
+  <view class="info-item" bindtap="showPwdModal">
+    <view class="info-label">修改密码</view>
+    <view class="info-content">
+      <text>点击修改密码</text>
+      <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+</view>
+
+<!-- 1. 头像修改悬浮窗 -->
+<view class="modal-mask" wx:if="{{showAvatarModal}}" bindtap="hideAvatarModal"></view>
+<view class="modal-content" wx:if="{{showAvatarModal}}">
+  <view class="modal-title">修改头像</view>
+  <view class="avatar-modal-body">
+    <image class="modal-avatar-preview" src="{{tempAvatar || form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+    <button class="choose-avatar-btn" bindtap="chooseTempAvatar">选择图片</button>
+  </view>
+  <view class="modal-btn-group">
+    <button class="modal-cancel-btn" bindtap="hideAvatarModal">取消</button>
+    <button class="modal-confirm-btn" bindtap="confirmAvatarUpdate">确认修改</button>
+  </view>
+</view>
+
+<!-- 2. 用户名修改悬浮窗 -->
+<view class="modal-mask" wx:if="{{showUsernameModal}}" bindtap="hideUsernameModal"></view>
+<view class="modal-content" wx:if="{{showUsernameModal}}">
+  <view class="modal-title">修改昵称</view>
+  <view class="modal-input-group">
+    <input 
+      class="modal-input" 
+      placeholder="请输入昵称（2-10字）" 
+      value="{{tempUsername}}"
+      bindinput="handleTempUsernameInput"
+    />
+  </view>
+  <view class="modal-btn-group">
+    <button class="modal-cancel-btn" bindtap="hideUsernameModal">取消</button>
+    <button class="modal-confirm-btn" bindtap="confirmUsernameUpdate">确认修改</button>
+  </view>
+</view>
+
+<!-- 3. 邮箱修改悬浮窗 -->
+<view class="modal-mask" wx:if="{{showEmailModal}}" bindtap="hideEmailModal"></view>
+<view class="modal-content" wx:if="{{showEmailModal}}">
+  <view class="modal-title">修改邮箱</view>
+  <view class="modal-input-group">
+    <input 
+      class="modal-input" 
+      type="email"
+      placeholder="请输入合法邮箱" 
+      value="{{tempEmail}}"
+      bindinput="handleTempEmailInput"
+    />
+  </view>
+  <view class="modal-btn-group">
+    <button class="modal-cancel-btn" bindtap="hideEmailModal">取消</button>
+    <button class="modal-confirm-btn" bindtap="confirmEmailUpdate">确认修改</button>
+  </view>
+</view>
+
+<!-- 4. 手机号修改悬浮窗 -->
+<view class="modal-mask" wx:if="{{showPhoneModal}}" bindtap="hidePhoneModal"></view>
+<view class="modal-content" wx:if="{{showPhoneModal}}">
+  <view class="modal-title">修改手机号</view>
+  <view class="modal-input-group">
+    <input 
+      class="modal-input" 
+      type="number"
+      placeholder="请输入11位手机号" 
+      value="{{tempPhone}}"
+      bindinput="handleTempPhoneInput"
+    />
+  </view>
+  <view class="modal-btn-group">
+    <button class="modal-cancel-btn" bindtap="hidePhoneModal">取消</button>
+    <button class="modal-confirm-btn" bindtap="confirmPhoneUpdate">确认修改</button>
+  </view>
+</view>
+
+<!-- 5. 密码修改悬浮窗 -->
+<view class="modal-mask" wx:if="{{showPwdModal}}" bindtap="hidePwdModal"></view>
+<view class="modal-content" wx:if="{{showPwdModal}}">
+  <view class="modal-title">修改密码</view>
+  <view class="modal-input-group">
+    <input 
+      class="modal-input" 
+      type="password"
+      placeholder="请输入原密码" 
+      value="{{tempOldPwd}}"
+      bindinput="handleTempOldPwdInput"
+    />
+    <input 
+      class="modal-input" 
+      type="password"
+      placeholder="请输入新密码（8-16位）" 
+      value="{{tempNewPwd}}"
+      bindinput="handleTempNewPwdInput"
+    />
+    <input 
+      class="modal-input" 
+      type="password"
+      placeholder="请再次输入新密码" 
+      value="{{tempConfirmPwd}}"
+      bindinput="handleTempConfirmPwdInput"
+    />
+    <view class="password-strength">
+      <view class="strength-tip-item">● 密码由8-16位数字、字母或符号"!@#$%^&*"组成</view>
+      <view class="strength-tip-item">● 至少含有两种及以上的字符</view>
+    </view>
+  </view>
+  <view class="modal-btn-group">
+    <button class="modal-cancel-btn" bindtap="hidePwdModal">取消</button>
+    <button class="modal-confirm-btn" bindtap="confirmPwdUpdate">确认修改</button>
+  </view>
+</view>

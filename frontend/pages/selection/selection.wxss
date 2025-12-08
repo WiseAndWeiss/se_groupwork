@@ -1,0 +1,316 @@
+page {
+    background-color: rgba(239, 239, 239, 0.6);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 顶部导航栏 */
+  .custom-navbar {
+    position: fixed;
+    top:0;
+    width: 100%;
+    height: 170rpx;
+    background: #ffffff;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20rpx;
+    box-sizing: border-box;
+    z-index: 1000;
+    color: #591bb7;
+    font-weight: 600;
+  }
+  .navbar-title {
+    font-size: 35rpx;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .add-icon {
+    width: 50rpx;
+    height: 50rpx;
+    position: absolute;
+    left: 30rpx;
+    bottom: 17rpx;
+  }
+    
+    /* 排序按钮区域 */
+    .sort-bar {
+      display: flex;
+      padding: 190rpx 20rpx 20rpx;
+      background-color: #fff;
+      border-bottom: 1rpx solid #eee;
+      position:relative;
+      z-index:999;
+    }
+    
+    .sort-btn {
+      flex: 1;
+      text-align: center;
+      padding: 12rpx 0;
+      font-size: 26rpx;
+      font-weight: 600;
+      color: #666;
+      border-radius: 30rpx;
+      margin: 0 8rpx;
+    }
+    
+    /* 选中排序按钮样式（紫色主题） */
+    .sort-btn.active {
+      background-color: #7b2ff7;
+      color: #fff;
+      font-weight: 600;
+    }
+    
+    /* 搜索栏整体 */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    width: 92%;
+    margin: 30rpx auto 30rpx auto;
+    gap: 16rpx;
+    position:relative;
+    z-index:998;
+  }
+  
+  /* 输入框 */
+  .search-box {
+    flex: 1;
+  }
+  .search-inner {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2rpx solid #7b2ff7;
+    border-radius: 50rpx;
+    height: 70rpx;
+    padding: 0 16rpx 0 24rpx;
+  }
+  .search-icon {
+    width: 36rpx;
+    height: 36rpx;
+    margin-right: 14rpx;
+  }
+  .search-input {
+    flex: 1;
+    font-size: 26rpx;
+    color: #333;
+    border: none;
+    background: transparent;
+    padding-right: 10rpx;
+  }
+  .search-placeholder {
+    color: #aaa;
+  }
+
+  /* 搜索文字按钮样式 */
+.search-text-btn {
+    font-size: 26rpx;
+    color: #fff;
+    background-color: #7b2ff7;
+    padding: 8rpx 20rpx;
+    border-radius: 30rpx;
+    margin-left: 10rpx;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  /* 按钮点击态 */
+  .search-text-btn:active {
+    background-color: #6a1cd6;
+    transform: scale(0.98);
+  }
+
+  .content-container {
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: -30rpx; 
+  }
+  
+  .subscription-container {
+    position: relative;
+    height: calc(100vh - 350rpx); 
+  }
+  
+  .subscription-area{
+    display: flex;
+    flex-direction: column;
+    margin-top: 30rpx;
+  }
+  
+  /* 拖动排序相关样式 */
+  .draggable-item {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  /* 抖动动画效果 */
+  .draggable-item.shaking {
+    animation: shake 0.5s ease-in-out infinite;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-2rpx) rotate(-0.5deg); }
+    75% { transform: translateX(2rpx) rotate(0.5deg); }
+  }
+  
+  /* 拖动状态 */
+  .draggable-item.dragging {
+    z-index: 1000;
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  
+  /* 删除按钮 */
+  .delete-btn {
+    position: absolute;
+    top: -10rpx;
+    right: -10rpx;
+    width: 40rpx;
+    height: 40rpx;
+    background: #ff4757;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+  }
+  
+  .delete-icon {
+    width: 20rpx;
+    height: 20rpx;
+  }
+  
+  /* 公众号列表布局 */
+  .subscription-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    background-color: #f7f7f7;
+  }
+  
+  /* 非编辑模式样式 - 正常布局，无顶部内边距 */
+  .subscription-item.normal-mode {
+    padding-top: 0;
+  }
+  
+  /* 编辑模式样式 - 添加顶部内边距，确保第一行的红色叉子能完全显示 */
+  .subscription-item.editing-mode {
+    padding-top: 30rpx;
+  }
+  
+  /* 确保 card-picture 组件宽度适合三列布局 */
+  .subscription-item card-picture {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30rpx;
+    margin-left: 30rpx;
+  }
+    
+  
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120rpx;
+      background-color: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1rpx solid #eee;
+      box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+      z-index: 100;
+    }
+    
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #666;
+      font-size: 26rpx;
+    }
+    
+    .tab-item .menu-icon {
+      width: 40rpx;
+      height: 40rpx;
+      margin-bottom: 6rpx;
+      filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+    }
+    
+    .tab-item.active {
+      color: #7b2ff7;
+      font-weight: bold;
+    }
+    
+    .tab-item.active .menu-icon {
+      filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+    }
+  
+    .sticky-header {
+      position: sticky; 
+      top: 0rpx; 
+      background-color: #fff; 
+      z-index: 999; 
+      border-bottom: 1rpx solid #eee; 
+    }
+  
+  /* 滚动触发区域 */
+  .scroll-trigger-zone {
+    width: 100%;
+    height: 120rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 100;
+    transition: all 0.3s ease;
+  }
+  
+  /* 编辑模式下禁用滚动条的样式 */
+  .card-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .card-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 完成按钮 */
+  .edit-complete-btn {
+    position: fixed;
+    bottom: 160rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200rpx;
+    height: 80rpx;
+    background: linear-gradient(135deg, #7b2ff7 0%, #9d4edd 100%);
+    border-radius: 40rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8rpx 20rpx rgba(123, 47, 247, 0.3);
+    z-index: 1001;
+  }
+  
+  .complete-btn-text {
+    color: #fff;
+    font-size: 32rpx;
+    font-weight: 600;
+  }
+
+  /* 隐藏原有加载文字提示 */
+  .loading-tip {
+    text-align: center;
+    padding: 40rpx 0;
+    color: #999;
+    font-size: 28rpx;
+    /* 隐藏旧的文字加载提示 */
+    display: none; 
+  }
+
+  
