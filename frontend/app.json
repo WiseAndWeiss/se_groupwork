@@ -1,0 +1,60 @@
+{
+    "pages": [
+      "pages/login/login",
+      "pages/home/home",       
+      "pages/selection/selection", 
+      "pages/user/user",       
+      "pages/campus/campus",
+      "pages/campus-all/campus-all",
+      "pages/webview/webview"    
+    ],
+    "subPackages": [
+      {
+        "root": "packageA",    
+        "pages": [
+          "add/add", 
+          "collection/collection",          
+          "account/detail/detail", 
+          "user/profile/profile",  
+          "user/history/history",  
+          "user/subscriptions/subscriptions", 
+          "user/like/like",
+          "user/favorites/favorites",         
+          "user/help/help",        
+          "user/suggestion/suggestion",
+          "user/profile/update-userinfo/update-userinfo" 
+        ]
+      }
+    ],
+    "window": {
+      
+    },
+    "tabBar": {
+      "color": "#666",
+      "selectedColor": "#7b2ff7",
+      "backgroundColor": "#fff",
+      "borderStyle": "black",
+      "showIcon": false,
+      "showText": false,
+      "height": 0,
+      "list": [
+        { "pagePath": "pages/home/home", "text": "" },
+        { "pagePath": "pages/campus/campus", "text": "" },
+        { "pagePath": "pages/selection/selection", "text": "" },
+        { "pagePath": "pages/user/user", "text": "" },
+        { "pagePath": "pages/campus-all/campus-all", "text": "" }
+      ]
+    },
+    "style": "v2",
+    "renderer": "webview",
+    "rendererOptions": {},
+    "componentFramework": "glass-easel",
+    "sitemapLocation": "sitemap.json",
+    "lazyCodeLoading": "requiredComponents",
+    "preloadRule": {
+      "pages/home/home": {
+        "network": "all",
+        "packages": ["packageA"]
+      }
+    }
+  }

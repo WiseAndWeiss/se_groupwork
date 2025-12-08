@@ -1,0 +1,42 @@
+/* 公众号卡片容器：横向滚动适配+轻微立体感 */
+.card-picture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  width: 196rpx; /* 固定宽度，适配横向滚动 */
+  padding: 20rpx 8rpx;
+  border-radius: 24rpx; /* 圆润圆角，和文章卡片呼应 */
+  box-shadow: 0 3rpx 12rpx rgba(0, 0, 0, 0.04); /* 柔和阴影，不突兀 */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* 卡片点击反馈：轻微上浮+加深阴影 */
+.card-picture-container:active {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 公众号头像：圆形+边框装饰 */
+.official-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 24rpx;
+  object-fit: cover;
+  margin-bottom: 12rpx;
+}
+
+/* 公众号名称：居中+换行控制 */
+.official-name {
+  font-size: 24rpx;
+  color: #591bb7;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 10rpx;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

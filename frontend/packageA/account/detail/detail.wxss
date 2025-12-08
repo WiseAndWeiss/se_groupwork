@@ -1,0 +1,80 @@
+/* packageA/account/detail/detail.wxss */
+page {
+    background-color: rgba(239, 239, 239, 0.6);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* 防止页面整体滚动，让article-list内部滚动 */
+    overflow: hidden; 
+  }
+  
+  /* 顶部公众号信息区 - 固定顶部，明确top定位 */
+  .account-header {
+    position: fixed;
+    top: 0; /* 关键：固定在页面顶部，避免位置偏移 */
+    left: 0; /* 补充left定位，确保全屏宽度 */
+    width: 100%;
+    height: 170rpx;
+    background: #ffffff;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 30rpx 20rpx;
+    box-sizing: border-box;
+    z-index: 1000;
+    border-bottom: 1rpx solid #f0f0f0;
+  }
+  
+  /* 公众号名称容器 */
+  .header-info {
+    width: 100%;
+    text-align: center;
+    /* 避开左侧返回按钮的空间 */
+    padding-left: 80rpx; 
+    padding-right: 80rpx;
+    box-sizing: border-box;
+  }
+  
+  /* 公众号名称 */
+  .header-name {
+    font-size: 35rpx;
+    font-weight: 600;
+    color: #591bb7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%; /* 适配容器宽度 */
+    margin: 0 auto;
+  }
+  
+  /* 返回按钮样式 */
+  .nav-back {
+    width: 50rpx;
+    height: 50rpx;
+    position: absolute;
+    left: 30rpx;
+    bottom: 17rpx;
+    z-index: 1001; /* 高于header，确保可点击 */
+  }
+  
+  /* article-list 容器样式 - 核心调整 */
+  .article-list-container {
+    flex: 1; 
+    margin-top: 170rpx; 
+    overflow: hidden; 
+  }
+  
+  /* 空状态、加载中样式继承调整（若article-list组件内部使用） */
+  .article-list-empty {
+    margin-top: 80rpx;
+    text-align: center;
+    color: #888;
+  }
+  
+  .article-list-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400rpx;
+    font-size: 28rpx;
+    color: #591bb7;
+  }
