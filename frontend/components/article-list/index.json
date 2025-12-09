@@ -1,0 +1,8 @@
+{
+    "component": true,
+    "usingComponents": {
+        "card-component": "/components/card/index"  
+    },
+    "styleIsolation": "apply-shared"
+  }
+  

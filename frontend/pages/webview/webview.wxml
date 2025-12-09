@@ -1,0 +1,7 @@
+<!-- pages/webview/webview.wxml -->
+
+
+  <!-- web-view 容器 -->
+  <view class="webview-container">
+    <web-view src="{{url}}"></web-view>
+  </view>

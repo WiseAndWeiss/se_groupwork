@@ -1,0 +1,70 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon-top" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">我的收藏</view>
+</view>
+
+<text class="add-icon" wx:if="{{!showCreatePopup && !hasEditPopupOpen}}" bindtap="handleAddCollection">添加收藏夹</text>
+
+<!-- 收藏列表 -->
+<view class="favorites-container">
+  <scroll-view class="card-scroll" scroll-y="true">
+    <collection 
+      wx:for="{{collectionList}}" 
+      wx:key="id" 
+      item="{{item}}"
+      bind:collectionUpdated="onCollectionUpdated"
+      bind:collectionDeleted="onCollectionDeleted"
+      bind:favouriteMoved="onFavouriteMoved"
+      bind:editPopupOpened="onEditPopupOpened"
+      bind:editPopupClosed="onEditPopupClosed"
+    ></collection>
+  </scroll-view>
+</view>
+
+<view class="popup-mask" wx:if="{{showCreatePopup}}" catchtap="closeCreatePopup"></view>
+<!-- 创建收藏夹 -->
+<view class="edit-popup" wx:if="{{showCreatePopup}}">
+  <!-- 浮窗头部 -->
+  <view class="popup-header">
+    <image class="return-icon" catchtap="closeCreatePopup" src="../../../assets/icons/return.svg" mode="widthFix"></image>
+    <text class="complete-btn" catchtap="saveCreateCollection">完成</text>
+  </view>
+  
+  <!-- 浮窗内容 -->
+  <view class="popup-content">
+    <!-- 名称 -->
+    <view class="form-item">
+      <text class="form-label">收藏夹名称</text>
+      <view class="input-wrapper">
+        <input 
+          class="form-input" 
+          value="{{tempName}}" 
+          bindinput="onCreateNameInput"
+          placeholder="请输入收藏夹名称"
+          maxlength="10" 
+        />
+        <!-- 剩余字数 -->
+        <text class="remain-count">{{remainNameCount}}</text>
+      </view>
+    </view>
+
+    <!-- 描述 -->
+    <view class="form-item">
+      <text class="form-label">收藏夹描述</text>
+      <view class="input-wrapper">
+        <textarea 
+          class="form-textarea" 
+          value="{{tempDesc}}" 
+          bindinput="onCreateDescInput"
+          placeholder="请输入收藏夹描述（选填）"
+          maxlength="30" 
+          auto-height
+        />
+        <!-- 剩余字数 -->
+        <text class="remain-count">{{remainDescCount}}</text>
+      </view>
+    </view>
+  </view>
+</view>

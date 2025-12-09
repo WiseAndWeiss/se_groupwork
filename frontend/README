@@ -1,0 +1,84 @@
+##当前代码：
+基本实现已有界面的正常交互，并设计了一点点的css。
+##无实际意义的填充：
+主页滚动栏图片：assets/images
+公众号标志图：assets/campus/
+测试数据：：data/testData
+##关于CSS：
+各个页面有点基本的css，但还要修改。COMPONENTS里面有组件card和card-picture。card即为“主页”、“校内”、“自选”里面所有的展示条，只需要修改card.wxss即可。card-picture展示的是公众号标签，应用在“校内公众号一览”和“自选”中的“按公众号排序”。
+
+2025-11-14
+##BUG.关于收藏：在主页收藏后星星会亮起，在本页面可以点击星星取消收藏，跳转到其他页面星星不亮（在收藏管理里也不亮）；在收藏管理里删除收藏后回到主页，对应文章星星仍然亮着，点击后仅有“该文章未收藏”提示，星标也不会熄灭。
+##BUG.关于展开：类似于收藏，在某个页面展开后卡片具有记忆性，从其他页面返回时应该是收起的状态。
+##页面css.收藏和历史：需要优化，显而易见
+##修改api：删除全部、收藏全部操作多/all
+/*TODOLIST:*/
+compnont：详细的公众号卡片（最近更新，X条未读）；公众号订阅卡片（account）。
+api:筛选功能（前端做还是后端做）（前端修改筛选词条）。
+testData:使用mock。
+临时处理：先多做一个页面“我的订阅”，功能：管理所有已经订阅的公众号。
+TODO:/api/articles/by-account/在后端筛选
+
+2025-11-15
+当前版本
+未实现：
+/api/articles/by-account/ 获取指定公众号的最新文章
+/api/articles/filter/ 按条件筛选文章
+其余均实现
+
+关于MOCK：使用 Mock 数据来模拟后端 API 接口，Mock 系统位于 utils/mockConfig.js 和 utils/request.js 文件中。
+在 utils/request.js 中控制 Mock 的启用/关闭：
+const MOCK_ENABLE = true; 
+true: 使用Mock数据，false: 连接真实后端
+
+mockConfig.js：Mock 数据配置，包含所有接口的数据
+request.js：请求封装，统一处理 Mock 和真实接口的切换
+
+页面说明：
+compnont组件：
+    card：文章卡片，所有展示的文章都通过文章卡片渲染输出，在card.js中修改属性
+    account：公众号卡片，展示公众号，可以点击查看公众号内容（期望），目前版本暂时未完成（关系到/api/articles/by-account/ 获取指定公众号的最新文章）
+    card-picture:公众号卡片，展示公众号，用在“校内公众号一览”
+
+page页面：
+    account：展示公众号的详细内容（关系到/api/articles/by-account/ 获取指定公众号的最新文章），目前版本未完成。
+
+    add：添加自选，目前版本未添加功能。
+
+    campus：校内（关系到/api/articles/campus-latest/ 获取最新校内咨询文章），筛选页面（关系到/api/articles/filter/ 按条件筛选文章，需要知道是否有确定的条件）。
+
+    campus-all：校内公众号一览（就是一览的功能）。
+
+    home：主页。滚动栏：/api/articles/recommended/ 获取推荐文章列表；卡片栏：/api/articles/latest/ 获取最新文章列表。
+
+    login：登陆与注册页面，在login.js文件中查看与修改属性。
+
+    selection：自选。/api/articles/customized-latest/ 获取最新自选咨询文章
+
+    user：用户页面。用户资料url。
+
+data数据：
+    testdata：写死的测试数据（目前没什么用，校内公众号一览用到）
+
+在微信开发者工具里可以进行编译，记得加上npm依赖
+
+2025-11-23:
+隐藏tabbar，方案：  
+  onReady() {
+    // 此时页面已渲染完成，tabBar 存在，调用不会报错
+    wx.hideTabBar({
+      animation: false,
+      success: () => console.log("tabBar 隐藏成功"),
+      fail: (err) => console.log("隐藏失败", err)
+    });
+  },
+
+“猜你喜欢”改为“最新消息”
+
+公众号detail页面的标题位置、css样式需要调整：
+
+滚动字幕实现了基本样式（后续还需要调）。
+    
+2025-11-25
+修改“login.js”和“login.wxml”，实现注册账号的密码安全性检查（关于css样式问题）
+修改“web-view.js”，去黑头

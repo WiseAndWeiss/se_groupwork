@@ -1,0 +1,67 @@
+<view class="card">
+  <view class="header">
+    <!-- 标题：展开时去掉截断 -->
+    <text class="title {{isExpanded ? 'expanded' : ''}}">{{title}}</text>
+
+    <view class="icon-group">
+        <view class="star-container {{is_favorited ? 'favorited' : ''}} {{animateStar ? 'animate' : ''}}">
+      <!-- 收藏：用不同 svg 切换（outline / filled） -->
+            <image class="icon icon-star"
+             src="{{is_favorited ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}"
+             bindtap="onFavourite" mode="widthFix" />
+        </view>
+      <!-- 展开箭头：用两张 svg 切换 -->
+            <image class="icon icon-arrow"
+             src="{{isExpanded ? '/assets/icons/arrow-up.svg' : '/assets/icons/arrow-down.svg'}}"
+             bindtap="onExpand" mode="widthFix" />
+    </view>
+  </view>
+
+  <view class="bottom-row">
+    <!-- 左边标签 -->
+    <view class="tags">
+      <text class="tag" wx:for="{{tags}}" wx:key="*this">#{{item}}</text>
+    </view>
+
+    <!-- 右边作者和时间 -->
+    <view class="footer">
+      <text class="author">{{name}}</text>
+      <text class="time">{{time}}</text>
+    </view>
+  </view>
+
+  <!-- 悬浮窗显示更多内容 -->
+  <view class="floating-window {{isExpanded ? 'expanded' : 'collapsed'}} {{isAnimating ? 'animating' : ''}}">
+    <view class="key-info {{isExpanded ? 'visible' : ''}}">关键词：{{key_info}}</view>
+    <view class="desc {{isExpanded ? 'visible' : ''}}">{{desc}}</view>
+    <view class="original-link {{isExpanded ? 'visible' : ''}}" bindtap="openWebView" data-url="{{url}}">原文链接</view>
+  </view>
+</view>
+
+<!-- 收藏提示弹窗 -->
+<view class="fav-tip-popup" wx:if="{{showFavTipPopup}}">
+  <view class="tip-content">
+    <text class="tip-text">添加到默认收藏夹</text>
+    <button class="modify-btn" bindtap="openCollectionSelect">修改收藏夹</button>
+  </view>
+</view>
+
+<!-- 收藏夹选择弹窗 -->
+<view class="collection-select-popup" wx:if="{{showCollectionSelect}}">
+  <view class="select-mask" bindtap="closeAllPopups"></view>
+  <view class="select-content">
+    <view class="select-title">选择收藏夹</view>
+    <scroll-view class="collection-scroll" scroll-y="true">
+      <view class="collection-list">
+        <text 
+          class="collection-item {{item.id === defaultCollection.id ? 'active' : ''}}"
+          wx:for="{{collectionList}}"
+          wx:key="id"
+          bindtap="moveFavouriteToCollection"
+          data-collectionid="{{item.id}}"
+        >{{item.name}}<text wx:if="{{item.is_default}}" class="default-tag">默认</text>
+        </text>
+      </view>
+    </scroll-view>
+  </view>
+</view>

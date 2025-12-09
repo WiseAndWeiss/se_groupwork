@@ -1,0 +1,38 @@
+<!-- 顶部收藏夹信息区（对标公众号信息区，适配收藏夹场景） -->
+<view class="custom-navbar">
+  <image class="return-icon" bindtap="goBack" src="../../assets/icons/return.svg"></image>
+  <view class="navbar-title">{{collectionName}}</view>
+</view>
+
+<!-- 文章列表区 -->
+<view class="articles-list">
+  <!-- 加载中状态 -->
+  <view wx:if="{{isLoading}}" class="loading">加载中...</view>
+  
+  <!-- 空状态 -->
+  <view wx:elif="{{articles.length === 0 && !isLoading}}" class="empty-articles">
+    <image src="/assets/icons/article-empty.svg" class="empty-icon" mode="widthFix"></image>
+    <text class="empty-text">该收藏夹暂无文章</text>
+    <text class="empty-tip">\n收藏文章后会第一时间展示在这里~</text> 
+  </view>
+  
+  <!-- 有文章时显示 -->
+  <view wx:else class="collection-list">
+    <scroll-view class="collection-scroll" scroll-y="true">
+      <block wx:for="{{articles}}" wx:key="id">
+        <card-component
+          id_="{{item.article.id}}"
+          title="{{item.article.title}}"
+          time="{{item.article.publish_time}}"
+          tags="{{item.article.tags}}"
+          desc="{{item.article.summary}}"
+          key_info="{{item.article.key_info}}"
+          url="{{item.article.article_url}}"
+          name="{{item.article.account_name}}"
+          is_favorited="{{item.id}}"
+          data-isExpanded="{{false}}"
+        />
+      </block>
+    </scroll-view>
+  </view>
+</view>

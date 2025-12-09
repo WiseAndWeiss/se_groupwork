@@ -1,0 +1,131 @@
+page {
+    background-color: rgba(239, 239, 239, 0.6);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 顶部导航栏 */
+  .custom-navbar {
+    position: fixed;
+    width: 100%;
+    height: 170rpx;
+    background: #ffffff;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20rpx;
+    box-sizing: border-box;
+    z-index: 1000;
+    color: #591bb7;
+    font-weight: 600;
+  }
+  .navbar-title {
+    font-size: 35rpx;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    /* 新增：避免文字被返回按钮遮挡 */
+    padding-left: 60rpx;
+    padding-right: 60rpx;
+    text-align: center;
+  }
+  
+  .return-icon {
+    width: 50rpx;
+    height: 50rpx;
+    position: absolute;
+    left: 30rpx;
+    bottom: 17rpx;
+  }
+  
+  /* 头部信息：优化间距和溢出控制 */
+  .header-info {
+    flex: 1;
+    padding: 0 10rpx; /* 新增内边距，避免文字贴边 */
+    box-sizing: border-box;
+  }
+  
+  .header-name {
+    font-size: 32rpx;
+    font-weight: 500;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4; /* 新增行高，提升可读性 */
+  }
+  
+  /* 文章列表容器：优化padding，适配导航栏高度，避免内容被遮挡 */
+  .articles-list {
+    padding: 200rpx 30rpx 120rpx 30rpx; /* 下调顶部padding，上调底部padding（避开底部tab） */
+    flex: 1; /* 新增：让列表容器占满剩余高度 */
+    box-sizing: border-box;
+    overflow: hidden; /* 避免内容溢出 */
+  }
+  
+  /* 滚动容器：优化高度计算，适配小程序不同设备 */
+  .collection-scroll {
+    height: 100%; /* 改用100%替代calc，配合父容器flex:1 */
+    max-height: calc(100vh - 230rpx); /* 调整计算值，适配新的导航栏高度 */
+    overflow-y: auto; /* 明确滚动方向 */
+    -webkit-overflow-scrolling: touch; /* 新增：iOS顺滑滚动 */
+  }
+
+  .collection-list card-component {
+    margin-bottom: 20rpx;
+  }
+  
+  /* 加载中样式：优化间距和视觉 */
+  .loading {
+    text-align: center;
+    padding: 60rpx 0; /* 增加上下内边距 */
+    font-size: 28rpx;
+    color: #999;
+    line-height: 1.5;
+  }
+  
+  /* 空状态样式：优化排版和视觉层次 */
+  .empty-articles {
+    text-align: center;
+    padding: 120rpx 20rpx 80rpx; /* 调整内边距，更居中 */
+    font-size: 28rpx;
+    color: #999;
+  }
+  
+  .empty-icon {
+    width: 180rpx; /* 微调图标大小，更协调 */
+    height: auto;
+    margin-bottom: 40rpx; /* 增加间距 */
+    opacity: 0.4; /* 降低不透明度，更柔和 */
+    display: inline-block; /* 修复居中问题 */
+  }
+  
+  .empty-text {
+    display: block;
+    font-size: 30rpx;
+    margin-bottom: 15rpx; /* 增加间距 */
+    color: #666; /* 加深文字颜色，提升可读性 */
+    font-weight: 400;
+  }
+  
+  .empty-tip {
+    font-size: 26rpx;
+    line-height: 1.6; /* 增加行高 */
+    color: #999;
+    max-width: 500rpx; /* 限制宽度，避免文字换行混乱 */
+    margin: 0 auto; /* 居中显示 */
+  }
+  
+  /* 新增：适配小屏设备 */
+  @media (max-height: 667px) {
+    .custom-navbar {
+      height: 150rpx;
+    }
+    .articles-list {
+      padding-top: 160rpx;
+    }
+    .collection-scroll {
+      max-height: calc(100vh - 160rpx);
+    }
+  }

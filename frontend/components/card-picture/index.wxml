@@ -1,0 +1,12 @@
+<view class="card-picture-container {{isDisabled ? 'disabled' : ''}}" bindtap="handleCardClick">
+  <!-- 公众号图标-->
+  <image 
+    class="official-avatar" 
+    src="{{avatar}}" 
+    mode="aspectFill"
+    lazy-load="false"
+    bindtap="navigateToAccountDetail"
+  />
+  <!-- 公众号名称 -->
+  <view class="official-name">{{name}}</view>
+</view>

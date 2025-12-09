@@ -1,0 +1,63 @@
+<!--packageA/user/suggestion.wxml-->
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">反馈建议</view>
+</view>
+
+<!-- 联系方式区域 -->
+<view class="contact-container">
+  <!-- 提示信息 -->
+  <view class="tip-card">
+    <view class="tip-text">如有任何建议或意见，欢迎通过以下方式联系我，我会认真考虑并持续优化产品体验。</view>
+  </view>
+  
+  <view class="contact-title">联系方式-后端Ruben</view>
+  <view class="contact-list">
+    <view class="contact-item">
+      <view class="contact-label">微信号</view>
+      <view class="contact-value">luyutao1017</view>
+    </view>
+    <view class="contact-item">
+      <view class="contact-label">邮箱</view>
+      <view class="contact-value">lu-yt23@mails.tsinghua.edu.cn</view>
+    </view>
+  </view>
+
+  <view class="contact-title">联系方式-前端Greth</view>
+  <view class="contact-list">
+    <view class="contact-item">
+      <view class="contact-label">微信号</view>
+      <view class="contact-value">sachiho_</view>
+    </view>
+    <view class="contact-item">
+      <view class="contact-label">邮箱</view>
+      <view class="contact-value">gr23@mails.tsinghua.edu.cn</view>
+    </view>
+  </view>
+
+  <view class="contact-title">联系方式-前端Shanyun</view>
+  <view class="contact-list">
+    <view class="contact-item">
+      <view class="contact-label">微信号</view>
+      <view class="contact-value">Y2397035529</view>
+    </view>
+    <view class="contact-item">
+      <view class="contact-label">邮箱</view>
+      <view class="contact-value">yuch23@mails.tsinghua.edu.cn</view>
+    </view>
+  </view>
+
+  <view class="contact-title">联系方式-前端isXSong</view>
+  <view class="contact-list">
+    <view class="contact-item">
+      <view class="contact-label">微信号</view>
+      <view class="contact-value">wxs15648657794</view>
+    </view>
+    <view class="contact-item">
+      <view class="contact-label">邮箱</view>
+      <view class="contact-value">wang-xs22@mails.tsinghua.edu.cn</view>
+    </view>
+  </view>
+</view>
