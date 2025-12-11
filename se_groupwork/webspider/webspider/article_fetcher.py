@@ -120,6 +120,16 @@ class ArticleFetcher:
             self.params["begin"] = str(i * per_page)
 
             try:
+                # 随机延迟，避免请求过于频繁
+                wait_time = random.randint(15, 20)
+
+                print(f"第{i+1}页: 等待 {wait_time}秒", end='', flush=True)
+            
+                for _ in range(wait_time):
+                    time.sleep(1)
+                    print('.', end='', flush=True)
+                print() 
+    
                 response = requests.get(
                     self.url,
                     headers=self.headers,
@@ -132,10 +142,7 @@ class ArticleFetcher:
                 if self.is_validated(content_json):
                     content_list.extend(content_json.get("app_msg_list", []))
                 else:
-                    print(f"第{i + 1}页验证失败")
-
-                # 随机延迟，避免请求过于频繁
-                time.sleep(random.randint(1, 3))
+                    print(f"第{i + 1}页验证失败:{content_json.get('base_resp', {}).get('err_msg')}")
 
             except Exception as e:
                 print(f"获取第{i + 1}页失败: {e}")
@@ -346,7 +353,7 @@ class ArticleFetcher:
         except Exception as e:
             print(f"❌ 保存封面失败 {article.title}: {str(e)}")
 
-    def fetch_articles(self, n: int):
+    def fetch_articles_old(self, n: int):
         """
         完整流程：获取文章总数 -> 获取文章url等信息（不包含内容） -> 利用ArticleScraper和url获取文章内容 -> 保存到数据库
         """
@@ -367,6 +374,26 @@ class ArticleFetcher:
         # 保存到数据库
         self.save_to_database(content_list)
 
+    def fetch_articles(self, n: int):
+        """
+        简化流程流程： 直接获取文章url等信息（不包含内容） -> 利用ArticleScraper和url获取文章内容 -> 保存到数据库
+        """
+        # 获取文章总数
+        # total_count = self.get_total_count()
+        # if total_count <= 0:
+        #     print("获取文章总数失败，请检查Cookie、token和fakeid是否正确")
+        #     return
+        # print(f"共有 {total_count} 篇文章")
+        # n = min(total_count, n)
+
+        # 获取文章列表
+        content_list = self.get_content_list(n)
+        if not content_list:
+            print("获取文章列表失败")
+            return
+        
+        # 保存到数据库
+        self.save_to_database(content_list)
 
 # 使用示例
 if __name__ == '__main__':
