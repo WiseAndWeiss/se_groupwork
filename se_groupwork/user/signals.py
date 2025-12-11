@@ -62,25 +62,6 @@ def update_collection_count_on_delete(sender, instance, **kwargs):
     user.collection_count -= 1
     user.save(update_fields=['collection_count'])
 
-@receiver(post_save, sender=Collection)
-def update_collection_count_on_save(sender, instance, created, **kwargs):
-    """
-    当收藏夹创建时，更新用户的收藏夹计数
-    """
-    if created:
-        user = instance.user
-        user.collection_count += 1
-        user.save(update_fields=['collection_count'])
-
-@receiver(post_delete, sender=Collection)
-def update_collection_count_on_delete(sender, instance, **kwargs):
-    """
-    当收藏夹删除时，更新用户的收藏夹计数
-    """
-    user = instance.user
-    user.collection_count -= 1
-    user.save(update_fields=['collection_count'])
-
 @receiver(post_save, sender=Favorite)
 def update_favorite_count_on_save(sender, instance, created, **kwargs):
     """
