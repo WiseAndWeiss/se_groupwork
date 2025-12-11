@@ -88,6 +88,13 @@ class WxmpLauncher:
         # 无头模式
         options.add_argument("--headless")
 
+        # 如果容器中安装了 Chromium，显式设置 binary 路径以便 Selenium 能找到浏览器
+        # 常见路径：/usr/bin/chromium 或 /usr/bin/chromium-browser
+        if os.path.exists('/usr/bin/chromium'):
+            options.binary_location = '/usr/bin/chromium'
+        elif os.path.exists('/usr/bin/chromium-browser'):
+            options.binary_location = '/usr/bin/chromium-browser'
+
         # 初始化浏览器
         self.driver = webdriver.Chrome(options=options)
 

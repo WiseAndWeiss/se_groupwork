@@ -1,4 +1,3 @@
-import threading
 import json
 from remoteAI.remoteAI.article_ai_serializer import entry
 from webspider.webspider.article_fetcher import ArticleFetcher
@@ -9,10 +8,10 @@ from django.db.models import Q
 
 class TaskManager:
     def __init__(self):
-        # 最大并发线程数限制为5
-        self.semaphore = threading.Semaphore(3)
         self.task_pool = []
+        self.task_data = [] 
         self.result = []
+        self.names = [] 
 
     def print_table_to_json(self, save_path):
         """打印数据表"""
@@ -32,36 +31,53 @@ class TaskManager:
         with open(save_path, "w", encoding="utf-8") as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
 
-
     def get_all_tasks_fakeid(self) -> bool:
         """获取所有过长时间未爬虫的公众号fakeid"""
         ten_hours_ago = timezone.now() - timedelta(hours=10)
 
-        unprocessed_tasks = PublicAccount.objects.filter(
-            Q(last_crawl_time__lt=ten_hours_ago) | Q(last_crawl_time__isnull=True)
-        ).values_list('fakeid', flat=True)
-
-        unprocessed_tasks = unprocessed_tasks.filter(
-            Q(is_default=True) | Q(subscription_count__gt=0)
+        # 先获取默认公众号
+        default_tasks = PublicAccount.objects.filter(
+            Q(last_crawl_time__lte=ten_hours_ago) | Q(last_crawl_time__isnull=True),
+            is_default=True
         )
+        
+        # 再获取非默认但有订阅的公众号
+        non_default_tasks = PublicAccount.objects.filter(
+            Q(last_crawl_time__lte=ten_hours_ago) | Q(last_crawl_time__isnull=True),
+            is_default=False,
+            subscription_count__gt=0
+        )
+        
+        # 合并：默认公众号在前
+        all_tasks = list(default_tasks.values_list('fakeid', 'name')) + \
+                    list(non_default_tasks.values_list('fakeid', 'name'))
 
-        unprocessed_tasks = list(unprocessed_tasks)
-        self.task_pool = unprocessed_tasks
-        if len(unprocessed_tasks) == 0:
+        self.task_data = all_tasks
+
+        fakeids = [task[0] for task in self.task_data]
+        self.names = [task[1] for task in self.task_data]
+        print(f"待处理的公众号：{self.names}")
+
+        self.task_pool = fakeids
+        if len(fakeids) == 0:
             return False
         else: 
             return True
 
-    def _worker(self, fakeid) -> None:
-        """线程工作函数，用于控制并发和调用处理函数"""
+    def _process_task(self, fakeid) -> None:
+        """单线程处理"""
         try:
-            # 获得信号量许可（控制并发数）
-            self.semaphore.acquire()
             article_fetcher = ArticleFetcher(fakeid)
             article_fetcher.fetch_articles(5)
+        except Exception as e:
+            print(f"处理公众号 {fakeid} 时出错: {e}")
         finally:
-            # 释放信号量许可
-            self.semaphore.release()
+            # 获取公众号名称并打印
+            account = PublicAccount.objects.filter(fakeid=fakeid).first()
+            if account:
+                print(f"已完成处理公众号: {account.name}")
+            else:
+                print(f"找不到fakeid为 {fakeid} 的公众号")
 
     def startrun(self) -> None:
         """任务管理入口函数"""
@@ -69,19 +85,12 @@ class TaskManager:
         if not self.get_all_tasks_fakeid():
             return False
 
-        # 2. 逐个处理任务
-        threads = []
-        for fakeid in self.task_pool:
-            # 创建并启动线程（异步执行）
-            thread = threading.Thread(target=self._worker, args=(fakeid,))
-            threads.append(thread)
-            thread.start()
-
-        for thread in threads:
-            thread.join()
+        # 2. 顺序处理任务
+        for fakeid, name in self.task_data:
+            print(f"正在处理公众号: {name}")
+            self._process_task(fakeid)
         
         return True
-
 
 if __name__ == "__main__":
     # 示例用法

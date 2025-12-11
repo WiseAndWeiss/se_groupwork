@@ -86,5 +86,3 @@ webspider/webspider/avatars/
 *.tmp
 *.temp
 
-# 迁移文件
-migrations/

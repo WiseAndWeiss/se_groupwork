@@ -14,6 +14,13 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
+# Optional PyMySQL compatibility (use PyMySQL instead of mysqlclient)
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except Exception:
+    pass
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,12 +29,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uk#%!syv3zy%pz_j)ud--fla#f-jxin(@gds$i*!_kgaucb*i-'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes')
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Hosts allowed to serve the application. For development allow all hosts.
+allowed_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '')
+if allowed_hosts:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
+else:
+    ALLOWED_HOSTS = ['127.0.0.1','localhost','49.232.208.99']  # 开发环境默认
 
 
 # Application definition
@@ -64,6 +77,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.getenv('JWT_SECRET_KEY', SECRET_KEY),  # 独立的JWT密钥
 }
 
 SPECTACULAR_SETTINGS = {
@@ -136,6 +151,7 @@ SPECTACULAR_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -169,14 +185,16 @@ WSGI_APPLICATION = 'se_groupwork.wsgi.application'
 
 DATABASES = {
     'default': {
+        'CONN_MAX_AGE': 600,
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'se',      # 数据库名
-        'USER': 'root',           # 数据库用户
-        'PASSWORD': '3213',       # 数据库密码
-        'HOST': 'localhost',              # 数据库地址
-        'PORT': '3306',                   # 数据库端口
+        'NAME': os.getenv('MYSQL_DATABASE', 'se'),      # 数据库名
+        'USER': os.getenv('MYSQL_USER', 'root'),           # 数据库用户
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),       # 数据库密码
+        'HOST': os.getenv('MYSQL_HOST', 'localhost'),              # 数据库地址
+        'PORT': os.getenv('MYSQL_PORT', '3306'),                   # 数据库端口
         'OPTIONS': {
             'charset': 'utf8mb4',         # 支持emoji等特殊字符
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",  # 严格模式
         }
     }
 }
@@ -230,6 +248,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Use WhiteNoise for static file serving in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -265,12 +287,113 @@ DEFAULT_PUBLIC_ACCOUNTS = [
     "清华小清心",
     "软小宣",
     "清软小研",
+    
+    # 清华大学 清华紫荆之声 清华大学学生会 清华大学社会实践 清华大学学生公益 清华大学学生社团 乐学 学在清华 清华后勤服务 清华家园网 艾生权 行在清华 食在清华 清华体育 清华大学新清华学堂 清华大学医院 清华职业辅导 清华大学艺术博物馆 清华海外学习 清华青年科创 清华小清心 软小宣 清软小研
 ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')
 
-BASE_URL = 'http://127.0.0.1:8000' 
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+LOG_DIR = '/var/log/django'
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',  # 轮转处理器
+            'filename': os.path.join(LOG_DIR, 'error.log'),
+            'maxBytes': 1024 * 1024 * 10,  # 10MB
+            'backupCount': 5,  # 保留5个备份
+            'formatter': 'verbose'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'mail_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'user': {
+            'handlers': ['file'], 
+            'level': 'DEBUG'
+        },
+        'webspider': {
+            'handlers': ['file'], 
+            'level': 'DEBUG'
+        },
+        'remoteAI': {
+            'handlers': ['file'], 
+            'level': 'DEBUG'
+        },
+        'article_selector': {
+            'handlers': ['file'], 
+            'level': 'DEBUG'
+        },
+    },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1',
+        'CONNECTION_POOL_KWARGS': {
+            'max_connections': 100,  # 连接池大小
+            'retry_on_timeout': True,
+        },
+        'SOCKET_CONNECT_TIMEOUT': 5,  # 连接超时
+        'SOCKET_TIMEOUT': 5,  # 读写超时
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+SECURE_SSL_REDIRECT = False 
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False # HTTP
+
+# CSRF 信任的来源
+CSRF_TRUSTED_ORIGINS = [
+    'http://49.232.208.99',   # 服务器地址
+    'http://localhost',        # 本地开发
+    'http://127.0.0.1',        # 本地开发
+]
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+
+SECURE_HSTS_SECONDS = 31536000  # HSTS一年
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'  # 防止点击劫持
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Meilisearch 配置
 MEILISEARCH_HOST = 'http://localhost:7700'
