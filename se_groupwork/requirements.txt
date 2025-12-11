@@ -17,3 +17,4 @@ gunicorn==21.2.0
 PyMySQL==1.1.1
 whitenoise==6.11.0
 django-redis>=5.0.0
+meilisearch
