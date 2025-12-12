@@ -18,10 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         account_names = options['account_names']
-        count = options['max_count']
+        max_count = options['max_count']
+
         #TODO 分别处理各个公众号的未处理文章
-        manager = TaskManager(max_workers=50)
-        manager.startrun(target_accounts_name=account_names, max_count=count)
+        manager = TaskManager(target_accounts_name=account_names, max_article_num=max_count, max_semaphore=10)
+        result = manager.startrun()
         if result:
             self.stdout.write(self.style.SUCCESS('任务执行成功！'))
         else:

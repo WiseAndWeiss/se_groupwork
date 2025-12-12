@@ -21,8 +21,12 @@ class UserManager(BaseUserManager):
             raise ValueError('用户必须提供用户名')
         if not password:
             raise ValueError('用户必须提供密码')
+        
+        if email:
+            email = self.normalize_email(email)
+        else:
+            email = None  # 不能是空字符串！否则违背了唯一性原则
 
-        email = self.normalize_email(email)
         user = self.model(
             username=username,
             email=email,
@@ -35,6 +39,9 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, username, password, email=None, **extra_fields):
         """创建超级用户"""
+        if not email:
+            raise ValueError('超级用户必须提供邮箱')
+        
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -46,7 +53,7 @@ class UserManager(BaseUserManager):
         return self.create_user(username, password, email, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """
     自定义用户模型
     - 储存用户的基本信息
@@ -66,6 +73,8 @@ class User(AbstractBaseUser):
     email = models.EmailField(
         _('邮箱地址'),
         blank=True,
+        null=True,  # 添加这一行
+        unique=True,
         error_messages={
             'unique': _("该邮箱地址已被占用。"),
         },
@@ -74,6 +83,8 @@ class User(AbstractBaseUser):
         _('手机号'),
         max_length=11,
         blank=True,
+        null=True,  # 添加这一行
+        unique=True,
         error_messages={
             'unique': _("该手机号已被占用。"),
         },
