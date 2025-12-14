@@ -28,7 +28,8 @@ class ArticleDAO:
                 "id": article.id,
                 "title": article.title,
                 "content": article.content,
-                "account": article.public_account.name
+                "account": article.public_account.name,
+                "publish_time": article.publish_time.strftime("%Y-%m-%d %H"),
             }
         except Article.DoesNotExist:
             # TODO: 日志
@@ -50,7 +51,8 @@ class ArticleDAO:
                     "tags": article_info["tags"],
                     "key_info": article_info["key_info"],
                     "tags_vector": article_info["tags_vector"],
-                    "semantic_vector": article_info["semantic_vector"]
+                    "semantic_vector": article_info["semantic_vector"],
+                    "relevant_time": article_info["relevant_time"]
                 }
             with transaction.atomic():
                 for article_id, update_case in update_cases.items():
