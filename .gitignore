@@ -46,6 +46,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# 迁移文件
+migrations/
+
 # 环境变量文件
 .env
 .venv
@@ -71,6 +74,7 @@ ehthumbs.db
 Thumbs.db
 
 # 数据库文件
+meili_data/
 *.sqlite3
 *.db
 

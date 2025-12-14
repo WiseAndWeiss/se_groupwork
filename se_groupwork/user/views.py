@@ -2,6 +2,7 @@ import os
 from datetime import datetime, time
 from django.db import transaction
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth import update_session_auth_hash
@@ -11,8 +12,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, TodoSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
-from user.models import Collection, User, Subscription, Favorite, History, Todo
+from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, TodoSerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer, SubscriptionSortSerializer
+from user.models import Collection, Collection, User, Subscription, Favorite, History, Todo
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser

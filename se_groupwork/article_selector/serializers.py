@@ -19,6 +19,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'summary',
             'tags',
             'key_info',
+            'relevant_time',
             'is_favorited'
         ]
 

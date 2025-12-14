@@ -22,6 +22,7 @@ def ai_summarize_article(content):
 	- 提取数个关键词，用于检索
 	- 生成一个简洁的摘要(150字左右)
 	- 并为文章分配2-3个合适的分类标签
+	- 提取文章中的关键时间，例如活动开始时间、报名截止时间（如无则留空），精确到天即可
 	请确保摘要准确反映文章的主要内容，且分类标签简洁明了。
 	你可以任意思考和输出，但最终的结论输出内容请组织为以下json格式，记得用```json和```包裹：
 	```json
@@ -29,7 +30,11 @@ def ai_summarize_article(content):
 		"key_info": ["关键词1", "关键词2", "..."],
 		"summary": "这里是文章的简洁摘要。",
 		"tags": ["分类标签1", "分类标签2", "..."],
-		"relevant_time": "MM-DD HH:MM",   # 可选，例如活动的时间，通知的截止时间等，如无相关时间信息则留空字符串
+		"relevant_time": [
+			{"描述1": "YYYY-MM-DD"},	# 描述应详细，包括活动名称和时间事件，例如“第三十二届挑战者杯报名截止时间”
+			{"描述2": "YYYY-MM-DD"},
+			...	# 如无相关时间，此处留空[]即可
+		]
 	}
 	```
 	关键词应该有一定的概括性和泛用性，例如“挑战者杯”而不是“第十三届挑战者杯一等奖”。
@@ -81,6 +86,8 @@ def entry(article_msg):
 		if not success_flag:
 			print(f"[Retry {retry}] For {article_msg['title']}")
 			continue
+		if "relevant_time" not in ai_resp:
+			ai_resp["relevant_time"] = []
 		print(ai_resp)
 		ai_resp["semantic_vector"] = keywords_vectorize(ai_resp["key_info"])
 		ai_resp["tags_vector"] = tags_vectorize(ai_resp["tags"])

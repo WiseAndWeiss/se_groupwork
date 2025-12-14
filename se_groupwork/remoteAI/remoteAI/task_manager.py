@@ -3,7 +3,7 @@ from django.db import transaction
 
 from remoteAI.remoteAI.article_ai_serializer import entry
 from webspider.models import Article
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 class ArticleDAO:
     @staticmethod
@@ -28,7 +28,8 @@ class ArticleDAO:
                 "id": article.id,
                 "title": article.title,
                 "content": article.content,
-                "account": article.public_account.name
+                "account": article.public_account.name,
+                "publish_time": article.publish_time.strftime("%Y-%m-%d %H"),
             }
         except Article.DoesNotExist:
             # TODO: 日志
@@ -50,7 +51,8 @@ class ArticleDAO:
                     "tags": article_info["tags"],
                     "key_info": article_info["key_info"],
                     "tags_vector": article_info["tags_vector"],
-                    "semantic_vector": article_info["semantic_vector"]
+                    "semantic_vector": article_info["semantic_vector"],
+                    "relevant_time": article_info["relevant_time"]
                 }
             with transaction.atomic():
                 for article_id, update_case in update_cases.items():
@@ -133,7 +135,7 @@ class TaskManager:
                     print(f"线程出错：{article_id}")
         if self.result:
             ArticleDAO.batch_update_articles_info(self.result)
-        meilitools = MeilisearchTool()
+        meilitools = global_meili_tool_load()
         meilitools.update_batch_articles([article_info["id"] for article_info in self.result])
         self.result.clear()
         self.task_pool.clear()

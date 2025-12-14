@@ -1,14 +1,13 @@
-from sentence_transformers import SentenceTransformer
+from se_groupwork.global_tools import global_embedding_load
 import numpy as np
 import json
 
 from remoteAI.remoteAI.tags import TAGS
 
-local_model_path = './remoteAI/all-MiniLM-L6-v2'
-model = SentenceTransformer(local_model_path)
 
 def vectorize(text):
-    vector = model.encode(text)
+    embedding = global_embedding_load()
+    vector = embedding.embed_documents([text])
     cuted_vector = vector[0:100]
     return cuted_vector
 

@@ -115,6 +115,10 @@ class Article(models.Model):
         default=list,
         verbose_name="语义向量"
     )
+    relevant_time = models.JSONField(
+        default=list,
+        verbose_name="相关时间"
+    )
     cover = models.ImageField(
         upload_to='covers/',
         blank=True,

@@ -20,6 +20,14 @@ try:
     pymysql.install_as_MySQLdb()
 except Exception:
     pass
+from datetime import timedelta
+
+# Optional PyMySQL compatibility (use PyMySQL instead of mysqlclient)
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except Exception:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -61,6 +69,7 @@ INSTALLED_APPS = [
     'user',
     'remoteAI',
     'article_selector',
+    'askAI',
 ]
 
 # 配置Django Rest Framework
@@ -131,6 +140,10 @@ SPECTACULAR_SETTINGS = {
         {
             'name': '文章推送',
             'description': '按时间、推荐或其他条件获取推文列表'
+        },
+        {
+            'name': '智能体',
+            'description': '智能体功能'
         }
     ],
     
@@ -189,7 +202,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('MYSQL_DATABASE', 'se'),      # 数据库名
         'USER': os.getenv('MYSQL_USER', 'root'),           # 数据库用户
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),       # 数据库密码
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', '3213'),       # 数据库密码
         'HOST': os.getenv('MYSQL_HOST', 'localhost'),              # 数据库地址
         'PORT': os.getenv('MYSQL_PORT', '3306'),                   # 数据库端口
         'OPTIONS': {
@@ -238,6 +251,18 @@ REST_FRAMEWORK = {
         '%Y-%m-%dT%H:%M:%S',
         '%Y-%m-%dT%H:%M:%S.%f',
     ],
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT认证优先
+        'rest_framework.authentication.SessionAuthentication',        # Session认证
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -408,4 +433,15 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 MEILISEARCH_HOST = 'http://localhost:7700'
 MEILISEARCH_API_KEY = None
 MEILISEARCH_INDEX_NAME = 'articles'
+TMP_MEILISEARCH_INDEX_NAME_FOR_TEST = 'test_articles'
 
+# Faiss 配置
+FAISS_INDEX_PATH = "askAI/faiss/faiss_index.index"
+CHUNK_TO_ARTICLE_ID_JSON_PATH = "askAI/faiss/chunk_to_article_id.json"
+TMP_FAISS_INDEX_PATH_FOR_TEST = "askAI/faiss/faiss_index_tmp.index"
+TMP_CHUNK_TO_ARTICLE_ID_JSON_PATH_FOR_TEST = "askAI/faiss/chunk_to_article_id_tmp.json"
+
+# Embedding model 配置
+EMBEDDING_MODEL = 'shibing624-text2vec-base-chinese'
+EMBEDDING_MODEL_PATH = './shibing624-text2vec-base-chinese'
+EMBEDDING_DIM = 768

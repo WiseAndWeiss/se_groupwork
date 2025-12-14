@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 class Command(BaseCommand):
     help = 'delete article by id to meilisearch index'
@@ -9,5 +9,5 @@ class Command(BaseCommand):
         
     def handle(self, *args, **options):
         article_id = options['article_id']
-        meilisearch_tool = MeilisearchTool()
-        meilisearch_tool.delete_article(article_id)
+        meili_tools = global_meili_tool_load()
+        meili_tools.delete_article(article_id)

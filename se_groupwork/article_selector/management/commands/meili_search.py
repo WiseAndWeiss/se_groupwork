@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 from webspider.models import Article
 
 class Command(BaseCommand):
@@ -10,8 +10,8 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         text = options['text']
-        meili = MeilisearchTool()
-        ids = meili.search_articles(text)
+        meili_tools = global_meili_tool_load()
+        ids = meili_tools.search_articles(text)
         print("搜索结果:", ids)
         for id in ids:
             article = Article.objects.get(id=id)

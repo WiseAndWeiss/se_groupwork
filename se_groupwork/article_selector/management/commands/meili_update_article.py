@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 class Command(BaseCommand):
     help = 'update article by id to meilisearch index'
@@ -9,5 +9,5 @@ class Command(BaseCommand):
         
     def handle(self, *args, **options):
         article_id = options['article_id']
-        meilisearch_tool = MeilisearchTool()
+        meilisearch_tool = global_meili_tool_load()
         meilisearch_tool.update_article(article_id)
