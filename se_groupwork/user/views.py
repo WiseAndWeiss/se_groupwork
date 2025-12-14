@@ -1,4 +1,7 @@
 import os
+from datetime import datetime, time
+from django.db import transaction
+from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
@@ -9,8 +12,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer
-from user.models import Collection, User, Subscription, Favorite, History
+from .serializers import ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, ArticleSerializer, CollectionCreateSerializer, CollectionSerializer, FavoriteMoveSerializer, FavoriteSerializer, HistorySerializer, PublicAccountSerializer, TodoSerializer, PublicAccountSerializer, UserEmailChangeSerializer, UserPasswordChangeSerializer, UserPhoneChangeSerializer, UserRegistrationSerializer, UserLoginSerializer , UserProfileSerializer, SubscriptionSerializer, SubscriptionSortSerializer, SubscriptionSortSerializer
+from user.models import Collection, Collection, User, Subscription, Favorite, History, Todo
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -762,6 +765,132 @@ class HistoryDetailView(APIView):
         """删除特定的历史记录"""
         history = get_object_or_404(History, pk=pk, user=request.user)
         History.objects.delete_history(history)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(
+    tags=['待办'],
+    summary='待办列表',
+    description='获取当前用户的待办列表，可按日期筛选',
+    methods=['GET'],
+    parameters=[
+        OpenApiParameter(
+            name='date',
+            type=str,
+            location=OpenApiParameter.QUERY,
+            description='过滤指定日期（YYYY-MM-DD）的待办，跨天任务会包含在跨度内',
+            required=False
+        )
+    ]
+)
+@extend_schema(
+    tags=['待办'],
+    summary='新增待办',
+    description='为当前用户创建待办事项',
+    methods=['POST'],
+    request=TodoSerializer,
+    responses={
+        201: OpenApiResponse(description='待办创建成功'),
+        400: OpenApiResponse(description='参数格式错误')
+    }
+)
+class TodoListView(APIView):
+    """待办列表与创建"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        todos = Todo.objects.filter(user=request.user)
+
+        date_str = request.query_params.get('date')
+        if date_str:
+            try:
+                target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({'error': 'date 格式应为 YYYY-MM-DD'}, status=status.HTTP_400_BAD_REQUEST)
+
+            tz = timezone.get_current_timezone()
+            start_of_day = timezone.make_aware(datetime.combine(target_date, time.min), tz)
+            end_of_day = timezone.make_aware(datetime.combine(target_date, time.max), tz)
+
+            todos = todos.filter(
+                Q(end_time__isnull=True, start_time__gte=start_of_day, start_time__lte=end_of_day) |
+                Q(end_time__isnull=False, start_time__lte=end_of_day, end_time__gte=start_of_day)
+            )
+
+        todos = todos.order_by('start_time', 'id')
+        serializer = TodoSerializer(todos, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = TodoSerializer(data=request.data)
+        if serializer.is_valid():
+            todo = serializer.save(user=request.user)
+            return Response(TodoSerializer(todo).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(
+    tags=['待办'],
+    summary='获取单个待办',
+    description='获取当前用户的单条待办详情',
+    methods=['GET'],
+    responses={
+        200: TodoSerializer,
+        404: OpenApiResponse(description='未找到待办')
+    }
+)
+@extend_schema(
+    tags=['待办'],
+    summary='更新待办',
+    description='修改待办内容，支持全量和部分更新',
+    methods=['PUT', 'PATCH'],
+    request=TodoSerializer,
+    responses={
+        200: TodoSerializer,
+        400: OpenApiResponse(description='参数格式错误'),
+        404: OpenApiResponse(description='未找到待办')
+    }
+)
+@extend_schema(
+    tags=['待办'],
+    summary='删除待办',
+    description='删除指定待办',
+    methods=['DELETE'],
+    responses={
+        204: OpenApiResponse(description='待办已删除'),
+        404: OpenApiResponse(description='未找到待办')
+    }
+)
+class TodoDetailView(APIView):
+    """待办详情与更新"""
+    permission_classes = [IsAuthenticated]
+
+    def _get_object(self, request, pk):
+        return get_object_or_404(Todo, pk=pk, user=request.user)
+
+    def get(self, request, pk):
+        todo = self._get_object(request, pk)
+        return Response(TodoSerializer(todo).data)
+
+    def put(self, request, pk):
+        todo = self._get_object(request, pk)
+        serializer = TodoSerializer(todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        todo = self._get_object(request, pk)
+        serializer = TodoSerializer(todo, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        todo = self._get_object(request, pk)
+        todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
