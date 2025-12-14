@@ -3,7 +3,8 @@
     "usingComponents": {
       "card-component": "/components/card/index"  ,
       "loading": "/components/loading/index",
-      "article-list":"/components/article-list/index"
+      "article-list":"/components/article-list/index",
+      "floating-pet": "/components/floating-pet/index"
     },
     "enablePullDownRefresh": true, 
     "onReachBottomDistance": 50,   

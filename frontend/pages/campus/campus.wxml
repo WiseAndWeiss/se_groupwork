@@ -207,3 +207,6 @@
     <text class="tab-text">我的</text>
   </view>
 </view>
+
+<!-- 桌宠组件 -->
+<floating-pet />

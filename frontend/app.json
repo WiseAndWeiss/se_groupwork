@@ -6,7 +6,8 @@
       "pages/user/user",       
       "pages/campus/campus",
       "pages/campus-all/campus-all",
-      "pages/webview/webview"    
+      "pages/webview/webview",
+      "pages/ai-chat/ai-chat"    
     ],
     "subPackages": [
       {

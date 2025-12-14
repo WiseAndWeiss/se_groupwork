@@ -3,7 +3,7 @@ export const resourceUrl = "http://49.232.208.99/";
 
 let access_token = wx.getStorageSync('access_token') || '';
 let refresh_token = wx.getStorageSync('refresh_token') || '';
-const MOCK_ENABLE = false; // 启用 Mock
+const MOCK_ENABLE = true; // 启用 Mock
 const mockApi = require('./mockConfig.js'); // 引入分接口 Mock 方法
 
 const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
@@ -418,6 +418,115 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
         }, 200);
         return;
       }
+
+      // AI对话接口（POST /ai/chat/）
+      if (url === '/ai/chat/' && method === 'POST') {
+        setTimeout(() => {
+          const question = data.question || '';
+          
+          // Mock测试样例数据
+          let response = {
+            question: question,
+            answer: '',
+            'references-articles': []
+          };
+
+          // 测试样例1: 自我介绍类问题
+          if (question.includes('你是谁') || question.includes('介绍') || question.includes('介绍自己')) {
+            response.answer = '我是面向校园生活领域的信息整合和总结专家，专门为师生提供清华大学软件学院相关的信息服务，例如心理咨询、学生组织动态等。我的回答基于提供的知识库内容，确保信息准确可靠。如需帮助，请随时告诉我你想了解的具体内容！ 😊';
+            response['references-articles'] = [
+              {
+                id: 11,
+                title: '软见心语丨心理咨询预约渠道全面升级！',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=2&sn=618ae575925e4084e49da77b4e373354#rd'
+              },
+              {
+                id: 10,
+                title: '清华大学软件学院第二十三届学生科协主席候选人公示',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=1&sn=69df39451056736f3ac38a7b30c81326#rd'
+              }
+            ];
+          }
+          // 测试样例2: 心理咨询相关问题
+          else if (question.includes('心理') || question.includes('咨询') || question.includes('预约')) {
+            response.answer = '清华大学软件学院提供心理咨询服务，预约渠道已全面升级。你可以通过以下方式预约心理咨询：1. 线上预约系统；2. 电话预约；3. 现场预约。如需了解更多详情，请查看相关文章。';
+            response['references-articles'] = [
+              {
+                id: 11,
+                title: '软见心语丨心理咨询预约渠道全面升级！',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=2&sn=618ae575925e4084e49da77b4e373354#rd'
+              }
+            ];
+          }
+          // 测试样例3: 学生组织相关问题
+          else if (question.includes('学生会') || question.includes('科协') || question.includes('学生组织') || question.includes('主席')) {
+            response.answer = '清华大学软件学院有多个学生组织，包括学生会和学生科协。近期有学生会主席团和科协主席的候选人公示，你可以查看相关文章了解详细信息。';
+            response['references-articles'] = [
+              {
+                id: 10,
+                title: '清华大学软件学院第二十三届学生科协主席候选人公示',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=1&sn=69df39451056736f3ac38a7b30c81326#rd'
+              },
+              {
+                id: 2,
+                title: '清华大学软件学院第二十四次学代会简报',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873886&idx=1&sn=774de9b0e96fb62cde45411b1dcabf34#rd'
+              },
+              {
+                id: 5,
+                title: '清华大学软件学院第二十四届学生会主席团候选人简介——叶思萌',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873860&idx=3&sn=fead22634dea6e508e9e3b4dba562c6b#rd'
+              },
+              {
+                id: 8,
+                title: '清华大学软件学院第二十三届学生科协主席候选人简介——李天笑',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873860&idx=6&sn=4d0accd838bb27f1d8bfe35ae51b23ff#rd'
+              }
+            ];
+          }
+          // 测试样例4: 学代会相关问题
+          else if (question.includes('学代会') || question.includes('代表大会')) {
+            response.answer = '清华大学软件学院第二十四次学生代表大会已成功召开。学代会是学生参与学院民主管理的重要平台，你可以查看相关简报了解会议内容和决议。';
+            response['references-articles'] = [
+              {
+                id: 2,
+                title: '清华大学软件学院第二十四次学代会简报',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873886&idx=1&sn=774de9b0e96fb62cde45411b1dcabf34#rd'
+              }
+            ];
+          }
+          // 测试样例5: 问候类问题（无参考文章）
+          else if (question.includes('你好') || question.includes('hello') || question.includes('hi')) {
+            response.answer = '你好！我是面向校园生活领域的信息整合和总结专家，专门为师生提供清华大学软件学院相关的信息服务。有什么可以帮助你的吗？';
+            response['references-articles'] = [];
+          }
+          // 测试样例6: 帮助类问题（无参考文章）
+          else if (question.includes('帮助') || question.includes('help') || question.includes('功能')) {
+            response.answer = '我可以帮助你解答关于清华大学软件学院的各种问题，包括心理咨询、学生组织动态、校园活动等信息。你可以直接问我任何相关问题，我会基于知识库为你提供准确的答案和相关文章链接。';
+            response['references-articles'] = [];
+          }
+          // 测试样例7: 默认回复（带参考文章）
+          else {
+            response.answer = `我理解你的问题是："${question}"。作为面向校园生活领域的信息整合专家，我基于知识库为你提供相关信息。以下是一些可能相关的文章，你可以查看获取更多详情。`;
+            response['references-articles'] = [
+              {
+                id: 11,
+                title: '软见心语丨心理咨询预约渠道全面升级！',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=2&sn=618ae575925e4084e49da77b4e373354#rd'
+              },
+              {
+                id: 10,
+                title: '清华大学软件学院第二十三届学生科协主席候选人公示',
+                article_url: 'http://mp.weixin.qq.com/s?__biz=MjM5NDMyNzcwNQ==&mid=2649873817&idx=1&sn=69df39451056736f3ac38a7b30c81326#rd'
+              }
+            ];
+          }
+
+          console.log('Mock - AI对话返回：', response);
+          resolve(response);
+        }, 500);
+        return;
+      }
     }
 
     // 后端接口逻辑（MOCK_ENABLE=false 时生效）
@@ -546,6 +655,9 @@ const getLatestArticles = (data = {}) => request('/articles/latest/', 'GET', dat
 const getRecommendedArticles = () => request('/articles/recommended', 'GET');
 const getFilteredArticles = (data) => request('/articles/filter/', 'POST', data);
 
+// AI对话
+const chatWithAI = (data) => request('/ai/chat/', 'POST', data);
+
 // 所有方法
 module.exports = {
   resourceUrl,
@@ -587,5 +699,6 @@ module.exports = {
   getCollectionArticles,
   updateCollection,
   deleteCollection,
-  moveFavourite
+  moveFavourite,
+  chatWithAI
 };
