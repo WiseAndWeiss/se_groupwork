@@ -1,5 +1,8 @@
 // app.js
 App({
+    globalData: {
+      petPosition: null
+    },
     onLaunch() {
       // 启动后立即隐藏 tabBar，animation: true 可选（是否带隐藏动画）
       wx.hideTabBar({

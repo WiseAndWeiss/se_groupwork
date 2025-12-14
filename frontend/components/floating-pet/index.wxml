@@ -1,0 +1,12 @@
+<!-- floating-pet.wxml -->
+<!-- 使用 cover-view 实现最顶层显示 -->
+<cover-view 
+  class="pet-cover-view"
+  style="transform: translate({{x}}rpx, {{y}}rpx);"
+  catchtouchstart="onTouchStart"
+  catchtouchmove="onTouchMove"
+  catchtouchend="onTouchEnd"
+>
+  <cover-image class="pet-cover-image" src="/assets/pet.gif"></cover-image>
+</cover-view>
+
