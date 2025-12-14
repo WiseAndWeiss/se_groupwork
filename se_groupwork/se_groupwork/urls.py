@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from article_selector.views import ArticleViewSet
+from askAI.views import AskView
 
 
 urlpatterns = [
@@ -38,6 +39,9 @@ urlpatterns = [
     path('api/articles/customized-latest/search', ArticleViewSet.as_view({'get': 'search_customized_latest'}), name='articles-customized-latest-search'),
 	path('api/articles/by-account/', ArticleViewSet.as_view({'get': 'by_account'}), name='articles-by-account'),
     path('api/articles/filter/', ArticleViewSet.as_view({'post': 'filter'}), name='articles-filter'),
+
+    # 智能体问答
+    path('api/ask/', AskView.as_view(), name='ask'),
 
     # API文档
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

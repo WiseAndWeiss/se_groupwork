@@ -132,6 +132,10 @@ SPECTACULAR_SETTINGS = {
         {
             'name': '文章推送',
             'description': '按时间、推荐或其他条件获取推文列表'
+        },
+        {
+            'name': '智能体',
+            'description': '智能体功能'
         }
     ],
     
