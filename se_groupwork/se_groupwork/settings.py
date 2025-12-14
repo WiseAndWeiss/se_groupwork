@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'user',
     'remoteAI',
     'article_selector',
+    'askAI',
 ]
 
 # 配置Django Rest Framework
@@ -189,7 +190,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('MYSQL_DATABASE', 'se'),      # 数据库名
         'USER': os.getenv('MYSQL_USER', 'root'),           # 数据库用户
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),       # 数据库密码
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', '3213'),       # 数据库密码
         'HOST': os.getenv('MYSQL_HOST', 'localhost'),              # 数据库地址
         'PORT': os.getenv('MYSQL_PORT', '3306'),                   # 数据库端口
         'OPTIONS': {
@@ -400,3 +401,11 @@ MEILISEARCH_HOST = 'http://localhost:7700'
 MEILISEARCH_API_KEY = None
 MEILISEARCH_INDEX_NAME = 'articles'
 
+# Faiss 配置
+FAISS_INDEX_PATH = "askAI/faiss/faiss_index.index"
+CHUNK_TO_ARTICLE_ID_JSON_PATH = "askAI/faiss/chunk_to_article_id.json"
+
+# Embedding model 配置
+EMBEDDING_MODEL = 'shibing624-text2vec-base-chinese'
+EMBEDDING_MODEL_PATH = './shibing624-text2vec-base-chinese'
+EMBEDDING_DIM = 768
