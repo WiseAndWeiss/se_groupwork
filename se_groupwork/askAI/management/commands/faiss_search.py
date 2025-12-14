@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from askAI.faiss.faiss_tools import FaissTool
+from se_groupwork.global_tools import global_faiss_tool_load
 from webspider.models import Article
 
 class Command(BaseCommand):
@@ -10,8 +10,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         query = options['query']
-        faiss_tool = FaissTool()
-        res = faiss_tool.search(query)
+        faissTool = global_faiss_tool_load()
+        res = faissTool.search(query)
         for id, score in res:
             article = Article.objects.get(id=id)
             print(f"- {id}({score}) {article.title}")

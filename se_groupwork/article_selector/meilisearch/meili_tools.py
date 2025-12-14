@@ -16,11 +16,40 @@ mysql.webspider_articles -> meilisearch
 '''
 
 class MeilisearchTool:
-	def __init__(self):
+	_instance = None
+	initialized = False
+
+	def __new__(cls, *args, **kwargs):
+		if not cls._instance:
+			cls._instance = super().__new__(cls)
+		return cls._instance
+
+	def __init__(self, test_mode=False):
+		if MeilisearchTool.initialized:
+			return
+		MeilisearchTool.initialized = True
+		print("[Info at meili_tools.py::__init__] MeilisearchTool 初始化", test_mode)
 		self.client = Client(settings.MEILISEARCH_HOST, settings.MEILISEARCH_API_KEY)
-		self.index_name = settings.MEILISEARCH_INDEX_NAME
-		self.index = self.check_and_create_index()
-		self.valid = self.index is not None
+		if not test_mode:
+			self.index_name = settings.MEILISEARCH_INDEX_NAME
+			self.index = self.check_and_create_index()
+			self.valid = self.index is not None
+		else:
+			self.index_name = settings.TMP_MEILISEARCH_INDEX_NAME_FOR_TEST
+			indexes = self.client.get_indexes()
+			uids = [index.uid for index in indexes['results']]
+			if self.index_name not in uids:
+				self.client.create_index(
+					uid = self.index_name,
+					options={"primaryKey": "id"}
+				)
+				time.sleep(0.1)
+				print("[Info at meili_tools.py::__init__] 索引创建成功")
+				self.index = self.client.get_index(self.index_name)
+			else:
+				self.index = self.client.get_index(self.index_name)
+				self.clear_index()
+			self.valid = self.index is not None
 
 
 	def check_and_create_index(self):

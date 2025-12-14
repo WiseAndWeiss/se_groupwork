@@ -1,22 +1,17 @@
 from webspider.models import Article
 from django.conf import settings
+from se_groupwork.global_tools import global_embedding_load
 
 import os
 import json
 import faiss
 import numpy as np
-from typing import List, Tuple, Optional, Dict
-from langchain_huggingface import HuggingFaceEmbeddings
+from typing import List, Dict
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 50
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name=settings.EMBEDDING_MODEL_PATH,
-	model_kwargs={"device": "cpu"},
-	encode_kwargs={"normalize_embeddings": True}
-)
 text_splitter = RecursiveCharacterTextSplitter(
 	chunk_size=CHUNK_SIZE, 
 	chunk_overlap=CHUNK_OVERLAP,
@@ -24,41 +19,68 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 class FaissTool:
-	def __init__(self):
-		self.index = self._load_index()
-		self.chunk_article_map = self._load_chunk_article_map()
+	_instance = None
+	initialized = False
+
+	def __new__(cls, *args, **kwargs):
+		if cls._instance is None:
+			cls._instance = super().__new__(cls)
+		return cls._instance
+
+	def __init__(self, test_mode=False):
+		if FaissTool.initialized:
+			return
+		FaissTool.initialized = True
+		self.test_mode = test_mode
+		self.embedding = global_embedding_load()
+		if not self.test_mode:
+			self.faiss_index_path = settings.FAISS_INDEX_PATH
+			self.chunk_to_article_id_json_path = settings.CHUNK_TO_ARTICLE_ID_JSON_PATH
+			self.index = self._load_index()
+			self.chunk_article_map = self._load_chunk_article_map()
+		else:
+			self.faiss_index_path = settings.TMP_FAISS_INDEX_PATH_FOR_TEST
+			self.chunk_to_article_id_json_path = settings.TMP_CHUNK_TO_ARTICLE_ID_JSON_PATH_FOR_TEST
+			self.index = faiss.IndexFlatL2(settings.EMBEDDING_DIM)
+			self.chunk_article_map = {}
+			faiss.write_index(self.index, self.faiss_index_path)
+			f = open(self.chunk_to_article_id_json_path, "w", encoding="utf-8")
+			f.write("{}")
+			f.close()
+
 
 	def _load_index(self) -> faiss.Index:
-		if os.path.exists(settings.FAISS_INDEX_PATH):
-			index = faiss.read_index(settings.FAISS_INDEX_PATH)
+		if os.path.exists(self.faiss_index_path):
+			index = faiss.read_index(self.faiss_index_path)
 		else:
 			index = faiss.IndexFlatL2(settings.EMBEDDING_DIM)
-			faiss.write_index(index, settings.FAISS_INDEX_PATH)
-			f = open(settings.CHUNK_TO_ARTICLE_ID_JSON_PATH, "w")
+			faiss.write_index(index, self.faiss_index_path)
+			f = open(self.chunk_to_article_id_json_path, "w")
 			f.write("{}")
 			f.close()
 		return index
 
 	def _save_index(self):
-		faiss.write_index(self.index, settings.FAISS_INDEX_PATH)
+		faiss.write_index(self.index, self.faiss_index_path)
 
 	def _load_chunk_article_map(self) -> Dict[int, int]:
-		if os.path.exists(settings.CHUNK_TO_ARTICLE_ID_JSON_PATH):
-			with open(settings.CHUNK_TO_ARTICLE_ID_JSON_PATH, "r") as f:
+		if os.path.exists(self.chunk_to_article_id_json_path):
+			with open(self.chunk_to_article_id_json_path, "r") as f:
 				jsondata = json.load(f)
 				return {int(k): int(v) for k, v in jsondata.items()}
-		f = open(settings.CHUNK_TO_ARTICLE_ID_JSON_PATH, "w", encoding="utf-8")
+		f = open(self.chunk_to_article_id_json_path, "w", encoding="utf-8")
 		f.write("{}")
 		f.close()
 		return {}
 	
 	def _save_chunk_article_map(self):
 		jsondata = {str(k): str(v) for k, v in self.chunk_article_map.items()}
-		with open(settings.CHUNK_TO_ARTICLE_ID_JSON_PATH, "w", encoding="utf-8") as f:
+		with open(self.chunk_to_article_id_json_path, "w", encoding="utf-8") as f:
 			json.dump(jsondata, f, ensure_ascii=False, indent=4)
 	
 	def _embed_texts(self, texts: List[str]) -> np.ndarray:
-		return np.array(embedding_model.embed_documents(texts)).astype(np.float32)
+		
+		return np.array(self.embedding.embed_documents(texts)).astype(np.float32)
 	
 	def _add_content_to_index(self, content: str, id: int):
 		if not content:

@@ -1,12 +1,12 @@
 from django.core.management.base import BaseCommand
-from askAI.faiss.faiss_tools import FaissTool
 from webspider.models import Article
+from se_groupwork.global_tools import global_faiss_tool_load
 
 class Command(BaseCommand):
     help = 'load once and do as command'
     
     def handle(self, *args, **kwargs):
-        faissTool = FaissTool()
+        faissTool = global_faiss_tool_load()
         while True:
             t = input("Enter command: ")
             t = t.split()
@@ -20,7 +20,7 @@ class Command(BaseCommand):
                 print(res)
             elif cmd == "update_article":
                 target_id = argv[0]
-                faissTool.update_article()
+                faissTool.update_article(target_id)
             elif cmd == "update_articles":
                 target_ids = argv
                 faissTool.update_articles(target_ids)

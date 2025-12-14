@@ -15,7 +15,7 @@ from webspider.models import Article, PublicAccount
 from user.models import Subscription
 from article_selector.serializers import ArticleSerializer, ArticlesFilterSerializer
 from article_selector.article_selector import *
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 response_format = {
     200: OpenApiResponse(
@@ -398,7 +398,7 @@ class ArticleViewSet(viewsets.ViewSet):
         search_content = data.get('search_content')
         if search_content:  # 筛选逻辑：如果关键词在标题/摘要/内容中出现，则将其返回
             try:
-                meilitools = MeilisearchTool()
+                meilitools = global_meili_tool_load()
                 search_result_ids = meilitools.search_articles(search_content)
                 queryset = queryset.filter(id__in=search_result_ids)
             except Exception:

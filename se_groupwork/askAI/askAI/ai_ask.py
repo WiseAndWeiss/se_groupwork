@@ -1,5 +1,5 @@
+from se_groupwork.global_tools import global_faiss_tool_load
 from askAI.askAI.ai_request import get_stream_response
-from askAI.faiss.faiss_tools import FaissTool
 from webspider.models import Article
 from copy import copy
 
@@ -14,9 +14,9 @@ base_prompt = """
 """
 
 def get_reference_articles(question):
-    faiss_tool = FaissTool()
     articles = []
-    for id, score in faiss_tool.search(question, top_k=5):
+    faissTool = global_faiss_tool_load()
+    for id, score in faissTool.search(question, top_k=5):
         article = Article.objects.get(id=id)
         articles.append(article)
     return articles

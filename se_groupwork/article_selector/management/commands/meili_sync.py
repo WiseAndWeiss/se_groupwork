@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 class Command(BaseCommand):
     help = 'sync articles to meilisearch index with mysql'
     
         
     def handle(self, *args, **options):
-        meilisearch_tool = MeilisearchTool()
-        meilisearch_tool.sync_articles_index_with_mysql()
+        meili_tools = global_meili_tool_load()
+        meili_tools.sync_articles_index_with_mysql()

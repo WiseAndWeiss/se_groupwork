@@ -404,10 +404,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 MEILISEARCH_HOST = 'http://localhost:7700'
 MEILISEARCH_API_KEY = None
 MEILISEARCH_INDEX_NAME = 'articles'
+TMP_MEILISEARCH_INDEX_NAME_FOR_TEST = 'test_articles'
 
 # Faiss 配置
 FAISS_INDEX_PATH = "askAI/faiss/faiss_index.index"
 CHUNK_TO_ARTICLE_ID_JSON_PATH = "askAI/faiss/chunk_to_article_id.json"
+TMP_FAISS_INDEX_PATH_FOR_TEST = "askAI/faiss/faiss_index_tmp.index"
+TMP_CHUNK_TO_ARTICLE_ID_JSON_PATH_FOR_TEST = "askAI/faiss/chunk_to_article_id_tmp.json"
 
 # Embedding model 配置
 EMBEDDING_MODEL = 'shibing624-text2vec-base-chinese'

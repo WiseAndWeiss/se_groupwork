@@ -3,7 +3,7 @@ from django.db import transaction
 
 from remoteAI.remoteAI.article_ai_serializer import entry
 from webspider.models import Article
-from article_selector.meilisearch.meili_tools import MeilisearchTool
+from se_groupwork.global_tools import global_meili_tool_load
 
 class ArticleDAO:
     @staticmethod
@@ -135,7 +135,7 @@ class TaskManager:
                     print(f"线程出错：{article_id}")
         if self.result:
             ArticleDAO.batch_update_articles_info(self.result)
-        meilitools = MeilisearchTool()
+        meilitools = global_meili_tool_load()
         meilitools.update_batch_articles([article_info["id"] for article_info in self.result])
         self.result.clear()
         self.task_pool.clear()
