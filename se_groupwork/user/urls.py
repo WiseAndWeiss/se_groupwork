@@ -28,6 +28,10 @@ urlpatterns = [
     # 浏览历史
     path('history/', views.HistoryListView.as_view(), name='history-list'),
     path('history/<int:pk>/', views.HistoryDetailView.as_view(), name='history-detail'),
+
+    # 待办
+    path('todos/', views.TodoListView.as_view(), name='todo-list'),
+    path('todos/<int:pk>/', views.TodoDetailView.as_view(), name='todo-detail'),
     
     # 个人资料更新
     path('update/username/', views.UsernameUpdateView.as_view(), name='update-username'),

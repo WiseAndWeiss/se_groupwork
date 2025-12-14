@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.db.models import Count
 
-from .models import User, Subscription, Collection, Favorite, History
+from .models import User, Subscription, Collection, Favorite, History, Todo
 
 
 # ==================== 内联模型配置 ====================
@@ -48,6 +48,16 @@ class HistoryInline(admin.TabularInline):
     extra = 0
     readonly_fields = ('viewed_at',)
     fields = ('article', 'viewed_at')
+    raw_id_fields = ('article',)
+    show_change_link = True
+
+
+class TodoInline(admin.TabularInline):
+    """用户待办的内联显示"""
+    model = Todo
+    extra = 0
+    readonly_fields = ('start_time', 'end_time', 'remind')
+    fields = ('title', 'start_time', 'end_time', 'remind')
     raw_id_fields = ('article',)
     show_change_link = True
 
@@ -97,7 +107,7 @@ class UserAdmin(DjangoUserAdmin):
     )
     
     # 内联显示相关数据
-    inlines = [SubscriptionInline, CollectionInline, FavoriteInline, HistoryInline]
+    inlines = [SubscriptionInline, CollectionInline, FavoriteInline, HistoryInline, TodoInline]
     
     # 自定义方法
     def get_avatar_preview(self, obj):
@@ -210,4 +220,24 @@ class HistoryAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('user', 'article')}),
         (_('时间信息'), {'fields': ('viewed_at',)}),
+    )
+
+
+@admin.register(Todo)
+class TodoAdmin(admin.ModelAdmin):
+    """待办事项管理界面"""
+
+    list_display = ('title', 'user', 'start_time', 'end_time', 'remind', 'article', 'created_at')
+    list_display_links = ('title', 'user')
+    list_filter = ('remind', 'start_time', 'end_time')
+    search_fields = ('title', 'user__username')
+    readonly_fields = ('created_at', 'updated_at')
+    raw_id_fields = ('user', 'article')
+    date_hierarchy = 'start_time'
+    ordering = ('start_time',)
+
+    fieldsets = (
+        (None, {'fields': ('user', 'title', 'note', 'article')}),
+        (_('时间信息'), {'fields': ('start_time', 'end_time', 'remind')}),
+        (_('记录信息'), {'fields': ('created_at', 'updated_at')}),
     )
