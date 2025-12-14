@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 from remoteAI.remoteAI.task_manager import TaskManager
+from webspider.models import Article
+import json
 
 class Command(BaseCommand):
     help = '处理特定公众号的未摘要的文章'

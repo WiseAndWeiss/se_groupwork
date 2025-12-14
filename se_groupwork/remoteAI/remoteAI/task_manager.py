@@ -1,119 +1,145 @@
-import threading
-import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from django.db import transaction
+
 from remoteAI.remoteAI.article_ai_serializer import entry
-from webspider.models import Article, PublicAccount
+from webspider.models import Article
+from article_selector.meilisearch.meili_tools import MeilisearchTool
+
+class ArticleDAO:
+    @staticmethod
+    def get_pending_article_ids(target_accounts_name = None, max_article_num = None):
+        '''获取待处理的文章'''
+        queryset = Article.objects.filter(summary="").order_by('-publish_time')
+        if target_accounts_name:
+            queryset = queryset.filter(public_account__name__in=target_accounts_name)
+        if max_article_num:
+            queryset = queryset[:max_article_num]
+        print(f"计划处理文章{len(queryset)}篇:")
+        for article in queryset:
+            print(f"  - {article.id} | {article.title}")
+        return list(queryset.values_list('id', flat=True))
+
+    @staticmethod
+    def get_article_info(article_id):
+        '''获取文章信息'''
+        try:
+            article = Article.objects.get(id=article_id)
+            return {
+                "id": article.id,
+                "title": article.title,
+                "content": article.content,
+                "account": article.public_account.name
+            }
+        except Article.DoesNotExist:
+            # TODO: 日志
+            print(f"文章{article_id}不存在")
+            return None
+
+    
+    @staticmethod
+    def batch_update_articles_info(articles_info, batch_size = 10):
+        '''批量更新文章信息'''
+        if len(articles_info) == 0:
+            return
+        for i in range(0, len(articles_info), batch_size):
+            batch = articles_info[i:i+batch_size]
+            update_cases = {}
+            for article_info in batch:
+                update_cases[article_info["id"]] = {
+                    "summary": article_info["summary"],
+                    "tags": article_info["tags"],
+                    "key_info": article_info["key_info"],
+                    "tags_vector": article_info["tags_vector"],
+                    "semantic_vector": article_info["semantic_vector"]
+                }
+            with transaction.atomic():
+                for article_id, update_case in update_cases.items():
+                    Article.objects.filter(id=article_id).update(**update_case)
+
 
 class TaskManager:
-    def __init__(self, target_accounts_name = None, max_article_num = None, max_semaphore=5):
-        # 最大并发线程数限制为5
-        self.semaphore = threading.Semaphore(max_semaphore)
+    def __init__(self, max_workers = 50):
+        self.max_workers = max_workers
+        self.target_accounts_name = None
+        self.max_article_num = None
         self.task_pool = []
         self.result = []
+
+    def update_task_pool(self):
+        self.task_pool = ArticleDAO.get_pending_article_ids(
+            self.target_accounts_name, 
+            self.max_article_num
+        )
+        return len(self.task_pool) > 0
+
+    def _process_article(self, article_info):
+        '''线程函数，处理单任务'''
+        if not article_info:
+            return None
+        article_id = article_info["id"]
+        print(f"线程开始：{article_info['title']}")
+        try:
+            resp = entry(article_info)
+            if resp is None:
+                return None
+            else:
+                return resp | {"id": article_id}
+        except Exception as e:
+            # TODO: 日志
+            print(f"线程出错：{article_info['title']}")
+            print(e)
+            return None
+        
+    def startrun_fortest(self, task_pool):
+        '''测试用方法，指定任务id，不操作数据库'''
+        self.task_pool = task_pool
+        self.result = []
+        with ThreadPoolExecutor(max_workers=self.max_workers, thread_name_prefix="remoteAIWorker") as executor:
+            future_to_article = {
+                executor.submit(self._process_article, ArticleDAO.get_article_info(article_id)): article_id
+                for article_id in self.task_pool
+            }
+            for future in as_completed(future_to_article):
+                article_info = future_to_article[future]
+                try:
+                    article_info = future.result()
+                    if article_info:
+                        self.result.append(article_info)
+                except Exception:
+                    # TODO: 日志
+                    print(f"线程出错：{article_info['title']}")
+        return self.result
+
+    def startrun(self, target_accounts_name = None, max_article_num = None):
         self.target_accounts_name = target_accounts_name
         self.max_article_num = max_article_num
-
-    def print_table_to_json(self, save_path):
-        """打印数据表"""
-        all_articles = Article.objects.all()
-        json_data = {
-            "articles": [
-                {
-                    "id": article.id,
-                    "title": article.title,
-                    "url": article.article_url,
-                    "content": article.content,
-                    "account": article.public_account.name,
-                    "summary": article.summary,
-                    "keyinfo": article.key_info,
-                    "tags": article.tags,
-                    "semantic_vector": article.semantic_vector
-                }
-                for article in all_articles
-            ]
-        }
-        with open(save_path, "w", encoding="utf-8") as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=4)
-
-
-
-    def get_all_tasks_id(self) -> bool:
-        """获取所有未处理任务的ID"""
-        alltasks = Article.objects.filter(summary="").order_by('-publish_time')
-        target_ids = []
-        if self.target_accounts_name is not None:
-            if self.max_article_num is not None:
-                for name in self.target_accounts_name:
-                    target_ids += list(alltasks.filter(public_account__name=name).order_by('-publish_time')[:self.max_article_num].values_list('id', flat=True))
-            else:
-                for name in self.target_accounts_name:
-                    target_ids += list(alltasks.filter(public_account__name=name).order_by('-publish_time').values_list('id', flat=True))
-        else:
-            if self.max_article_num is not None:
-                target_ids = list(alltasks.order_by('-publish_time')[:self.max_article_num].values_list('id', flat=True))
-            else:
-                target_ids = list(alltasks.order_by('-publish_time').values_list('id', flat=True))
-        target_ids = list(set(target_ids))
-        self.task_pool = target_ids
+        self.update_task_pool()
         if len(self.task_pool) == 0:
             return False
-        else: 
-            return True
-
-    def get_msg_by_id(self, task_id):
-        """根据任务ID获取任务详情"""
-        item = Article.objects.get(id=task_id)
-        article_msg = {
-            "id": task_id,
-            "title": item.title,
-            "content": item.content,
-            "account": item.public_account.name
-        }
-        return article_msg
-
-    def _worker(self, article_msg) -> None:
-        """线程工作函数，用于控制并发和调用处理函数"""
-        try:
-            print(f"开始任务：{article_msg['title']}")
-            # 获得信号量许可（控制并发数）
-            self.semaphore.acquire()
-            resp = entry(article_msg)
-            if resp is None:
-                self.result.append({"id": article_msg["id"], "summary": "", "keyinfo": [], "tags": [], "semantic_vector": [], "tags_vector": []})
-            # 更新数据库
-            else:
-                self.result.append(resp | {"id": article_msg["id"]})
-        finally:
-            # 释放信号量许可
-            self.semaphore.release()
-
-    def startrun(self) -> None:
-        """任务管理入口函数"""
-        self.print_table_to_json("origin.json")
-        if not self.get_all_tasks_id():
-            return False
-
-        # 2. 逐个处理任务
-        threads = []
-        for task_id in self.task_pool:
-            # 获取任务详情
-            task_msg = self.get_msg_by_id(task_id)
-            # 创建并启动线程（异步执行）
-            thread = threading.Thread(target=self._worker, args=(task_msg,))
-            threads.append(thread)
-            thread.start()
-
-        for thread in threads:
-            thread.join()
-        
-        # 3. 更新数据库
-        for item in self.result:
-            Article.objects.filter(id=item["id"]).update(summary=item["summary"], key_info=",".join(item["keyinfo"]), tags=item["tags"], tags_vector=item["tags_vector"], semantic_vector=item["semantic_vector"])
         self.result = []
-        self.print_table_to_json("result.json")
+        with ThreadPoolExecutor(max_workers=self.max_workers, thread_name_prefix="remoteAIWorker") as executor:
+            future_to_article = {
+                executor.submit(self._process_article, ArticleDAO.get_article_info(article_id)): article_id
+                for article_id in self.task_pool
+            }
+            for future in as_completed(future_to_article):
+                article_id = future_to_article[future]
+                try:
+                    article_info = future.result()
+                    if article_info:
+                        self.result.append(article_info)
+                except Exception:
+                    # TODO: 日志
+                    print(f"线程出错：{article_id}")
+        if self.result:
+            ArticleDAO.batch_update_articles_info(self.result)
+        meilitools = MeilisearchTool()
+        meilitools.update_batch_articles([article_info["id"] for article_info in self.result])
+        self.result.clear()
+        self.task_pool.clear()
         return True
-
-
+        
 if __name__ == "__main__":
-    # 示例用法
-    manager = TaskManager()
-    manager.startrun()
+    # 实例用法
+    task_manager = TaskManager()
+    task_manager.startrun()

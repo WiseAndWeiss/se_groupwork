@@ -1,6 +1,8 @@
 import json
 import requests
 import configparser as confp
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 cfg = confp.ConfigParser()
 cfg.read('./remoteAI/remoteAI/remoteAI.ini')
@@ -12,45 +14,60 @@ model = cfg.get(llm, "model")
 setting = {
     "model": model,
     "temperature": 0.7,
-    "stream": True
+    "stream": False
 }
-stream_output = False
 
 def get_response(msg):
-    data = setting | {"messages": msg}
+    '''
+    非流式获取AI响应
+    '''
+    data = {**setting, "messages": msg}
     headers = {
-    "Content-Type": "application/json",
-    'authorization': f'Bearer {key}'
+        "Content-Type": "application/json",
+        'authorization': f'Bearer {key}'
     }
-    full_response = ''
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=2,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["POST"]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    result = ""
     try:
-        with requests.post(
+        response = session.post(
             url=url,
             headers=headers,
             json=data,
-            stream=True
-        ) as response:
-            response.raise_for_status()
-            for line in response.iter_lines():
-                if line:
-                    decoded_line = line.decode('utf-8')
-                    if decoded_line.startswith("data: "):
-                        chunk = decoded_line[6:]
-                        if chunk == "[DONE]":
-                            break
-                        try:
-                            chunk_json = json.loads(chunk)
-                            content = chunk_json.get("choices", [{}])[0].get("delta", {}).get("content", "")
-                            if content:
-                                if stream_output:
-                                    print(content, end="", flush=True)
-                                full_response += content
-                        except json.JSONDecodeError:
-                            print(f"解析错误: {chunk}")
+            timeout=(10, 100)
+        )
+        response.raise_for_status()
+        response_json = response.json()
+        result = response_json.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
     except requests.exceptions.RequestException as e:
-        print(f"请求出错: {e}")
+        # TODO: 日志
+        print(f"[Error at ai_request.py::get_response] 请求出错: {e}")
+    except requests.exceptions.ConnectTimeout:
+        # TODO: 日志
+        print("[Error at ai_request.py::get_response] 网络连接超时")
+    except requests.exceptions.ReadTimeout:
+        # TODO: 日志
+        print("[Error at ai_request.py::get_response] 等待返回超时")
+    except requests.exceptions.HTTPError as e:
+        # TODO: 日志
+        print(f"[Error at ai_request.py::get_response] HTTP状态码: {e}")
+    except json.JSONDecodeError:
+        # TODO: 日志
+        print("[Error at ai_request.py::get_response] JSON解析错误")
+    except Exception as e:
+        # TODO: 日志
+        print(f"[Error at ai_request.py::get_response] 未知错误: {e}")
     finally:
-        return str(full_response)
+        session.close()
+        return str(result)
+    
     
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 from sentence_transformers import SentenceTransformer
-from sklearn.random_projection import GaussianRandomProjection
 import numpy as np
 import json
 
