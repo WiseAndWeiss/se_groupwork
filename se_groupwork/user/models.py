@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.db.models import F, Q
 from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -477,3 +478,45 @@ class History(models.Model):
         ]
     def __str__(self):
         return f"{self.user} viewed {self.article}"
+
+
+class Todo(models.Model):
+    """用户待办事项，用于日历标记和提醒"""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='todos'
+    )
+    title = models.CharField(_('标题'), max_length=100)
+    note = models.TextField(_('备注'), blank=True)
+    start_time = models.DateTimeField(_('开始时间'))
+    end_time = models.DateTimeField(_('结束时间'), null=True, blank=True)
+    remind = models.BooleanField(_('是否提醒'), default=False)
+    article = models.ForeignKey(
+        Article,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('相关文章')
+    )
+    created_at = models.DateTimeField(_('创建时间'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('更新时间'), auto_now=True)
+
+    class Meta:
+        verbose_name = _('待办')
+        verbose_name_plural = _('待办')
+        ordering = ['start_time', 'id']
+        indexes = [
+            models.Index(fields=['user', 'start_time']),
+            models.Index(fields=['user', 'end_time']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(end_time__gte=F('start_time')) | Q(end_time__isnull=True),
+                name='todo_end_after_start'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.title} ({self.user})"

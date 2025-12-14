@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Collection, User, Subscription, Favorite, History
+from .models import Collection, User, Subscription, Favorite, History, Todo
 from webspider.models import PublicAccount, Article
 from .param_validate import validate_credentials, check_password_strength, check_phone_number
 from article_selector.serializers import ArticleSerializer
@@ -211,6 +211,31 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History  # 关联历史模型
         fields = ['id', 'article', 'viewed_at']  # 包含的历史信息字段
+
+
+class TodoSerializer(serializers.ModelSerializer):
+    """待办序列化器"""
+
+    article = serializers.PrimaryKeyRelatedField(
+        queryset=Article.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
+    class Meta:
+        model = Todo
+        fields = [
+            'id', 'title', 'note', 'start_time', 'end_time',
+            'remind', 'article', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate(self, attrs):
+        start = attrs.get('start_time') or getattr(self.instance, 'start_time', None)
+        end = attrs.get('end_time') or getattr(self.instance, 'end_time', None)
+        if start and end and end < start:
+            raise serializers.ValidationError('结束时间不能早于开始时间')
+        return attrs
 
 # 修改个人资料相关的序列化器
 class UserPasswordChangeSerializer(serializers.Serializer):
