@@ -13,10 +13,17 @@ class Command(BaseCommand):
             default=5,
             help='要获取的文章数量（默认：5）'
         )
+        parser.add_argument(
+            '--sleep',
+            type=int,
+            default=None,
+            help='抓取请求间隔秒数，未设置则在15-20秒内随机'
+        )
 
     def handle(self, *args, **options):
         account_names = options['account_names']
         count = options['count']
+        sleep_seconds = options['sleep']
 
         # 批量获取所有指定公众号的fakeid
         accounts_info = PublicAccount.objects.filter(
@@ -40,7 +47,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                article_fetcher = ArticleFetcher(fakeid)
+                article_fetcher = ArticleFetcher(fakeid, sleep_seconds=sleep_seconds)
                 article_fetcher.fetch_articles(count)
                 
                 self.stdout.write(self.style.SUCCESS(f'成功更新公众号"{account_name}"的文章！'))
