@@ -22,7 +22,7 @@ from webspider.models import Article, Cookies, PublicAccount
 import html
 
 class ArticleFetcher:
-    def __init__(self, fakeid: str = None):
+    def __init__(self, fakeid: str = None, sleep_seconds: int | None = None, sleep_min: int = 20, sleep_max: int = 30):
         """
         初始化文章抓取器
 
@@ -36,6 +36,10 @@ class ArticleFetcher:
         self.url = "https://mp.weixin.qq.com/cgi-bin/appmsg"
         self.scraper = cloudscraper.create_scraper()
         self.avatar_downloader = AvatarDownloader(save_dir="media/covers")
+        # 若指定固定等待时间则使用，否则在[min,max]内随机，默认20~30秒
+        self.sleep_seconds = sleep_seconds
+        self.sleep_min = sleep_min
+        self.sleep_max = sleep_max
 
         # 初始化参数和headers
         self.params = {
@@ -120,15 +124,14 @@ class ArticleFetcher:
             self.params["begin"] = str(i * per_page)
 
             try:
-                # 随机延迟，避免请求过于频繁
-                wait_time = random.randint(15, 20)
+                # 控制请求间隔，优先使用固定秒数，其次使用随机区间
+                wait_time = self._get_wait_time()
 
                 print(f"第{i+1}页: 等待 {wait_time}秒", end='', flush=True)
-            
                 for _ in range(wait_time):
                     time.sleep(1)
                     print('.', end='', flush=True)
-                print() 
+                print()
     
                 response = requests.get(
                     self.url,
@@ -267,16 +270,23 @@ class ArticleFetcher:
             print(f"下载文章封面图失败: {e}")
             return ""
 
-    def save_to_database(self, content_list: List[Dict[str, Any]]) -> None:
+    def save_to_database(self, content_list: List[Dict[str, Any]]) -> int:
         """
         将文章数据保存到数据库。
 
         Args:
             content_list：包含title、link、publish_time、cover_url等信息
+
+        Returns:
+            新增的文章数量
         """
         # 由于django和mysql存在时区不同会出现警告，为了便于使用选择忽视警告。
-        warnings.filterwarnings("ignore", category=RuntimeWarning, 
+        warnings.filterwarnings("ignore", category=RuntimeWarning,
                             message="DateTimeField.*received a naive datetime")
+
+        created_count = 0
+        has_error = False
+
         try:
             for item in content_list:
                 article_url = item.get("link", "")
@@ -305,11 +315,19 @@ class ArticleFetcher:
 
                 if created:
                     self._save_cover_to_imagefield(article, result['cover'])
+                    created_count += 1
                     print(f"✅ 已保存文章链接: {title}")
                 else:
                     print(f"⚠️ 文章链接已存在: {title}")
         except Exception as e:
+            has_error = True
             print(f"保存到数据库失败: {e}")
+        finally:
+            # 当本次抓取无新文章但流程正常时，也要刷新最后抓取时间
+            if not has_error and created_count == 0:
+                self._mark_account_crawled()
+
+        return created_count
 
     def _remove_chksm(self, url):
         parsed = urlparse(url)
@@ -390,10 +408,22 @@ class ArticleFetcher:
         content_list = self.get_content_list(n)
         if not content_list:
             print("获取文章列表失败")
-            return
+            return 0
         
         # 保存到数据库
-        self.save_to_database(content_list)
+        return self.save_to_database(content_list)
+
+    def _mark_account_crawled(self) -> None:
+        """更新公众号的最后抓取时间，即使本次没有新增文章。"""
+        PublicAccount.objects.filter(id=self.public_account.id).update(
+            last_crawl_time=timezone.localtime(timezone.now())
+        )
+
+    def _get_wait_time(self) -> int:
+        """获取本次请求应等待的秒数。"""
+        if self.sleep_seconds is not None:
+            return max(0, int(self.sleep_seconds))
+        return random.randint(self.sleep_min, self.sleep_max)
 
 # 使用示例
 if __name__ == '__main__':
