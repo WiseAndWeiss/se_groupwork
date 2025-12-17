@@ -539,7 +539,6 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
     }, 200);
     return;
     }
-   }
 
     // 后端接口逻辑（MOCK_ENABLE=false 时生效）
     wx.request({
@@ -730,6 +729,6 @@ module.exports = {
   addTodo,
   updateTodo,
   deleteTodo,
-  getArticleDetail 
+  getArticleDetail ,
   chatWithAI
 };
