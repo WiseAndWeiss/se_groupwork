@@ -1,4 +1,3 @@
-// card.js
 const request = require('../../utils/request');
 
 Component({
@@ -28,15 +27,45 @@ Component({
     defaultCollection: null, // 默认收藏夹
     currentFavoriteId: '', // 当前收藏ID
     tipTimer: null, // 提示弹窗定时器
+    // 待办功能
+    showAddTodoModal: false, // 添加待办弹窗显示
+    newTodoData: { // 待办数据（仅关联文章ID）
+      title: '',
+      content: '',
+      startTime: '',
+      endTime: '',
+      status: 0,
+      article_id: '' // 仅存文章ID
+    },
+    // 时间选择器相关
+    timeRange: [], // [年,月,日,时,分]
+    newTodoStartTimeIndex: [0,0,0,0,0],
+    newTodoEndTimeIndex: [0,0,0,0,0],
+    currentYear: new Date().getFullYear(),
+    currentMonth: new Date().getMonth() + 1,
+    formattedKeyInfo: ''
   },
 
   lifetimes: {
     detached() {
         if (this.data.tipTimer) clearTimeout(this.data.tipTimer);
+      },
+      attached() {
+        // 初始化时间选择器
+        this.initTimeRange();
+        const formattedKeyInfo = this.formatKeyInfo(this.properties.key_info);
+      this.setData({ formattedKeyInfo });
       }
   },
 
   methods: { 
+    formatKeyInfo(keyInfo) {
+        if (!keyInfo || typeof keyInfo !== 'string') {
+          return '无'; 
+        }
+        return keyInfo.replace(/[\[\]"']/g, '').trim() || '无';
+      },
+
     openWebView(e) {
       const url = e.currentTarget.dataset.url;
       // 对URL进行编码
@@ -94,7 +123,7 @@ Component({
           const articleData = {
             article_id: articleId,
             // 关联默认收藏夹（如果接口支持）
-            collection_id: this.data.defaultCollection?.id || ''
+            collection_id: this.data.defaultCollection ? this.data.defaultCollection.id : '' // 修复可选链
           };
           this.setData({ animateStar: true });
           const response = await request.addFavourite(articleData);
@@ -112,46 +141,6 @@ Component({
         wx.showToast({ title: err || '操作失败', icon: 'none' });
       }
     },
-    /* 
-    //收藏按钮，只显示动画
-    async onFavourite() {
-        const articleId = this.properties.id_;
-        if (!articleId) {
-          wx.showToast({ title: '操作失败：文章ID无效', icon: 'none' });
-          return;
-        }
-      
-        // 核心：直接反转现有 is_favorited 状态（0→1，1→0），无需新增变量
-        const currentFavState = this.properties.is_favorited;
-        const newFavState = currentFavState ? 0 : 1;
-      
-        try {
-          // 1. 先更新状态（图标即时切换，优先满足视觉需求）
-          this.setData({ is_favorited: newFavState });
-          this.setData({ animateStar: true });
-          wx.showToast({ title: newFavState ? '收藏成功' : '取消收藏成功' });
-          setTimeout(() => {
-            this.setData({ animateStar: false });
-          }, 300);
-      
-          // 2. 调用Mock接口（成功与否不影响状态切换，忽略全局共享）
-          if (newFavState) {
-            // 收藏：传递必要字段调用接口（无需依赖返回ID）
-            await request.addFavourite({ id: articleId });
-          } else {
-            // 取消收藏：用当前状态的ID（或直接传articleId，Mock不校验则不影响）
-            await request.deleteFavourite(currentFavState || articleId);
-          }
-        } catch (err) {
-          console.error('收藏接口调用失败（状态已切换）：', err);
-          // 接口失败不回滚状态，仅提示（符合“只关心切换”的需求）
-          wx.showToast({ title: '接口调用失败，状态已更新', icon: 'none' });
-        }
-      },
-      */
-    /**
-     * 展开/收起逻辑（添加历史记录，对接 POST /api/user/history/）
-     */
 
     // 显示收藏提示弹窗
     showFavTipPopup() {
@@ -284,6 +273,212 @@ Component({
             isAnimating: false
           });
         }, 400); // 与CSS动画时间匹配
-      }
+      },
+
+    // 1. 初始化时间选择器（和Calendar完全一致）
+    initTimeRange() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+  
+        const yearList = [year - 2, year - 1, year, year + 1, year + 2].map(y => `${y}年`);
+        const monthList = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);
+        const dayList = Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => `${i + 1}日`);
+        const hourList = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}时`);
+        const minuteList = Array.from({ length: 60 }, (_, i) => `${String(i).padStart(2, '0')}分`);
+  
+        this.setData({
+          timeRange: [yearList, monthList, dayList, hourList, minuteList],
+          currentYear: year,
+          currentMonth: month
+        });
+      },
+      
+    // 2. 生成当前时间字符串（和Calendar完全一致）
+    getCurrentTimeStr(isEnd = false) {
+        const now = new Date();
+        if (isEnd) now.setMinutes(now.getMinutes() + 1);
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      },
+  
+      // 3. 时间字符串转选择器索引（修复可选链语法）
+      getTimeIndexByStr(timeStr) {
+        const timeRange = this.data.timeRange; // 先取数据，避免链式调用
+        if (!timeStr || typeof timeStr !== 'string') return [0, 0, 0, 0, 0];
+        
+        const [datePart = '', timePart = ''] = timeStr.split(' ');
+        const [year = 0, month = 0, day = 0] = datePart.split('-').map(Number);
+        const [hour = 0, minute = 0] = timePart.split(':').map(Number);
+  
+        // 修复可选链：用条件判断替代?.
+        const yearIndex = timeRange[0] ? timeRange[0].findIndex(item => item === `${year}年`) : 0;
+        const monthIndex = timeRange[1] ? timeRange[1].findIndex(item => item === `${month}月`) : 0;
+        const dayIndex = timeRange[2] ? timeRange[2].findIndex(item => item === `${day}日`) : 0;
+        const hourIndex = timeRange[3] ? timeRange[3].findIndex(item => item === `${String(hour).padStart(2, '0')}时`) : 0;
+        const minuteIndex = timeRange[4] ? timeRange[4].findIndex(item => item === `${String(minute).padStart(2, '0')}分`) : 0;
+  
+        return [
+          yearIndex || 0,
+          monthIndex || 0,
+          dayIndex || 0,
+          hourIndex || 0,
+          minuteIndex || 0
+        ];
+      },
+      
+    // 4. 修复：时间选择器列切换（从dataset取type）
+    handleTimeColumnChange(e) {
+        const type = e.currentTarget.dataset.type; // 从dataset获取type
+        if (!type) return; // 无type直接返回
+        const { column, value } = e.detail;
+        const indexKey = type === 'start' ? 'newTodoStartTimeIndex' : 'newTodoEndTimeIndex';
+        const { timeRange, currentYear, currentMonth } = this.data;
+        const index = this.data[indexKey]; // 先取索引
+        
+        if (!timeRange.length) return;
+        const newIndex = [...index];
+        newIndex[column] = value;
+        let newTimeRange = JSON.parse(JSON.stringify(timeRange));
+  
+        if (column === 0 || column === 1) {
+          const targetYear = column === 0 ? parseInt(newTimeRange[0][value]) : currentYear;
+          const targetMonth = column === 1 ? parseInt(newTimeRange[1][value]) : currentMonth;
+          const validMonth = Math.max(1, Math.min(12, targetMonth));
+          const dayCount = new Date(targetYear, validMonth, 0).getDate();
+          newTimeRange[2] = Array.from({ length: dayCount }, (_, i) => `${i + 1}日`);
+          newIndex[2] = Math.min(newIndex[2], newTimeRange[2].length - 1);
+          this.setData({ currentYear: targetYear, currentMonth: validMonth });
+        }
+  
+        this.setData({ timeRange: newTimeRange, [indexKey]: newIndex });
+      },
+      
+    // 确认时间选择
+    confirmTime(e) {
+        const type = e.currentTarget.dataset.type; // 从dataset获取type
+        if (!type) return;
+        const { value } = e.detail;
+        const { timeRange } = this.data;
+        const timeKey = type === 'start' ? 'startTime' : 'endTime';
+        
+        if (!timeRange[0] || !timeRange[1] || !timeRange[2] || !timeRange[3] || !timeRange[4]) {
+          wx.showToast({ title: '时间选择异常', icon: 'none' });
+          return;
+        }
+        
+        const year = timeRange[0][value[0]].replace('年', '');
+        const month = String(timeRange[1][value[1]].replace('月', '')).padStart(2, '0');
+        const day = String(timeRange[2][value[2]].replace('日', '')).padStart(2, '0');
+        const hour = timeRange[3][value[3]].replace('时', '');
+        const minute = timeRange[4][value[4]].replace('分', '');
+        const timeStr = `${year}-${month}-${day} ${hour}:${minute}`;
+  
+        this.setData({
+          [`newTodoData.${timeKey}`]: timeStr,
+          [type === 'start' ? 'newTodoStartTimeIndex' : 'newTodoEndTimeIndex']: value
+        });
+      },
+      
+    // 6. 打开添加待办弹窗（仅新增文章ID赋值）
+    handleAddTodo() {
+        const articleId = this.properties.id_;
+        if (!articleId) {
+          wx.showToast({ title: '文章ID无效', icon: 'none' });
+          return;
+        }
+        // 初始化待办数据（和Calendar一致，仅关联文章ID）
+        const startTime = this.getCurrentTimeStr();
+        const endTime = this.getCurrentTimeStr(true);
+        this.setData({
+          showAddTodoModal: true,
+          newTodoData: {
+            title: '',
+            content: '',
+            startTime,
+            endTime,
+            status: 0,
+            article_id: articleId // 仅传递文章ID
+          },
+          newTodoStartTimeIndex: this.getTimeIndexByStr(startTime),
+          newTodoEndTimeIndex: this.getTimeIndexByStr(endTime)
+        });
+      },
+  
+      // 7. 关闭添加待办弹窗（和Calendar完全一致）
+      closeAddTodoModal() {
+        this.setData({ showAddTodoModal: false });
+      },
+      
+    // 8. 核心修复：输入待办标题/内容（从dataset取type + 去空格）
+    inputTodoData(e) {
+        const type = e.currentTarget.dataset.type; // 从dataset获取type
+        const value = e.detail.value.trim(); // 去除首尾空格
+        console.log(`输入${type}：`, value); // 调试日志
+        if (!type) return; // 无type直接返回
+        this.setData({ 
+          [`newTodoData.${type}`]: value 
+        }, () => {
+          // 确认数据更新
+          console.log('newTodoData更新后：', this.data.newTodoData);
+        });
+      },  
+
+    // 9. 确认添加待办（修复标题校验 + 调试日志）
+    handleAddTodoConfirm() {
+        const { newTodoData } = this.data;
+        // 调试：打印完整数据，确认标题是否真的有值
+        console.log('确认添加待办，当前数据：', newTodoData);
+        
+        // 修复：标题去空格后校验
+        const title = newTodoData.title ? newTodoData.title.trim() : '';
+        if (!title) {
+          return wx.showToast({ title: '标题不能为空', icon: 'none' });
+        }
+        if (!newTodoData.startTime) {
+          return wx.showToast({ title: '请选择开始时间', icon: 'none' });
+        }
+        if (!newTodoData.endTime) {
+          return wx.showToast({ title: '请选择结束时间', icon: 'none' });
+        }
+        
+        // 时间校验（和Calendar完全一致）
+        const parseTimeStr = (timeStr) => {
+          if (!timeStr) return null;
+          const date = new Date(timeStr.replace('T', ' '));
+          return isNaN(date.getTime()) ? null : date;
+        };
+        const startTime = parseTimeStr(newTodoData.startTime);
+        const endTime = parseTimeStr(newTodoData.endTime);
+        if (!startTime || !endTime) {
+          return wx.showToast({ title: '时间格式错误', icon: 'none' });
+        }
+        if (startTime >= endTime) {
+          return wx.showToast({ title: '结束时间需晚于开始时间', icon: 'none' });
+        }
+  
+        // 请求参数（和Calendar一致 + 新增article_id）
+        const requestData = {
+          title: title, // 使用去空格后的标题
+          note: newTodoData.content ? newTodoData.content.trim() : "",
+          start_time: newTodoData.startTime + ":00",
+          end_time: newTodoData.endTime + ":00",
+          remind: true,
+          status: newTodoData.status,
+          article: newTodoData.article_id // 仅传递文章ID
+        };
+
+        console.log('待办请求参数：', requestData); // 调试日志
+        
+        // 调用添加待办接口（和Calendar一致）
+        request.addTodo(requestData).then(() => {
+          wx.showToast({ title: '创建成功', icon: 'success' });
+          this.closeAddTodoModal();
+        }).catch(err => {
+          console.error('创建待办失败：', err);
+          wx.showToast({ title: `创建失败：${err}`, icon: 'none' });
+        });
+    },
+    
+    stopPropagation() {}
   }
 });

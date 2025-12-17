@@ -855,6 +855,10 @@ Page({
   },
 
   onPullDownRefresh() {
+    if (this.data.isEditing) {
+        wx.stopPullDownRefresh();
+        return;
+      };
     console.log('下拉刷新，重置和公众号列表');
     this.setData({
         searchContent: '',

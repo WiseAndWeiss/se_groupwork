@@ -1,3 +1,4 @@
+/* 原有所有样式保留 */
 .card {
     background-color: #fff;
     border-radius: 20rpx;
@@ -90,177 +91,179 @@
   
   /* 展开内容浮层基础样式 */
   .floating-window {
-      background-color: #fff;
-      padding: 20rpx 10rpx 0rpx 10rpx;
-      margin-top: 16rpx;
-      border-top: 4rpx solid #f1f1f1;
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.3s ease-out;
-    }
-    
-    /* 展开状态 */
-    .floating-window.expanded {
-      max-height: 1000rpx; 
-      opacity: 1;
-      padding: 20rpx 10rpx 0rpx 10rpx;
-      margin-bottom: 18rpx;
-    }
-    
-    /* 收起状态 */
-    .floating-window.collapsed {
-      max-height: 0;
-      opacity: 0;
-      padding: 0 10rpx;
-    }
-    
-    /* 内容文字动画 */
-    .desc, .original-link, .key-info {
-      opacity: 0;
-      transform: translateY(10rpx);
-      transition: all 0.3s ease-out;
-    }
-    
-    /* 展开时文字延迟出现 */
-    .floating-window.expanded .desc,
-    .floating-window.expanded .original-link,
-    .floating-window.expanded .key-info {
-      opacity: 1;
-      transform: translateY(0);
-      transition: all 0.4s ease-out 0.1s; /* 延迟0.1s开始动画 */
-    }
-    
-    /* 收起，文字立即开始消失 */
-    .floating-window.collapsed .desc,
-    .floating-window.collapsed .original-link,
-    .floating-window.collapsed .key-info {
-      opacity: 0;
-      transform: translateY(20rpx);
-      transition: all 0.3s ease-out; 
-    }
-    
-    /* 动画过程中禁用交互 */
-    .floating-window.animating {
-      pointer-events: none;
-    }
-    
-    .key-info {
-      font-size: 24rpx;
-      color: #333;
-      line-height: 1.6;
-      margin-bottom: 16rpx;
-      font-weight: 550;
-    }
+    background-color: #fff;
+    padding: 20rpx 10rpx 0rpx 10rpx;
+    margin-top: 16rpx;
+    border-top: 4rpx solid #f1f1f1;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
   
-    .desc {
-      font-size: 24rpx;
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 6rpx;
-      white-space: pre-line;
-    }
-    
-    .original-link {
-      color: #1890ff;
-      font-size: 24rpx;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-    
-    .original-link:active {
-      transform: scale(0.98);
-    }
+  /* 展开状态 */
+  .floating-window.expanded {
+    max-height: 1000rpx;
+    opacity: 1;
+    padding: 20rpx 10rpx 0rpx 10rpx;
+    margin-bottom: 18rpx;
+  }
+  
+  /* 收起状态 */
+  .floating-window.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 10rpx;
+  }
+  
+  /* 内容文字动画 */
+  .desc, .original-link, .key-info, .add-todo-btn { 
+    opacity: 0;
+    transform: translateY(10rpx);
+    transition: all 0.3s ease-out;
+  }
+  
+  /* 展开时文字延迟出现 */
+  .floating-window.expanded .desc,
+  .floating-window.expanded .original-link,
+  .floating-window.expanded .key-info,
+  .floating-window.expanded .add-todo-btn { /* 新增add-todo-btn动画触发 */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.4s ease-out 0.1s; /* 延迟0.1s开始动画 */
+  }
+  
+  /* 收起，文字立即开始消失 */
+  .floating-window.collapsed .desc,
+  .floating-window.collapsed .original-link,
+  .floating-window.collapsed .key-info,
+  .floating-window.collapsed .add-todo-btn { /* 新增add-todo-btn动画收起 */
+    opacity: 0;
+    transform: translateY(20rpx);
+    transition: all 0.3s ease-out;
+  }
+  
+  /* 动画过程中禁用交互 */
+  .floating-window.animating {
+    pointer-events: none;
+  }
+  
+  .key-info {
+    font-size: 24rpx;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 16rpx;
+    font-weight: 550;
+  }
+  
+  .desc {
+    font-size: 24rpx;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 6rpx;
+    white-space: pre-line;
+  }
+  
+  .original-link {
+    color: #1890ff;
+    font-size: 24rpx;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .original-link:active {
+    transform: scale(0.98);
+  }
   
   /* 收藏按钮*/
   .star-container {
-      position: relative;
-      display: inline-block;
-      width: 44rpx;
-      height: 44rpx;
+    position: relative;
+    display: inline-block;
+    width: 44rpx;
+    height: 44rpx;
+  }
+  
+  /* 星星缩放动画：先缩后放 */
+  @keyframes starScale {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); } /* 放大1.5倍*/
+    70% { transform: scale(0.7); } /* 放大1.5倍*/
+    100% { transform: scale(1); } /* 恢复原大小 */
+  }
+  
+  /* 背景圆环扩散动画 */
+  @keyframes circleSpread {
+    0% {
+      transform: scale(0);
+      opacity: 0.8; /* 初始半透明 */
     }
-    
-    /* 星星缩放动画：先缩后放 */
-    @keyframes starScale {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.3); } /* 放大1.5倍*/
-      70% { transform: scale(0.7); } /* 放大1.5倍*/
-      100% { transform: scale(1); } /* 恢复原大小 */
+    100% {
+      transform: scale(2); /* 扩散到2倍大小 */
+      opacity: 0; /* 逐渐消失 */
     }
-    
-    /* 背景圆环扩散动画 */
-    @keyframes circleSpread {
-      0% {
-        transform: scale(0);
-        opacity: 0.8; /* 初始半透明 */
-      }
-      100% {
-        transform: scale(2); /* 扩散到2倍大小 */
-        opacity: 0; /* 逐渐消失 */
-      }
+  }
+  
+  /* 四周飞溅圆点动画 */
+  @keyframes dotSplash {
+    0% {
+      transform: scale(0) translate(-50%, -50%);
+      opacity: 1;
     }
-    
-    /* 四周飞溅圆点动画 */
-    @keyframes dotSplash {
-      0% {
-        transform: scale(0) translate(-50%, -50%);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(4) translate(-50%, -50%); /* 放大+飞溅 */
-        opacity: 0;
-      }
+    100% {
+      transform: scale(4) translate(-50%, -50%); /* 放大+飞溅 */
+      opacity: 0;
     }
-    
-    /* 动画触发类：点击时添加 */
-    .star-container.animate .icon-star {
-      animation: starScale 0.4s ease-in-out;
-    }
-    
-    /* 背景圆环（伪元素::after） */
-    .star-container::after {
-      content: "";
-      position: absolute;
-      left: 0%;
-      top: 0%;
-      transform: translate(-50%, -50%);
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: #591bb7; /* 黄色半透明背景 */
-      opacity: 0; 
-      pointer-events: none; 
-    }
-    
-    /* 飞溅圆点（伪元素::before）：用box-shadow生成4个圆点 */
-    .star-container::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 3rpx;
-      height: 3rpx;
-      border-radius: 50%;
-      background: #591bb7; /* 圆点 */
-      box-shadow: 
-      0 -12rpx 0 #591bb7,   /* 顶点1：正上方（角度90°）→ x=0, y=-15 */
-      11rpx -4rpx 0 #591bb7,  /* 顶点2：右上方（角度18°）→ x≈14.1, y≈4.6 → 取整(14,5) */
-      -11rpx -4rpx 0 #591bb7, /* 顶点3：左上方（角度162°）→ x≈-14.1, y≈4.6 → 取整(-14,5) */
-      7rpx 10rpx 0 #591bb7, /* 顶点4：右下方（角度306°）→ x≈8.8, y≈-12.2 → 取整(9,-12) */
-      -7rpx 10rpx 0 #591bb7;
-      opacity: 0; /* 默认隐藏 */
-      pointer-events: none; /* 不影响点击 */
-    }
-    
-    /* 动画触发时：显示圆环和圆点并执行动画 */
-    .star-container.animate::after {
-      animation: circleSpread 0.3s ease-in-out;
-    }
-    .star-container.animate::before {
-      animation: dotSplash 0.3s ease-in-out;
-    }
+  }
+  
+  /* 动画触发类：点击时添加 */
+  .star-container.animate .icon-star {
+    animation: starScale 0.4s ease-in-out;
+  }
+  
+  /* 背景圆环（伪元素::after） */
+  .star-container::after {
+    content: "";
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #591bb7; /* 黄色半透明背景 */
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* 飞溅圆点（伪元素::before）：用box-shadow生成4个圆点 */
+  .star-container::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3rpx;
+    height: 3rpx;
+    border-radius: 50%;
+    background: #591bb7; /* 圆点 */
+    box-shadow: 
+    0 -12rpx 0 #591bb7,   /* 顶点1：正上方（角度90°）→ x=0, y=-15 */
+    11rpx -4rpx 0 #591bb7,  /* 顶点2：右上方（角度18°）→ x≈14.1, y≈4.6 → 取整(14,5) */
+    -11rpx -4rpx 0 #591bb7, /* 顶点3：左上方（角度162°）→ x≈-14.1, y≈4.6 → 取整(-14,5) */
+    7rpx 10rpx 0 #591bb7, /* 顶点4：右下方（角度306°）→ x≈8.8, y≈-12.2 → 取整(9,-12) */
+    -7rpx 10rpx 0 #591bb7;
+    opacity: 0; /* 默认隐藏 */
+    pointer-events: none; /* 不影响点击 */
+  }
+  
+  /* 动画触发时：显示圆环和圆点并执行动画 */
+  .star-container.animate::after {
+    animation: circleSpread 0.3s ease-in-out;
+  }
+  .star-container.animate::before {
+    animation: dotSplash 0.3s ease-in-out;
+  }
   
   /* 收藏提示弹窗 */
   .fav-tip-popup {
@@ -426,4 +429,123 @@
     border-radius: 20rpx;
     margin-left: 12rpx;
   }
-    
+  
+  /* ========== 优化添加待办按钮样式（匹配现有设计） ========== */
+  .link-group {
+    display: flex;
+    gap: 20rpx;
+    margin-top: 15rpx;
+    justify-content: center; /* 居中显示按钮 */
+    padding-bottom: 10rpx; /* 增加底部间距 */
+  }
+  .original-link {
+    color: #7b2ff7; /* 改为品牌紫色 */
+    font-size: 24rpx;
+    padding: 12rpx 24rpx;
+    background: rgba(123, 47, 247, 0.08);
+    border-radius: 30rpx; /* 圆角匹配标签样式 */
+  }
+  .add-todo-btn {
+    color: #7b2ff7; /* 改为品牌紫色 */
+    font-size: 24rpx;
+    padding: 12rpx 24rpx;
+    border: 2rpx solid #7b2ff7; /* 加粗边框 + 品牌色 */
+    border-radius: 30rpx; /* 圆角匹配现有组件 */
+    background: rgba(123, 47, 247, 0.05);
+    transition: all 0.2s ease;
+  }
+  .add-todo-btn:active {
+    background: rgba(123, 47, 247, 0.2); /* 点击态背景 */
+    transform: scale(0.98); /* 点击缩小效果 */
+  }
+  
+  /* ========== 待办弹窗样式（完全适配现有设计风格） ========== */
+  .modal-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2002; /* 层级高于收藏弹窗 */
+    animation: fadeIn 0.3s ease-out; /* 复用现有淡入动画 */
+  }
+  .modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 600rpx;
+    background: #fff;
+    border-radius: 30rpx; /* 圆角匹配收藏弹窗 */
+    z-index: 2003;
+    box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15); /* 阴影匹配收藏提示弹窗 */
+    animation: slideUpTip 0.3s ease-out; /* 复用现有上滑动画 */
+  }
+  .modal-content {
+    padding: 30rpx;
+  }
+  .modal-item {
+    margin-bottom: 24rpx;
+  }
+  .modal-label {
+    display: block;
+    font-size: 28rpx;
+    color: #333;
+    margin-bottom: 12rpx;
+    font-weight: 550;
+  }
+  .modal-input {
+    width: 100%;
+    padding: 18rpx 20rpx;
+    border: 2rpx solid #e8e8e8; /* 边框匹配收藏夹选项 */
+    border-radius: 16rpx; /* 圆角匹配收藏夹选项 */
+    font-size: 28rpx;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus {
+    border-color: #7b2ff7; /* 聚焦态品牌色 */
+    outline: none;
+  }
+  .desc-input {
+    min-height: 120rpx;
+    line-height: 1.6;
+    resize: none;
+  }
+  .placeholder-style {
+    color: #999;
+  }
+  .modal-btn-group {
+    display: flex;
+    gap: 20rpx;
+    margin-top: 30rpx;
+  }
+  .modal-btn {
+    flex: 1;
+    text-align: center;
+    padding: 16rpx;
+    border-radius: 30rpx; /* 圆角匹配现有按钮 */
+    font-size: 28rpx;
+    font-weight: 550;
+    transition: all 0.2s;
+  }
+  .cancel-btn {
+    background: #f8f8f8;
+    color: #666;
+    border: 2rpx solid #e8e8e8;
+  }
+  .cancel-btn:active {
+    background: #f0f0f0;
+    transform: scale(0.98);
+  }
+  .confirm-btn {
+    background: #7b2ff7; /* 品牌紫色背景 */
+    color: #fff;
+    border: none;
+  }
+  .confirm-btn:active {
+    background: #6a27d8; /* 深色点击态 */
+    transform: scale(0.98);
+  }

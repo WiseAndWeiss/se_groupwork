@@ -96,6 +96,11 @@ Page({
     wx.navigateTo({ url: '/packageA/user/subscriptions/subscriptions' });
   },
 
+  // 跳转到我的待办
+  goToCalendar() {
+    wx.navigateTo({ url: '/packageA/user/calendar/calendar' });
+  },
+
   // 底部 Tab 切换（保持不变）
   goToHome() {
     wx.switchTab({ url: '/pages/home/home' });

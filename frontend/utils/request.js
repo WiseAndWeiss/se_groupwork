@@ -1,10 +1,10 @@
-const baseUrl = 'http://49.232.208.99/api';
-export const resourceUrl = "http://49.232.208.99/";
+const baseUrl = 'https://403app.xyz/api';
+export const resourceUrl = "https://403app.xyz/";
 
 let access_token = wx.getStorageSync('access_token') || '';
 let refresh_token = wx.getStorageSync('refresh_token') || '';
-const MOCK_ENABLE = false; // 启用 Mock
-const mockApi = require('./mockConfig.js'); // 引入分接口 Mock 方法
+const MOCK_ENABLE = false; // 核心：关闭Mock，启用真实后端请求
+const mockApi = require('./mockConfig.js'); // 保留（若需临时开启Mock）
 
 const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
   return new Promise((resolve, reject) => {
@@ -17,7 +17,7 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
        const filePath = uploadData.filePath;
        const fieldName = uploadData.fieldName || 'file';
        const formData = uploadData.formData || {};
-       
+      
        // 验证 filePath 是否为字符串
        if (typeof filePath !== 'string') {
          reject('filePath 必须是字符串类型');
@@ -418,7 +418,50 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
         }, 200);
         return;
       }
+
+      // 待办相关 Mock
+    // 1. 获取全量待办（无date参数）
+    if (url === '/user/todos/' && method === 'GET' && !data.date) {
+    setTimeout(() => {
+        const res = mockApi.mockGetTodos();
+        console.log('Mock - 获取全量待办返回：', res);
+        res.code === 200 ? resolve(res.data) : reject(res.msg);
+    }, 200);
+    return;
     }
+
+    // 3. 添加待办（原有逻辑保留）
+    if (url === '/user/todos/' && method === 'POST') {
+    setTimeout(() => {
+        const res = mockApi.mockAddTodo(data);
+        console.log('Mock - 添加待办返回：', res);
+        res.code === 200 ? resolve(res.data) : reject(res.msg);
+    }, 200);
+    return;
+    }
+
+    // 4. 修改待办（修正为 PATCH 方法，匹配前端调用）
+    if (url.match(/^\/user\/todos\/(\d+)\/$/) && method === 'PATCH') {
+    const todoId = url.match(/^\/user\/todos\/(\d+)\/$/)[1];
+    setTimeout(() => {
+        const res = mockApi.mockUpdateTodo(todoId, data);
+        console.log('Mock - 修改待办返回：', res);
+        res.code === 200 ? resolve(res.data) : reject(res.msg);
+    }, 200);
+    return;
+    }
+
+    // 5. 删除待办（原有逻辑保留）
+    if (url.match(/^\/user\/todos\/(\d+)\/$/) && method === 'DELETE') {
+    const todoId = url.match(/^\/user\/todos\/(\d+)\/$/)[1];
+    setTimeout(() => {
+        const res = mockApi.mockDeleteTodo(todoId);
+        console.log('Mock - 删除待办返回：', res);
+        res.code === 200 ? resolve(res.data) : reject(res.msg);
+    }, 200);
+    return;
+    }
+   }
 
     // 后端接口逻辑（MOCK_ENABLE=false 时生效）
     wx.request({
@@ -438,7 +481,7 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
         } 
         // 错误处理
         else {
-            const errorMsg = res.data?.message || res.data?.detail || `用户名或密码错误`;
+            const errorMsg = res.data?.message || res.data?.detail || `请求失败`;
             reject(errorMsg);
         }
       },
@@ -457,6 +500,20 @@ const updateCollection = (collectionId, data) => {
     return request(`/user/collections/${collectionId}/`, 'PUT', data);};
 const deleteCollection = (collectionId) => request(`/user/collections/${collectionId}/`, 'DELETE');
 const moveFavourite = (favoriteId, targetCollectionId) => {return request(`/user/favorites/${favoriteId}/move/`, 'POST', {collection_id: targetCollectionId});};
+// 待办（Todo）
+const getTodos = (date) => {
+    // 正确定义params：有date则传date参数，无则传空对象
+    let params = {};
+    if (date) {
+      params.date = date;
+    }
+    // GET请求，参数作为query传递
+    return request('/user/todos/', 'GET', params);
+  };
+const addTodo = (data) => request('/user/todos/', 'POST', data);
+const updateTodo = (todoId, data) => request(`/user/todos/${todoId}/`, 'PATCH', data);
+const deleteTodo = (todoId) => request(`/user/todos/${todoId}/`, 'DELETE');
+const getArticleDetail = ( articleId ) =>  request(`/webspider/articles/${articleId}/`, 'GET');
 // 收藏
 const addFavourite = (data) => request('/user/favorites/', 'POST', data);
 const deleteFavourite = (articleId) => request(`/user/favorites/${articleId}/`, 'DELETE');
@@ -587,5 +644,10 @@ module.exports = {
   getCollectionArticles,
   updateCollection,
   deleteCollection,
-  moveFavourite
+  moveFavourite,
+  getTodos,
+  addTodo,
+  updateTodo,
+  deleteTodo,
+  getArticleDetail 
 };

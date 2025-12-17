@@ -331,6 +331,183 @@ let mockFavorites = [];
 // 生成数字收藏ID的计数器
 let favIdCounter = 1000;
 
+// 1. 重构mockTodos数据结构（匹配后端返回格式）
+let mockTodos = [
+    {
+      id: 1,
+      title: "完成日历",
+      note: "软工日历", // 对应前端content
+      start_time: "2025-12-12 09:00:00", // 前端需要的startTime源字段
+      end_time: "2025-12-13 10:00:00",   // 前端需要的endTime源字段
+      status: 0, 
+      created_at: "2025-12-01 10:00:00",
+      updated_at: "2025-12-01 10:00:00",
+      remind: true,
+      article: 0
+    },
+    {
+      id: 2,
+      title: "完成桌宠",
+      note: "小程序桌宠",
+      start_time: "2025-12-12 14:00:00",
+      end_time: "2025-12-12 16:00:00",
+      status: 0,
+      created_at: "2025-12-01 11:00:00",
+      updated_at: "2025-12-01 11:00:00",
+      remind: true,
+      article: 0
+    },
+    {
+      id: 3,
+      title: "图书馆借书",
+      note: "借《金瓶梅》",
+      start_time: "2025-12-10 15:00:00",
+      end_time: "2025-12-10 16:00:00",
+      status: 1,
+      created_at: "2025-11-30 09:00:00",
+      updated_at: "2025-12-10 10:00:00",
+      remind: true,
+      article: 0
+    },
+    {
+      id: 4,
+      title: "体育打卡",
+      note: "校园跑3公里",
+      start_time: "2025-12-15 08:00:00",
+      end_time: "2025-12-15 09:00:00",
+      status: 0,
+      created_at: "2025-12-05 08:00:00",
+      updated_at: "2025-12-05 08:00:00",
+      remind: true,
+      article: 0
+    }
+  ];
+  
+  // 获取指定日期的待办
+  exports.mockGetTodos = (date) => {
+    console.log('Mock - 获取待办，日期：', date);
+    let filteredTodos = [...mockTodos];
+    
+    // 有date参数时：筛选「目标日期在待办时间范围内」的项（适配跨天）
+    if (date) {
+      filteredTodos = mockTodos.filter(todo => {
+        if (!todo.start_time || !todo.end_time) return false;
+        
+        // 解析时间并标准化
+        const startDate = new Date(todo.start_time);
+        const endDate = new Date(todo.end_time);
+        const targetDate = new Date(date);
+        targetDate.setHours(0, 0, 0, 0); // 目标日期 00:00:00
+        const targetEnd = new Date(targetDate);
+        targetEnd.setHours(23, 59, 59, 999); // 目标日期 23:59:59
+        
+        // 核心逻辑：待办开始时间 ≤ 目标日期结束 且 待办结束时间 ≥ 目标日期开始
+        return startDate <= targetEnd && endDate >= targetDate;
+      });
+    }
+    
+    // 按开始时间倒序排列
+    filteredTodos.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    
+    // 移除空的创建/更新时间（非必须字段）
+    const resultTodos = filteredTodos.map(todo => {
+      const { created_at, updated_at, ...rest } = todo;
+      const result = { ...rest };
+      // 仅保留有值的创建/更新时间
+      if (created_at) result.created_at = created_at;
+      if (updated_at) result.updated_at = updated_at;
+      return result;
+    });
+    
+    return {
+      code: 200,
+      msg: "success",
+      data: {
+        list: resultTodos,
+        total: resultTodos.length
+      }
+    };
+  };
+  
+  // 添加待办
+  exports.mockAddTodo = (data) => {
+    
+    
+    // 1. 校验核心字段：标题、开始/结束时间
+    if (!data.title?.trim()) {
+        return { code: 400, msg: "待办标题不能为空" };
+      }
+      if (!data.start_time || !data.end_time) {
+        return { code: 400, msg: "待办开始/结束时间不能为空" };
+      }
+      // 2. 校验时间格式（YYYY-MM-DD HH:MM:SS）
+      const timeReg = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+      if (!timeReg.test(data.start_time) || !timeReg.test(data.end_time)) {
+        return { code: 400, msg: "时间格式错误，请使用YYYY-MM-DD HH:MM:SS" };
+      }
+      // 3. 校验结束时间晚于开始时间
+      const startTime = new Date(data.start_time.replace(' ', 'T'));
+      const endTime = new Date(data.end_time.replace(' ', 'T'));
+      if (endTime <= startTime) {
+        return { code: 400, msg: "结束时间需晚于开始时间" };
+      }
+      // 4. 模拟成功返回（生成唯一ID）
+      const newTodo = {
+        id: Date.now(), // 模拟后端生成的ID
+        ...data,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      return { code: 200, msg: "添加成功", data: newTodo };
+  };
+  
+  // 修改待办
+  exports.mockUpdateTodo = (todoId, data) => {
+    console.log('Mock - 修改待办：', { todoId, data });
+    const id = Number(todoId);
+    
+    // 查找待办
+    const todoIndex = mockTodos.findIndex(todo => todo.id === id);
+    if (todoIndex === -1) return { code: 400, msg: '待办不存在' };
+    
+    // 匹配前端传入的字段（note/start_time/end_time等）
+    if (data.title) mockTodos[todoIndex].title = data.title;
+    if (data.note) mockTodos[todoIndex].note = data.note; // 前端传note，对应后端字段
+    if (data.status !== undefined) mockTodos[todoIndex].status = data.status;
+    if (data.start_time) mockTodos[todoIndex].start_time = data.start_time;
+    if (data.end_time) mockTodos[todoIndex].end_time = data.end_time;
+    mockTodos[todoIndex].updated_at = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    
+    const updatedTodo = mockTodos[todoIndex];
+    console.log('Mock - 待办修改成功：', updatedTodo);
+    
+    return {
+      code: 200,
+      msg: '待办修改成功',
+      data: updatedTodo
+    };
+  };
+  
+  // 删除待办
+  exports.mockDeleteTodo = (todoId) => {
+    console.log('Mock - 删除待办：', todoId);
+    const id = Number(todoId);
+    
+    // 查找待办
+    const todoIndex = mockTodos.findIndex(todo => todo.id === id);
+    if (todoIndex === -1) return { code: 400, msg: '待办不存在' };
+    
+    // 删除
+    mockTodos.splice(todoIndex, 1);
+    console.log('Mock - 待办删除成功，剩余列表：', mockTodos);
+    
+    return {
+      code: 200,
+      msg: '待办删除成功',
+      data: { id }
+    };
+  };
+
 // ========== 同步文章收藏状态函数 ==========
 const updateArticleFavoriteStatus = (articleId, isFavorited, favoriteId = 0) => {
   const idType = typeof articleId === 'string' ? articleId : Number(articleId);

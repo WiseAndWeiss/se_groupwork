@@ -63,6 +63,14 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
+
+  <view class="menu-item" bindtap="goToCalendar">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/comment.svg" mode="widthFix"></image>
+      <text class="menu-text">我的待办</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
 </view>
 
 <!-- 底部导航栏 -->

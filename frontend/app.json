@@ -22,6 +22,7 @@
           "user/favorites/favorites",         
           "user/help/help",        
           "user/suggestion/suggestion",
+          "user/calendar/calendar",
           "user/profile/update-userinfo/update-userinfo" 
         ]
       }
