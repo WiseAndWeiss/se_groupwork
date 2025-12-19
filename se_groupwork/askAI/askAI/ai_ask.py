@@ -1,4 +1,4 @@
-from se_groupwork.global_tools import global_faiss_tool_load
+from se_groupwork.global_tools import global_sqlvec_tool_load
 from askAI.askAI.ai_request import get_stream_response
 from webspider.models import Article
 from copy import copy
@@ -15,8 +15,8 @@ base_prompt = """
 
 def get_reference_articles(question):
     articles = []
-    faissTool = global_faiss_tool_load()
-    for id, score in faissTool.search(question, top_k=5):
+    sqlvecTool = global_sqlvec_tool_load()
+    for id, score in sqlvecTool.search(question, top_k=5):
         article = Article.objects.get(id=id)
         articles.append(article)
     return articles

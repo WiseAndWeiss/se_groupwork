@@ -1,12 +1,12 @@
 from django.core.management.base import BaseCommand
 from webspider.models import Article
-from se_groupwork.global_tools import global_faiss_tool_load
+from se_groupwork.global_tools import global_sqlvec_tool_load
 
 class Command(BaseCommand):
     help = 'load once and do as command'
     
     def handle(self, *args, **kwargs):
-        faissTool = global_faiss_tool_load()
+        sqlvecTool = global_sqlvec_tool_load()
         while True:
             t = input("Enter command: ")
             t = t.split()
@@ -15,24 +15,24 @@ class Command(BaseCommand):
             if cmd == "exit":
                 break
             elif cmd == "all_articles":
-                res = faissTool.get_all_articles_ids_in_index()
-                print(f"{len(res)} articles in faiss index totally")
+                res = sqlvecTool.get_all_articles_ids_in_index()
+                print(f"{len(res)} articles in sqlvec index totally")
                 print(res)
             elif cmd == "update_article":
                 target_id = argv[0]
-                faissTool.update_article(target_id)
+                sqlvecTool.update_article(target_id)
             elif cmd == "update_articles":
                 target_ids = argv
-                faissTool.update_articles(target_ids)
+                sqlvecTool.update_articles(target_ids)
             elif cmd == "update_all":
-                faissTool.update_all_articles()
+                sqlvecTool.update_all_articles()
             elif cmd == 'clear':
-                faissTool.clear_index()
+                sqlvecTool.clear_index()
             elif cmd == 'rebuild':
-                faissTool.rebuild_index()
+                sqlvecTool.rebuild_index()
             elif cmd == 'search':
                 query = argv[0]
-                res = faissTool.search(query)
+                res = sqlvecTool.search(query)
                 for id, score in res:
                     article = Article.objects.get(id=id)
                     print(f"- {id}({score}) {article.title}")

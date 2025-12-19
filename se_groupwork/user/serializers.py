@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import Collection, User, Subscription, Favorite, History, Todo
 from webspider.models import PublicAccount, Article
-from .param_validate import validate_credentials, check_password_strength, check_phone_number
+from .param_validate import validate_credentials, validate_credentials_new, check_password_strength, check_phone_number
 from article_selector.serializers import ArticleSerializer
 from django.conf import settings
 from drf_spectacular.utils import extend_schema_field
@@ -31,7 +31,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("两次密码不一致")
         
         # 2. 调用检验函数
-        validation_result = validate_credentials(data['username'], data['password'])
+        # validation_result = validate_credentials(data['username'], data['password'])
+        validation_result = validate_credentials_new(data['username'], data['password'])
         
         if not validation_result['is_valid']:
             errors = []

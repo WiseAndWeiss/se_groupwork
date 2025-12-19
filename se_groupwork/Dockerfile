@@ -37,7 +37,8 @@ RUN pip install --no-cache-dir -r /app/requirements.txt \
         --extra-index-url https://mirrors.aliyun.com/pypi/simple/
 
 COPY . /app
-RUN chmod +x /app/entrypoint.sh
+# Normalize line endings to avoid /bin/bash "no such file" on Windows checkouts
+RUN sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 CMD ["/app/entrypoint.sh"]

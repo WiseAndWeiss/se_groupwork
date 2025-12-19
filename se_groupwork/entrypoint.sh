@@ -22,4 +22,9 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "Starting Gunicorn..."
-exec gunicorn se_groupwork.wsgi:application --bind 0.0.0.0:8000 --workers ${WEB_CONCURRENCY:-3}
+# Increase timeout to tolerate slower LLM responses; adjust via WEB_TIMEOUT if needed
+exec gunicorn se_groupwork.wsgi:application \
+  --bind 0.0.0.0:8000 \
+  --workers ${WEB_CONCURRENCY:-3} \
+  --timeout ${WEB_TIMEOUT:-60} \
+  --graceful-timeout ${WEB_GRACEFUL_TIMEOUT:-30}
