@@ -9,4 +9,7 @@ urlpatterns = [
     path('public-accounts/campus/', views.CampusPublicAccountListView.as_view(), name='campus-public-accounts'),
     path('public-accounts/search/', views.SearchPublicAccountListView.as_view(), name='search-public-accounts'),
     path('new-accounts/search/', views.SearchNewAccountListView.as_view(), name='search-new-accounts'),
+    
+    # 文章相关
+    path('articles/<int:pk>/', views.ArticleDetailView.as_view(), name='article-detail'),
 ]

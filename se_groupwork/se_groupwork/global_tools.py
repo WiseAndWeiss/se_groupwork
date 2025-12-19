@@ -3,8 +3,9 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from django.conf import settings
 
 G_EMBEDDING = None
-G_FAISSTOOL = None
+G_SQLVECTOOL = None
 G_MEILITOOL = None
+G_FAISSTOOL = None
 
 def is_test_mode():
     if "test" in sys.argv:
@@ -25,12 +26,21 @@ def global_embedding_load():
     return G_EMBEDDING
 
 
+def global_sqlvec_tool_load():
+    from askAI.sqlvec.sqlvec_tool import SqliteVectorTool
+    global G_SQLVECTOOL
+    if G_SQLVECTOOL is not None:
+        return G_SQLVECTOOL
+    G_SQLVECTOOL = SqliteVectorTool(test_mode=is_test_mode())
+    return G_SQLVECTOOL
+
+
 def global_faiss_tool_load():
-    from askAI.faiss.faiss_tools import FaissTool
+    """Backward-compatible alias; FAISS replaced by sqlite-vec."""
     global G_FAISSTOOL
     if G_FAISSTOOL is not None:
         return G_FAISSTOOL
-    G_FAISSTOOL = FaissTool(test_mode=is_test_mode())
+    G_FAISSTOOL = global_sqlvec_tool_load()
     return G_FAISSTOOL
 
 def global_meili_tool_load():

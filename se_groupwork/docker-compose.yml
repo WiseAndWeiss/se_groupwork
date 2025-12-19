@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: meilisearch-se
+    ports:
+      - "7700:7700"
+    volumes:
+      - ./meili_data:/meili_data
+    environment:
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_ENV=development
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
   db:
     image: mysql:8.0
     restart: unless-stopped
@@ -22,9 +39,12 @@ services:
       - MYSQL_HOST=db
     depends_on:
       - db
+      - meilisearch
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      # Persist sqlite-vec index to host to survive container rebuilds
+      - ./askAI/sqlvec:/app/askAI/sqlvec
     expose:
       - "8000"
     restart: unless-stopped
@@ -42,6 +62,8 @@ services:
     restart: unless-stopped
     volumes:
       - media_volume:/app/media
+      # Share the same sqlite-vec index for scheduled tasks
+      - ./askAI/sqlvec:/app/askAI/sqlvec
 
   nginx:
     image: nginx:1.25-alpine
@@ -61,3 +83,4 @@ volumes:
   db_data:
   static_volume:
   media_volume:
+  meili_data:

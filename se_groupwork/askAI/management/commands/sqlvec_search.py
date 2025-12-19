@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from se_groupwork.global_tools import global_faiss_tool_load
+from se_groupwork.global_tools import global_sqlvec_tool_load
 from webspider.models import Article
 
 class Command(BaseCommand):
@@ -10,8 +10,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         query = options['query']
-        faissTool = global_faiss_tool_load()
-        res = faissTool.search(query)
+        sqlvecTool = global_sqlvec_tool_load()
+        res = sqlvecTool.search(query)
         for id, score in res:
             article = Article.objects.get(id=id)
             print(f"- {id}({score}) {article.title}")

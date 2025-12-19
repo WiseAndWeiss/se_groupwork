@@ -14,9 +14,10 @@ from se_groupwork.global_tools import global_embedding_load, global_faiss_tool_l
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'se_groupwork.settings')
 
+# Initialize Django before loading tools that depend on apps/models.
+application = get_wsgi_application()
+
 global_embedding_load()
 global_faiss_tool_load()
 global_meili_tool_load()
-
-application = get_wsgi_application()
 
