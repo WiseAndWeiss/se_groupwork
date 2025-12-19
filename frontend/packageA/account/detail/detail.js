@@ -38,7 +38,7 @@ Page({
     // 页面卸载时清理（比如跳转到其他Tab页面、关闭页面）
   onHide() {
     console.log('页面卸载，彻底清理数据');
-    this.clearPageData();
+    //this.clearPageData();
   },
     
   clearPageData() {

@@ -79,6 +79,8 @@
     list="{{selectionList}}" 
     emptyText="暂无最新动态"
     bind:loadmore="handleLoadMore" 
+    isLoading="{{isLoading}}"
+    reachEnd="{{reach_end}}"
     />
 </view>
 

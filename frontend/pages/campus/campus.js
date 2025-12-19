@@ -1,26 +1,17 @@
 const request = require('../../utils/request');
 
-// 标签处理（数组/字符串）
-const processArticleTags = (tags) => {
-    if (Array.isArray(tags)) {
-      return tags.map(tag => (typeof tag === 'string' ? tag.trim() : '')).filter(tag => tag);
-    } else if (typeof tags === 'string' && tags.trim()) {
-      return tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-    }
-    return [];
-  };
-
 Page({
   data: {
     selectionList: [], // 从接口获取的数据
     filteredList: [],  // 筛选后数据
     isFilterShow: false,
     isLoading: false,   // 加载状态
-    startRank: 0,      // 分页偏移量
-    reachEnd: false,   // 是否已加载完所有数据
+    start_rank: 0,      // 分页偏移量
+    reach_end: false,   // 是否已加载完所有数据
     searchContent: '',  // 搜索内容
     currentCategory: 'time', // 当前选中的类目（默认时间）
     showLoadingAnimation: false,
+    isSelected: false,
     timeFilter: {
       start: '',
       end: ''
@@ -73,8 +64,8 @@ Page({
         filteredList: [],  // 筛选后数据
         isFilterShow: false,
         isLoading: false,   // 加载状态
-        startRank: 0,      // 分页偏移量
-        reachEnd: false,   // 是否已加载完所有数据
+        start_rank: 0,      // 分页偏移量
+        reach_end: false,   // 是否已加载完所有数据
         currentCategory: 'time', 
     });
   },
@@ -134,36 +125,47 @@ Page({
       });
   },
 
+  handleLoadMore() {
+    console.log('父页面接收到加载更多事件');
+    if (this.data.isSelected) {
+        this.searchArticles();
+    } else {
+        this.loadCampusArticles(false);
+    } // false=追加数据
+  },
+
   // 加载校园最新文章
   async loadCampusArticles(reset = false) {
-    if (this.data.isLoading) return;
+    if (this.data.isLoading || this.data.reach_end) return;
     console.log('开始加载校园文章...');
     this.setData({ 
         isLoading: true,
-        showLoadingAnimation: true // 显示加载动画
+        showLoadingAnimation: true 
       });
     
     try {
-      const startRank = reset ? 0 : this.data.startRank;
-      const response = await request.getCampusLatestArticles(startRank);
-      console.log('接口返回数据：', response);
+      let start_rank = reset ? 0 : this.data.start_rank;
+      console.log('请求start_rank:', start_rank);
+
+      const response = await request.getCampusLatestArticles(start_rank);
       
       if (response && response.articles) {
-        // 预处理tags字段：将字符串转换为数组
-        const processedArticles = response.articles.map(article => {
-          return {
-            ...article,
-            tags: processArticleTags(article.tags) 
-          };
-        });
-        console.log('处理后的文章数据:', processedArticles);
-
-        const newList = reset ? processedArticles : [...this.data.selectionList, ...processedArticles];
+        const newArticles = response.articles;
+        console.log('本次加载文章数量：', newArticles.length);
+        
+        // 3. 处理数据合并/重置
+        const finalList = reset ? newArticles : [...this.data.selectionList, ...newArticles];
+        
+        // 4. 计算新的start_rank（建议与pageSize对齐，或用返回数量）
+        const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
+        
+        // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
+        const reach_end = newArticles.length < this.data.pageSize;
         this.setData({
-          selectionList: newList,
-          filteredList: newList,
-          startRank: startRank + response.articles.length,
-          reachEnd: response.reach_end
+          selectionList: finalList,
+          filteredList: finalList,
+          start_rank: newStartRank,
+          reach_end: reach_end
         });
       } else {
         console.warn('接口返回数据格式异常：', response);
@@ -253,6 +255,8 @@ Page({
     }
     filterParams.range = 'd';
 
+    filterParams.start_rank = this.data.start_rank;
+
     console.log('最终请求：', filterParams);
     return filterParams;
   },
@@ -268,25 +272,30 @@ Page({
   },
   
   //  搜索
-  async searchArticles() {
+  async searchArticles(reset = false) {
+    let start_rank = reset ? 0 : this.data.start_rank;
     const filterParams = this.getFilterParams();
-    this.setData({ showLoadingAnimation: true });
-    
+    this.setData({ 
+        showLoadingAnimation: true,
+        isSelected: true
+     });
+    console.log(this.data.isSelected); 
     try {
       const response = await request.getFilteredArticles(filterParams);
       if (response && response.articles) {
-        // 预处理tags字段
-        const processedArticles = response.articles.map(article => ({
-          ...article,
-          tags: processArticleTags(article.tags)
-        }));
+        const newArticles = response.articles;
+        console.log('本次加载文章数量：', newArticles.length);
+        
+        // 3. 处理数据合并/重置
+        const finalList = reset ? newArticles : [...this.data.selectionList, ...newArticles];
+        const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
+        const reach_end = newArticles.length < this.data.pageSize;
         this.setData({
-          selectionList: processedArticles,
-          filteredList: processedArticles,
-          startRank: processedArticles.length,
-          reachEnd: response.reach_end
+          selectionList: finalList,
+          filteredList: finalList,
+          start_rank: newStartRank,
+          reach_end: reach_end,
         });
-        wx.showToast({ title: `找到${processedArticles.length}条结果` });
       } else {
         wx.showToast({ title: '未找到匹配内容', icon: 'none' });
         this.setData({
@@ -310,8 +319,16 @@ Page({
     });
   },
 
-  // 刷新
+  /*
   onPullDownRefresh() {
+    const app = getApp();
+    console.log(app.globalData.isPetDragging);
+    // 如果正在拖动桌宠，直接停止刷新，不执行任何操作
+    if (app.globalData.isPetDragging) {
+      wx.stopPullDownRefresh();
+      console.log(app.globalData.isPetDragging);
+      return;
+    };
     console.log('下拉刷新，重置campus文章列表');
     this.resetFilters();
     this.setData({
@@ -319,13 +336,13 @@ Page({
         filteredList: [],  // 筛选后数据
         isFilterShow: false,
         isLoading: false,   // 加载状态
-        startRank: 0,      // 分页偏移量
-        reachEnd: false,   // 是否已加载完所有数据
+        start_rank: 0,      // 分页偏移量
+        reach_end: false,   // 是否已加载完所有数据
         currentCategory: 'time', 
       });
     Promise.all([this.loadCampusArticles(true)]) // 重置数据
       .finally(() => wx.stopPullDownRefresh());
-  },
+  },*/
 
   // 其他方法
   goToAlllist() {

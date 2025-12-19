@@ -10,7 +10,7 @@
   <view class="info-item" bindtap="showAvatarModal">
     <view class="info-label">头像</view>
     <view class="info-content">
-      <image class="avatar-img" src="{{form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="avatar-img" src="https://{{form.avatar}}" mode="aspectFill"></image>
       <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
     </view>
   </view>
@@ -57,7 +57,7 @@
 <view class="modal-content" wx:if="{{showAvatarModal}}">
   <view class="modal-title">修改头像</view>
   <view class="avatar-modal-body">
-    <image class="modal-avatar-preview" src="{{tempAvatar || form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+    <image class="modal-avatar-preview" src="https://{{tempAvatar || form.avatar}}" mode="aspectFill"></image>
     <button class="choose-avatar-btn" bindtap="chooseTempAvatar">选择图片</button>
   </view>
   <view class="modal-btn-group">

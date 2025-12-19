@@ -7,11 +7,12 @@
 
 <!-- 加载动画组件 -->
 <loading showLoading="{{showLoadingAnimation}}" />
+
 <!-- 搜索栏 -->
 <view class="search-bar">
   <view class="search-box">
     <view class="search-inner">
-      <image class="search-icon" src="/assets/icons/search.svg"      bindtap="searchAccount"></image>
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchAccount"></image>
       <input 
         type="text"
         placeholder="快速搜索公众号"
@@ -28,7 +29,14 @@
 <view class="list-area">
   <!-- 卡片独立滚动容器 -->
   <scroll-view class="list-scroll" scroll-y="true">
-    <view class="campusAccount-list">
+    <!-- 添加无结果提示 -->
+    <view wx:if="{{showNoResults}}" class="no-results-tip">
+      <text class="no-results-text">数据库内未搜索到相关信息</text>
+      <text class="no-results-hint">请尝试底部"获取更多公众号"</text>
+    </view>
+    
+    <!-- 公众号列表 -->
+    <view class="campusAccount-list" wx:if="{{!showNoResults}}">
       <block wx:for="{{campusAccountList}}" wx:key="id">
           <!-- 公众号卡片 -->
           <account-card 

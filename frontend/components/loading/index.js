@@ -1,3 +1,5 @@
+const app = getApp(); 
+
 Component({
     properties: {
       showLoading: {
@@ -14,9 +16,27 @@ Component({
       }
     },
     data: {
-      timeoutId: null // 存储超时定时器ID
+      timeoutId: null ,// 存储超时定时器ID
+      loadingGifUrl: ''
     },
+    lifetimes:{
+        attached() {
+            this.getLoadingGifCache();
+          },
+    },
+    
     methods: {
+      getLoadingGifCache() {
+        const gifUrl = 'https://403app.xyz/static/loading.gif';
+        // 兼容app未定义的情况
+        if (typeof app !== 'undefined' && app.getImgCache) {
+          app.getImgCache(gifUrl).then((cachePath) => {
+            this.setData({ loadingGifUrl: cachePath });
+            console.log('.gif 缓存路径:', cachePath);
+          });
+        }
+      },
+
       // 阻止遮罩层下的滚动和点击
       preventTouchMove() {
         return false;

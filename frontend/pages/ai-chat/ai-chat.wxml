@@ -21,7 +21,7 @@
           <image 
             wx:if="{{item.type === 'ai'}}"
             class="avatar-image" 
-            src="/assets/pet.gif" 
+            src="{{petGifUrl || 'https://403app.xyz/static/pet.gif'}}"
             mode="aspectFit"
           ></image>
           <view wx:else class="avatar-image user-avatar">我</view>

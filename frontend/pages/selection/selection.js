@@ -670,7 +670,7 @@ Page({
       selectionList: [],
       officialList: [],
       isLoading: false,
-      startRank: 0,
+      start_rank: 0,
       reachEnd: false,
       subscriptionList: [],
       tempSubscriptionList: [],
@@ -697,8 +697,13 @@ Page({
     });
   },
 
+  handleLoadMore() {
+    console.log('父页面接收到加载更多事件');
+    this.loadCustomizedArticles(false); // false=追加数据
+  },
+
   async loadCustomizedArticles(reset = false) {
-    if (this.data.isLoading) return;
+    if (this.data.isLoading || this.data.reach_end) return; 
     this.setData({ 
         isLoading: true,
         showLoadingAnimation: true ,// 显示加载动画
@@ -706,14 +711,26 @@ Page({
     console.log('开始加载自选文章...');
     
     try {
-      const startRank = reset ? 0 : this.data.startRank;
-      const response = await request.getCustomizedLatestArticles(startRank);
-      console.log('获取自选最新文章：', response);
+      let start_rank = reset ? 0 : this.data.start_rank;
+      console.log('请求start_rank:', start_rank);
+      const response = await request.getCustomizedLatestArticles(start_rank);
 
       if (response && response.articles) {
-        const newList = reset ? response.articles : [...this.data.selectionList, ...response.articles];
+        const newArticles = response.articles;
+        console.log('本次加载文章数量：', newArticles.length);
+        
+        // 3. 处理数据合并/重置
+        const finalList = reset ? newArticles : [...this.data.selectionList, ...newArticles];
+        
+        // 4. 计算新的start_rank（建议与pageSize对齐，或用返回数量）
+        const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
+        
+        // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
+        const reach_end = newArticles.length < this.data.pageSize;
         this.setData({
-          selectionList: newList
+          selectionList: finalList,
+          start_rank: newStartRank,
+          reach_end: reach_end // 新增：标记末尾
         });
       } else {
         console.warn('接口返回数据格式异常：', response);
@@ -764,7 +781,7 @@ Page({
     this.setData({
       searchContent: '',
       currentSort: sortType,
-      startRank: 0,
+      start_rank: 0,
       reachEnd: false,
       officialList: [],
       selectionList: [],
@@ -815,8 +832,8 @@ Page({
     console.log('开始加载筛选的自选文章...');
     
     try {
-      const startRank = reset ? 0 : this.data.startRank;
-      const response = await request.getFilteredCustomizedLatestArticles(startRank, this.data.searchContent);
+      const start_rank = reset ? 0 : this.data.start_rank;
+      const response = await request.getFilteredCustomizedLatestArticles(start_rank, this.data.searchContent);
       console.log('获取自选最新文章：', response);
 
       if (response && response.articles) {
@@ -854,7 +871,16 @@ Page({
     }
   },
 
+  /*
   onPullDownRefresh() {
+    const app = getApp();
+    console.log(app.globalData.isPetDragging);
+    // 如果正在拖动桌宠，直接停止刷新，不执行任何操作
+    if (app.globalData.isPetDragging) {
+      wx.stopPullDownRefresh();
+      console.log(app.globalData.isPetDragging);
+      return;
+    };  
     if (this.data.isEditing) {
         wx.stopPullDownRefresh();
         return;
@@ -867,12 +893,12 @@ Page({
         maxScrollTop: 0, // 重置最大滚动距离
         enableScroll: true ,// 确保非编辑模式下滚动可用
         currentSort :'time',
-        startRank: 0,
+        start_rank: 0,
         reachEnd: false
       });
     Promise.all([this.loadCustomizedArticles(true)],[ this.getSubscriptionList(true)]) // 重置数据
       .finally(() => wx.stopPullDownRefresh());
-  },
+  },*/
   
 
   preventNavigation() {

@@ -150,11 +150,11 @@ page {
   }
   
   .year-month-item {
-    width: calc(33.333% - 10rpx);
+    width: calc(33.333% - 15rpx);
     box-sizing: border-box;
     background-color: var(--bg-white);
     border-radius: 8rpx;
-    padding: 10rpx;
+    padding: 5rpx;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: transform 0.2s ease;

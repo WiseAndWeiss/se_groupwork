@@ -11,7 +11,7 @@
   <view class="avatar-section">
     <image 
       class="avatar-img" 
-      src="{{userInfo.avatar || '/assets/icons/default-avatar.png'}}" 
+      src="https://{{userInfo.avatar}}" 
       mode="aspectFill"
     ></image>
     <view class="nickname">{{userInfo.username || '未设置'}}</view>

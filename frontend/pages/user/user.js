@@ -2,10 +2,6 @@ const request = require('../../utils/request'); // 引入 request 模块
 
 Page({
   data: {
-    userInfo: {
-      avatarUrl: '/assets/icons/default-avatar.png', // 默认头像
-      nickName: '未登录用户'                          // 默认昵称
-    }
   },
   
   onReady() {
@@ -23,7 +19,7 @@ Page({
   },
 
   // 下拉刷新时同步最新 Mock 用户信息
-  onPullDownRefresh: function() {
+  /*onPullDownRefresh: function() {
     console.log('下拉刷新：同步用户信息');
     this.getUserInfo(true); // 传 true 表示刷新场景
   },
@@ -31,7 +27,7 @@ Page({
    // 页面显示时获取（返回页面时触发）
    onShow: function() {
     this.getUserInfo(); 
-  },
+  },*/
 
 
   //从 Mock 接口获取用户信息（对接 GET /user/auth/profile/）
@@ -41,7 +37,7 @@ Page({
       // 更新页面数据
       this.setData({
         userInfo: {
-          avatarUrl: (mockUserInfo.avatar) || '/assets/icons/default-avatar.png',
+          avatarUrl: mockUserInfo.avatar,
           nickName: mockUserInfo.username || '默认用户名'
         }
       });

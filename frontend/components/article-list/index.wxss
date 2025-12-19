@@ -62,3 +62,9 @@
     color: #999;
     font-size: 28rpx;
   }
+
+  .load-more-btn {
+    font-size: 28rpx;
+    color: #409eff; 
+    font-weight: 500;
+  }

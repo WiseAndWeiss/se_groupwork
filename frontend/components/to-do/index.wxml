@@ -5,9 +5,6 @@
     <text class="todo-title {{todoData.status === 1 ? 'todo-completed' : ''}}">
       {{todoData.title || '无标题'}}
     </text>
-    <text class="todo-status {{todoData.status === 1 ? 'status-done' : 'status-undone'}}">
-      {{todoData.status === 1 ? '已完成' : '未完成'}}
-    </text>
   </view>
 
   <!-- 开始时间（完整年月日时分） -->

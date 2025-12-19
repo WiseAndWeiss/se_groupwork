@@ -1,4 +1,5 @@
 const request = require('../../utils/request');
+const app = getApp();
 
 Page({
   data: {
@@ -23,7 +24,10 @@ Page({
     strengthClass: 'strength-default',  // 强度样式
     
     // 动画相关状态
-    showLoadingAnimation: false
+    showLoadingAnimation: false,
+
+    iconUrl: '', // 缓存后的图片路径
+    fallbackIconUrl: '' 
   },
 
   // click() {
@@ -228,6 +232,13 @@ Page({
 
   onLoad: function() {
     console.log('登录页面加载完成');
+    const targetImgUrl = 'https://403app.xyz/static/icon.png'; // 要缓存的网络图片地址
+    app.getImgCache(targetImgUrl).then((cachePath) => {
+      console.log('缓存图片路径：', cachePath);
+      this.setData({ iconUrl: cachePath }); // 将缓存路径存入 data
+    });
+
+    
   },
 
   // 播放加载动画

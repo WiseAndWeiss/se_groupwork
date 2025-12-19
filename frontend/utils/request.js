@@ -419,8 +419,8 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
         return;
       }
 
-      // AI对话接口（POST /ai/chat/）
-      if (url === '/ai/chat/' && method === 'POST') {
+      // AI对话接口（POST /ai/ask/）
+      if (url === '/ai/ask/' && method === 'POST') {
         setTimeout(() => {
           const question = data.question || '';
           
@@ -681,7 +681,7 @@ const getRecommendedArticles = () => request('/articles/recommended', 'GET');
 const getFilteredArticles = (data) => request('/articles/filter/', 'POST', data);
 
 // AI对话
-const chatWithAI = (data) => request('/ai/chat/', 'POST', data);
+const chatWithAI = (data) => request('/ask/', 'POST', data);
 
 // 所有方法
 module.exports = {

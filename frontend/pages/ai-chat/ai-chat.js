@@ -7,6 +7,8 @@ Page({
     inputText: '', // 输入框内容
     isLoading: false, // 是否正在加载
     scrollTop: 0, // 滚动位置
+    iconUrl: '', // 缓存后的图片路径
+    fallbackIconUrl: '' 
   },
 
   onLoad() {
@@ -20,6 +22,18 @@ Page({
         }
       ]
     });
+    this.getPetGifCache();
+  },
+
+  getPetGifCache() {
+    const gifUrl = 'https://403app.xyz/static/pet.gif';
+    // 兼容app未定义的情况
+    if (typeof app !== 'undefined' && app.getImgCache) {
+      app.getImgCache(gifUrl).then((cachePath) => {
+        this.setData({ petGifUrl: cachePath });
+        console.log('pet.gif 缓存路径:', cachePath);
+      });
+    }
   },
 
   // 获取当前时间

@@ -8,7 +8,7 @@
   <view class="user-info-card">
     <view class="user-avatar">
       <!-- 用户头像，根据用户上传选取 -->
-      <image class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <image class="avatar-img" src="https://{{userInfo.avatarUrl}}" mode="aspectFill"></image>
     </view>
     <view class="user-name">{{userInfo.nickName || '用户名'}}</view>
   </view>

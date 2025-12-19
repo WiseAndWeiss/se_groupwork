@@ -1,7 +1,12 @@
 <!-- 顶部标题栏 -->
 <view class="header">
   <view class="title-container">
-    <image class="app-icon" src="/assets/icon.png" mode="widthFix"></image>
+    <image 
+      class="app-icon" 
+      src="{{iconUrl || '/assets/icon.png'}}" 
+      mode="widthFix"
+      lazy-load="true" 
+    ></image>
     <text class="app-name">小助手</text>
     <text class="app-desc">校内公众号信息整合助手</text>
   </view>

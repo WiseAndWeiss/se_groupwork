@@ -137,3 +137,32 @@ page {
       transform: translateX(-50%) scale(0.98);
       box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.25);
     }
+
+    /* 无结果提示样式 */
+.no-results-tip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80rpx 40rpx;
+    text-align: center;
+  }
+  
+  .no-results-icon {
+    width: 160rpx;
+    height: 160rpx;
+    opacity: 0.6;
+    margin-bottom: 40rpx;
+  }
+  
+  .no-results-text {
+    font-size: 32rpx;
+    color: #999;
+    margin-bottom: 16rpx;
+    font-weight: 500;
+  }
+  
+  .no-results-hint {
+    font-size: 28rpx;
+    color: #aaa;
+  }

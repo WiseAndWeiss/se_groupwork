@@ -6,7 +6,7 @@
   <view class="loading">
     <image 
       class="loading-gif" 
-      src="/assets/loading.gif" 
+      src="{{loadingGifUrl || 'https://403app.xyz/static/loading.gif'}}" 
       mode="aspectFit"
     ></image>
   </view>

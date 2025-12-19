@@ -27,9 +27,12 @@
 
 <view class="article-list-container">
   <article-list 
-    list="{{filteredList}}" 
+    list="{{selectionList}}" 
     emptyText="暂无匹配标签的动态"   
     article_list_scrollHeight="calc(100vh - 450rpx)" 
+    bind:loadmore="handleLoadMore" 
+    isLoading="{{isLoading}}"
+    reachEnd="{{reach_end}}"
   />
 </view>
 

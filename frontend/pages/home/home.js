@@ -33,7 +33,16 @@ Page({
     this.loadLatestArticles(true); // 加载首页文章数据（卡片）
   },
 
+  /*
   onPullDownRefresh() {
+    const app = getApp();
+    // 如果正在拖动桌宠，直接停止刷新，不执行任何操作
+    if (app.globalData.isPetDragging) {
+      wx.stopPullDownRefresh();
+      console.log(app.globalData.isPetDragging);
+      return;
+    }
+    
     console.log('下拉刷新，重置文章列表');
     this.setData({
         start_rank: 0,
@@ -41,7 +50,7 @@ Page({
       });
     Promise.all([this.loadLatestArticles(true)]) // 重置数据
       .finally(() => wx.stopPullDownRefresh());
-  },
+  },*/
 
   // 页面卸载时清理（比如跳转到其他Tab页面、关闭页面）
   onHide() {

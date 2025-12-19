@@ -1,3 +1,4 @@
+// article-list.js
 Component({
     properties: {
       // css设置样式
@@ -14,18 +15,31 @@ Component({
         type: String,
         value: '暂无文章'
       },
-    },
-
-    methods: {
-        onReachBottom: function() {
-              this.triggerEvent('loadmore');
-          }
-    },
-
-    lifetimes: {
-        attached: function() {
-          console.log('article-list 组件挂载');
-        }
+      // 新增：加载状态（由父页面传递）
+      isLoading: {
+        type: Boolean,
+        value: false
+      },
+      // 新增：是否已加载完所有数据（由父页面传递）
+      reachEnd: {
+        type: Boolean,
+        value: false
       }
+    },
   
+    methods: {
+      // 移除：原滑到底部触发的 onReachBottom
+      // 新增：点击加载更多按钮触发
+      onLoadMoreTap() {
+        // 加载中/已到底时不触发
+        if (this.properties.isLoading || this.properties.reachEnd) return;
+        this.triggerEvent('loadmore');
+      }
+    },
+  
+    lifetimes: {
+      attached: function() {
+        console.log('article-list 组件挂载');
+      }
+    }
   })

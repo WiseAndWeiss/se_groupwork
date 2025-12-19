@@ -1,31 +1,44 @@
+<!-- article-list.wxml -->
 <view class="card-area">
   <!-- 卡片独立滚动容器 -->
-    <scroll-view 
+  <scroll-view 
     class="card-scroll" 
     scroll-y="true" 
-    bindscrolltolower="onReachBottom"
-    lower-threshold="50" 
     style="height: {{article_list_scrollHeight}};"
   >
-    <!-- 加载状态 -->
-    <view wx:if="{{isLoading}}" class="loading-tip">
-      加载中...
-    </view>        
-      <view wx:else class="card-list">
-        <block wx:for="{{list}}" wx:key="id"> 
-          <card-component
-            id_="{{item.id}}"
-            title="{{item.title}}"
-            time="{{item.publish_time}}"
-            tags="{{item.tags}}"
-            desc="{{item.summary}}"
-            url="{{item.article_url}}"
-            key_info="{{item.key_info}}"
-            name="{{item.account_name}}"
-            is_favorited="{{item.is_favorited}}"
-          />
-        </block>
+    <view class="card-list">
+      <block wx:for="{{list}}" wx:key="id"> 
+        <card-component
+          id_="{{item.id}}"
+          title="{{item.title}}"
+          time="{{item.publish_time}}"
+          tags="{{item.tags}}"
+          desc="{{item.summary}}"
+          url="{{item.article_url}}"
+          key_info="{{item.key_info}}"
+          name="{{item.account_name}}"
+          is_favorited="{{item.is_favorited}}"
+        />
+      </block>
+    </view>
+    
+    <!-- 空数据提示 -->
+    <view wx:if="{{list.length === 0}}" class="empty-tip">{{emptyText}}</view>
+    
+    <!-- 新增：加载更多按钮区域 -->
+    <view wx:if="{{list.length > 0}}" class="load-more-area">
+      <!-- 加载中状态 -->
+      <view wx:if="{{isLoading}}" class="loading-tip">
+        加载中...
       </view>
-      <view wx:if="{{list.length === 0}}" class="empty-tip">暂无推荐文章</view>
-    </scroll-view>
+      <!-- 已加载完所有数据 -->
+      <view wx:elif="{{reachEnd}}" class="no-more-tip">
+        暂无更多文章
+      </view>
+      <!-- 可点击加载更多 -->
+      <view wx:else class="load-more-btn" bindtap="onLoadMoreTap">
+        点击加载更多文章
+      </view>
+    </view>
+  </scroll-view>
 </view>
