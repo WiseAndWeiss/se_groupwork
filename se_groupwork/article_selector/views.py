@@ -94,7 +94,7 @@ class ArticleViewSet(viewsets.ViewSet):
         """
         start_rank = int(request.query_params.get('start_rank', 0))
         related_accounts = get_accounts_by_user(request.user)
-        all_articles = self._base_queryset(related_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
+        all_articles = self._base_queryset(related_accounts, request.user).order_by('-publish_time', '-id')[start_rank:start_rank+21]
         reached_end = len(all_articles) < 21
         all_articles = all_articles[:20]
         serializer = ArticleSerializer(all_articles, many=True, context={'request': request})
@@ -152,7 +152,7 @@ class ArticleViewSet(viewsets.ViewSet):
         """
         start_rank = int(request.query_params.get('start_rank', 0))
         campus_accounts = get_campus_accounts()
-        campus_articles = self._base_queryset(campus_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
+        campus_articles = self._base_queryset(campus_accounts, request.user).order_by('-publish_time', '-id')[start_rank:start_rank+21]
         reached_end = len(campus_articles) < 21
         campus_articles = campus_articles[:20]
         serializer = ArticleSerializer(campus_articles, many=True, context={'request': request})
@@ -186,7 +186,7 @@ class ArticleViewSet(viewsets.ViewSet):
         start_rank = int(request.query_params.get('start_rank', 0))
         # 根据用户的自选偏好获取文章
         customized_accounts = get_customized_accounts(request.user)
-        customized_articles = self._base_queryset(customized_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
+        customized_articles = self._base_queryset(customized_accounts, request.user).order_by('-publish_time', '-id')[start_rank:start_rank+21]
         reached_end = len(customized_articles) < 21
         customized_articles = customized_articles[:20]
         serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
@@ -250,11 +250,12 @@ class ArticleViewSet(viewsets.ViewSet):
                 Q(content__icontains=search_content)
             )
 
-        base_query = base_query.order_by('-publish_time')
+        base_query = base_query.order_by('-publish_time', '-id')
 
         # 仿照 filter：先取 limit+1 条判断是否到末尾，再截断为 limit
         page_items = list(base_query[start_rank:start_rank + limit + 1])
-        reached_end = len(page_items) < limit
+        # 如果返回数量不超过当前页大小，则说明已到末尾
+        reached_end = len(page_items) <= limit
         page_items = page_items[:limit]
 
         serializer = ArticleSerializer(page_items, many=True, context={'request': request})
@@ -295,7 +296,7 @@ class ArticleViewSet(viewsets.ViewSet):
         start_rank = int(request.query_params.get('start_rank', 0))
         account_id = request.query_params.get('account_id')
         try:
-            account_articles = self._base_queryset([account_id], request.user).filter(public_account_id=account_id).order_by('-publish_time')[start_rank:start_rank+21]
+            account_articles = self._base_queryset([account_id], request.user).filter(public_account_id=account_id).order_by('-publish_time', '-id')[start_rank:start_rank+21]
             reached_end = len(account_articles) < 21
             account_articles = account_articles[:20]
             serializer = ArticleSerializer(account_articles, many=True, context={'request': request})
@@ -436,9 +437,10 @@ class ArticleViewSet(viewsets.ViewSet):
 
         start_rank = data.get('start_rank', 0)
         limit = data.get('limit', 21)
-        queryset = queryset.order_by('-publish_time')[start_rank:start_rank+limit+1]
+        queryset = queryset.order_by('-publish_time', '-id')[start_rank:start_rank+limit+1]
 
-        reached_end = len(queryset) < limit
+        # limit+1 取数，用 <= 确定是否到末尾，避免恰好满页时误判
+        reached_end = len(queryset) <= limit
         queryset = queryset[:limit]
         serializer = ArticleSerializer(queryset, many=True, context={'request': request})
         return Response({
