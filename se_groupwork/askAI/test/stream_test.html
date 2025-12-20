@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>ask_ai 流式测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 720px; margin: 24px auto; line-height: 1.5; }
+    textarea { width: 100%; height: 260px; font-family: Consolas, monospace; font-size: 14px; }
+    label { display: block; margin: 8px 0 4px; }
+    input[type=text] { width: 100%; padding: 6px 8px; }
+    button { padding: 8px 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h2>ask_ai 流式响应测试</h2>
+  <p>在下方填写 API 地址和 Bearer Token，提交问题后查看流式输出。</p>
+
+  <div style="margin: 8px 0; font-size: 14px;">
+    <div>请求发起时间：<span id="tStart">-</span></div>
+    <div>首字节时间：<span id="tFirst">-</span> （TTFB：<span id="ttfb">-</span> ms）</div>
+    <div>完成时间：<span id="tEnd">-</span> （总耗时：<span id="total">-</span> ms）</div>
+  </div>
+
+  <label>API 地址（默认 https://403app.xyz/api/ask/stream/）</label>
+  <input id="api" type="text" value="https://403app.xyz/api/ask/stream/" />
+
+  <label>Bearer Token（必填）</label>
+  <input id="token" type="text" placeholder="在此填写 access token" />
+
+  <label>问题</label>
+  <input id="question" type="text" value="请帮我总结一下近期校园活动" />
+
+  <button id="send">发送</button>
+
+  <label>输出</label>
+  <textarea id="log" readonly></textarea>
+
+  <script>
+    const btn = document.getElementById('send');
+    const log = document.getElementById('log');
+    const tStartEl = document.getElementById('tStart');
+    const tFirstEl = document.getElementById('tFirst');
+    const ttfbEl = document.getElementById('ttfb');
+    const tEndEl = document.getElementById('tEnd');
+    const totalEl = document.getElementById('total');
+
+    function resetTiming() {
+      tStartEl.textContent = '-';
+      tFirstEl.textContent = '-';
+      ttfbEl.textContent = '-';
+      tEndEl.textContent = '-';
+      totalEl.textContent = '-';
+    }
+
+    function append(text) {
+      log.value += text;
+      log.scrollTop = log.scrollHeight;
+    }
+
+    btn.onclick = async () => {
+      log.value = '';
+      resetTiming();
+      const api = document.getElementById('api').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const question = document.getElementById('question').value.trim();
+      if (!api || !token || !question) {
+        alert('API、Token、问题均不能为空');
+        return;
+      }
+
+      const t0 = performance.now();
+      const isoNow = new Date().toISOString();
+      tStartEl.textContent = isoNow;
+      let tFirst = null;
+
+      try {
+        const resp = await fetch(api, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ question })
+        });
+
+        if (!resp.ok) {
+          append(`HTTP ${resp.status}: ${resp.statusText}\n`);
+          const text = await resp.text();
+          append(text);
+          return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          if (!tFirst) {
+            tFirst = performance.now();
+            tFirstEl.textContent = new Date().toISOString();
+            ttfbEl.textContent = (tFirst - t0).toFixed(2);
+          }
+          append(decoder.decode(value, { stream: true }));
+        }
+
+        const tEnd = performance.now();
+        tEndEl.textContent = new Date().toISOString();
+        totalEl.textContent = (tEnd - t0).toFixed(2);
+      } catch (e) {
+        append(`异常: ${e}\n`);
+      }
+    };
+  </script>
+</body>
+</html>
