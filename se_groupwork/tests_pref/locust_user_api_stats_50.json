@@ -1,0 +1,67 @@
+{
+  "timestamp": 1766129332,
+  "fail_ratio": 0.0,
+  "total_rps": 79.8635587362504,
+  "requests": [
+    {
+      "name": "/api/user/auth/login/",
+      "method": "POST",
+      "num_requests": 51,
+      "num_failures": 0,
+      "avg_response_time_ms": 783.4331372555337,
+      "p95_ms": 1100.0,
+      "p99_ms": 1200.0,
+      "rps": 0.16993664450720838
+    },
+    {
+      "name": "GET subscriptions",
+      "method": "GET",
+      "num_requests": 5359,
+      "num_failures": 0,
+      "avg_response_time_ms": 14.155972158853432,
+      "p95_ms": 16,
+      "p99_ms": 79,
+      "rps": 17.856676037531955
+    },
+    {
+      "name": "GET history",
+      "method": "GET",
+      "num_requests": 2654,
+      "num_failures": 0,
+      "avg_response_time_ms": 13.320323549148387,
+      "p95_ms": 16,
+      "p99_ms": 23,
+      "rps": 8.843369696512374
+    },
+    {
+      "name": "GET favorites",
+      "method": "GET",
+      "num_requests": 5332,
+      "num_failures": 0,
+      "avg_response_time_ms": 14.7538845271357,
+      "p95_ms": 16,
+      "p99_ms": 190.0,
+      "rps": 17.766709578675197
+    },
+    {
+      "name": "GET profile",
+      "method": "GET",
+      "num_requests": 7867,
+      "num_failures": 0,
+      "avg_response_time_ms": 13.490683665969724,
+      "p95_ms": 16,
+      "p99_ms": 37,
+      "rps": 26.213560438004084
+    },
+    {
+      "name": "GET todos",
+      "method": "GET",
+      "num_requests": 2705,
+      "num_failures": 0,
+      "avg_response_time_ms": 14.036679630395449,
+      "p95_ms": 16,
+      "p99_ms": 110.0,
+      "rps": 9.013306341019582
+    }
+  ]
+}

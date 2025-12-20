@@ -47,7 +47,7 @@ coverage.xml
 .pytest_cache/
 
 # 迁移文件
-migrations/
+# migrations/
 
 # 环境变量文件
 .env
@@ -83,6 +83,8 @@ avatars/
 article_covers/
 *.png
 *.jpg
+*.jpeg
+*.gif
 
 # 日志文件
 *.log
@@ -93,3 +95,13 @@ article_covers/
 
 # 文本
 *.md
+
+#
+shibing624-text2vec-base-chinese/
+
+# api-key
+askAI.ini
+remoteAI.ini
+
+# SSL 证书
+certs/

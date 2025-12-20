@@ -1,0 +1,187 @@
+{
+  "timestamp": 1766150081,
+  "fail_ratio": 0.0,
+  "total_rps": 48.33776703598392,
+  "requests": [
+    {
+      "name": "/api/user/auth/login/",
+      "method": "POST",
+      "num_requests": 20,
+      "num_failures": 0,
+      "avg_response_time_ms": 972.1821099999943,
+      "p95_ms": 1400.0,
+      "p99_ms": 1400.0,
+      "rps": 0.06645280043440187
+    },
+    {
+      "name": "DELETE favorites cleanup",
+      "method": "DELETE",
+      "num_requests": 8,
+      "num_failures": 0,
+      "avg_response_time_ms": 589.3385249983112,
+      "p95_ms": 940.0,
+      "p99_ms": 940.0,
+      "rps": 0.02658112017376075
+    },
+    {
+      "name": "GET favorites list (cleanup)",
+      "method": "GET",
+      "num_requests": 20,
+      "num_failures": 0,
+      "avg_response_time_ms": 390.1009100038209,
+      "p95_ms": 820.0,
+      "p99_ms": 820.0,
+      "rps": 0.06645280043440187
+    },
+    {
+      "name": "GET subscriptions list (cleanup)",
+      "method": "GET",
+      "num_requests": 20,
+      "num_failures": 0,
+      "avg_response_time_ms": 289.279040004476,
+      "p95_ms": 840.0,
+      "p99_ms": 840.0,
+      "rps": 0.06645280043440187
+    },
+    {
+      "name": "GET collections list",
+      "method": "GET",
+      "num_requests": 1301,
+      "num_failures": 0,
+      "avg_response_time_ms": 30.430726748389183,
+      "p95_ms": 110.0,
+      "p99_ms": 240.0,
+      "rps": 4.322754668257842
+    },
+    {
+      "name": "POST todos create",
+      "method": "POST",
+      "num_requests": 1272,
+      "num_failures": 0,
+      "avg_response_time_ms": 43.56165691814733,
+      "p95_ms": 140.0,
+      "p99_ms": 290.0,
+      "rps": 4.2263981076279595
+    },
+    {
+      "name": "GET collection favorites",
+      "method": "GET",
+      "num_requests": 1301,
+      "num_failures": 0,
+      "avg_response_time_ms": 28.057726594740434,
+      "p95_ms": 98,
+      "p99_ms": 210.0,
+      "rps": 4.322754668257842
+    },
+    {
+      "name": "GET history list",
+      "method": "GET",
+      "num_requests": 708,
+      "num_failures": 0,
+      "avg_response_time_ms": 872.6684683608697,
+      "p95_ms": 2400.0,
+      "p99_ms": 4700.0,
+      "rps": 2.352429135377826
+    },
+    {
+      "name": "PATCH todos id",
+      "method": "PATCH",
+      "num_requests": 1272,
+      "num_failures": 0,
+      "avg_response_time_ms": 39.88678128911225,
+      "p95_ms": 120.0,
+      "p99_ms": 250.0,
+      "rps": 4.2263981076279595
+    },
+    {
+      "name": "POST subscriptions create",
+      "method": "POST",
+      "num_requests": 1298,
+      "num_failures": 0,
+      "avg_response_time_ms": 54.118467950663394,
+      "p95_ms": 150.0,
+      "p99_ms": 280.0,
+      "rps": 4.312786748192681
+    },
+    {
+      "name": "DELETE todos id",
+      "method": "DELETE",
+      "num_requests": 1272,
+      "num_failures": 0,
+      "avg_response_time_ms": 31.998367374524936,
+      "p95_ms": 91,
+      "p99_ms": 170.0,
+      "rps": 4.2263981076279595
+    },
+    {
+      "name": "DELETE subscriptions id",
+      "method": "DELETE",
+      "num_requests": 1025,
+      "num_failures": 0,
+      "avg_response_time_ms": 41.8352640978992,
+      "p95_ms": 110.0,
+      "p99_ms": 230.0,
+      "rps": 3.405706022263096
+    },
+    {
+      "name": "DELETE subscriptions cleanup",
+      "method": "DELETE",
+      "num_requests": 8,
+      "num_failures": 0,
+      "avg_response_time_ms": 256.013250000251,
+      "p95_ms": 840.0,
+      "p99_ms": 840.0,
+      "rps": 0.02658112017376075
+    },
+    {
+      "name": "POST favorites create",
+      "method": "POST",
+      "num_requests": 1276,
+      "num_failures": 0,
+      "avg_response_time_ms": 78.04152601930699,
+      "p95_ms": 180.0,
+      "p99_ms": 330.0,
+      "rps": 4.239688667714839
+    },
+    {
+      "name": "POST history create",
+      "method": "POST",
+      "num_requests": 1276,
+      "num_failures": 0,
+      "avg_response_time_ms": 51.92684898118096,
+      "p95_ms": 150.0,
+      "p99_ms": 260.0,
+      "rps": 4.239688667714839
+    },
+    {
+      "name": "DELETE favorites id",
+      "method": "DELETE",
+      "num_requests": 1241,
+      "num_failures": 0,
+      "avg_response_time_ms": 41.645609669826925,
+      "p95_ms": 120.0,
+      "p99_ms": 210.0,
+      "rps": 4.123396266954637
+    },
+    {
+      "name": "POST collections create",
+      "method": "POST",
+      "num_requests": 615,
+      "num_failures": 0,
+      "avg_response_time_ms": 53.642481462736576,
+      "p95_ms": 150.0,
+      "p99_ms": 270.0,
+      "rps": 2.0434236133578576
+    },
+    {
+      "name": "DELETE collections id",
+      "method": "DELETE",
+      "num_requests": 615,
+      "num_failures": 0,
+      "avg_response_time_ms": 40.35244439028173,
+      "p95_ms": 120.0,
+      "p99_ms": 190.0,
+      "rps": 2.0434236133578576
+    }
+  ]
+}

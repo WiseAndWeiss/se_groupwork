@@ -186,26 +186,7 @@ class SubscriptionListView(APIView):
         Subscription.objects.clear_user_subscriptions(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
-@extend_schema(
-    tags=['订阅管理'],
-    summary='在订阅中查询符合query的订阅',
-    description='在订阅中查询符合query的订阅，如果查询参数为空则返回所有订阅',
-    methods=['GET'],
-    responses={
-        200: OpenApiResponse(description='成功获取订阅列表'),
-    },
-    parameters=[
-            OpenApiParameter(
-                name="name",
-                type=str,
-                location=OpenApiParameter.QUERY,
-                description="公众号名称",
-                required=False,
-                examples=[OpenApiExample(name="name", value="清华大学")]
-            )
-        ],
-)
+
 class SearchSubscriptionListView(APIView):
     """
     在已订阅的公众号中查询符合query的公众号
@@ -690,8 +671,18 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     summary='历史记录列表',
-    description='获取用户的文章浏览历史',
+    description='获取用户的文章浏览历史（分页，start_rank，默认每次20条）',
     methods=['GET'],
+    parameters=[
+        OpenApiParameter(
+            name="start_rank",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="起始偏移量，默认0",
+            required=False,
+            examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+        ),
+    ],
     responses={
         200: OpenApiResponse(description='成功获取历史记录'),
         401: OpenApiResponse(description='未授权访问')
@@ -733,8 +724,9 @@ class HistoryListView(APIView):
     def get(self, request):
         """获取用户的所有浏览历史"""
         # 预取关联 + 注解收藏状态，避免 N+1 和大字段读取
+        start_rank = int(request.query_params.get('start_rank', 0))
         favorite_subq = Favorite.objects.filter(user=request.user, article=OuterRef('article_id')).values('id')[:1]
-        histories = (
+        qs = (
             History.objects
             .filter(user=request.user)
             .select_related('article__public_account')
@@ -746,8 +738,17 @@ class HistoryListView(APIView):
                 'article__relevant_time', 'article__public_account__name'
             )
         )
-        serializer = HistorySerializer(histories, many=True, context={'request': request})
-        return Response(serializer.data)
+
+        slice_qs = list(qs[start_rank:start_rank + 21])
+        reached_end = len(slice_qs) < 21
+        slice_qs = slice_qs[:20]
+
+        serializer = HistorySerializer(slice_qs, many=True, context={'request': request})
+        return Response({
+            'histories': serializer.data,
+            'reach_end': reached_end,
+            'start_rank': start_rank,
+        })
     
     def post(self, request):
         """创建或更新浏览历史记录"""
