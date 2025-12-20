@@ -237,8 +237,19 @@ Page({
       console.log('缓存图片路径：', cachePath);
       this.setData({ iconUrl: cachePath }); // 将缓存路径存入 data
     });
+    this.tryAutoLogin();
+  },
 
-    
+  async tryAutoLogin() {
+    try {
+      const autoLogin = await request.trySilentRefresh();
+      if (autoLogin) {
+        wx.showToast({ title: '已自动登录', icon: 'success' });
+        wx.reLaunch({ url: '/pages/home/home' });
+      }
+    } catch (err) {
+      console.log('自动登录失败：', err);
+    }
   },
 
   // 播放加载动画
