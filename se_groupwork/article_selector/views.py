@@ -5,14 +5,14 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
 
 from datetime import timedelta
 from django.utils import timezone
 
 from webspider.models import Article, PublicAccount
-from user.models import Subscription
+from user.models import Subscription, Favorite
 from article_selector.serializers import ArticleSerializer, ArticlesFilterSerializer
 from article_selector.article_selector import *
 from se_groupwork.global_tools import global_meili_tool_load
@@ -53,6 +53,24 @@ class ArticleViewSet(viewsets.ViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
     
+    def _annotate_favorite(self, qs, user):
+        favorite_subq = Favorite.objects.filter(user=user, article=OuterRef('pk')).values('id')[:1]
+        return qs.annotate(is_favorited_id=Subquery(favorite_subq))
+
+    def _base_queryset(self, accounts, user):
+        # 只取列表用得到的字段，避免拉取大文本/向量，减少 I/O
+        qs = (
+            Article.objects.select_related('public_account')
+            .only(
+                'id', 'title', 'article_url', 'publish_time', 'cover',
+                'summary', 'tags', 'key_info', 'relevant_time',
+                'public_account__name', 'public_account_id'
+            )
+            .filter(public_account__in=accounts)
+            .exclude(summary='')
+        )
+        return self._annotate_favorite(qs, user)
+
     @extend_schema(
         summary="获取最新文章列表",
         description="按发布时间倒序获取用户关联公众号的最新文章，支持分页加载（每次20条）",
@@ -76,9 +94,7 @@ class ArticleViewSet(viewsets.ViewSet):
         """
         start_rank = int(request.query_params.get('start_rank', 0))
         related_accounts = get_accounts_by_user(request.user)
-        all_articles = Article.objects.filter(
-            public_account__in = related_accounts,
-        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
+        all_articles = self._base_queryset(related_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(all_articles) < 21
         all_articles = all_articles[:20]
         serializer = ArticleSerializer(all_articles, many=True, context={'request': request})
@@ -101,10 +117,11 @@ class ArticleViewSet(viewsets.ViewSet):
         # 这里可以根据用户的阅读历史、偏好等进行推荐
         # 暂时返回固定的推荐文章
         related_accounts = get_accounts_by_user(request.user)
-        recent_articles = Article.objects.filter(
-            public_account__in=related_accounts,
-            publish_time__gte=timezone.now() - timedelta(days=3)
-        ).exclude(summary='')
+        recent_articles = (
+            self._base_queryset(related_accounts, request.user)
+            .filter(publish_time__gte=timezone.now() - timedelta(days=3))
+            .order_by('-publish_time')[:200]  # 限制候选集大小，降低排序成本
+        )
         recommended_articles = sort_articles_by_preference(request.user, recent_articles)[:8]
         serializer = ArticleSerializer(recommended_articles, many=True, context={'request': request})
         return Response({
@@ -135,9 +152,7 @@ class ArticleViewSet(viewsets.ViewSet):
         """
         start_rank = int(request.query_params.get('start_rank', 0))
         campus_accounts = get_campus_accounts()
-        campus_articles = Article.objects.filter(
-            public_account__in=campus_accounts
-          ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
+        campus_articles = self._base_queryset(campus_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(campus_articles) < 21
         campus_articles = campus_articles[:20]
         serializer = ArticleSerializer(campus_articles, many=True, context={'request': request})
@@ -171,9 +186,7 @@ class ArticleViewSet(viewsets.ViewSet):
         start_rank = int(request.query_params.get('start_rank', 0))
         # 根据用户的自选偏好获取文章
         customized_accounts = get_customized_accounts(request.user)
-        customized_articles = Article.objects.filter(
-            public_account__in=customized_accounts
-        ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
+        customized_articles = self._base_queryset(customized_accounts, request.user).order_by('-publish_time')[start_rank:start_rank+21]
         reached_end = len(customized_articles) < 21
         customized_articles = customized_articles[:20]
         serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
@@ -218,9 +231,7 @@ class ArticleViewSet(viewsets.ViewSet):
         customized_accounts = get_customized_accounts(request.user)
 
         # 基础查询：自选公众号且排除空summary
-        base_query = Article.objects.filter(
-            public_account__in=customized_accounts
-        ).exclude(summary='')
+        base_query = self._base_queryset(customized_accounts, request.user)
 
         # 如果有搜索内容，添加搜索条件（多字段模糊搜索）
         if search_content:
@@ -271,9 +282,7 @@ class ArticleViewSet(viewsets.ViewSet):
         start_rank = int(request.query_params.get('start_rank', 0))
         account_id = request.query_params.get('account_id')
         try:
-            account_articles = Article.objects.filter(
-                public_account_id=account_id,
-            ).exclude(summary='').order_by('-publish_time')[start_rank:start_rank+21]
+            account_articles = self._base_queryset([account_id], request.user).filter(public_account_id=account_id).order_by('-publish_time')[start_rank:start_rank+21]
             reached_end = len(account_articles) < 21
             account_articles = account_articles[:20]
             serializer = ArticleSerializer(account_articles, many=True, context={'request': request})
@@ -374,9 +383,7 @@ class ArticleViewSet(viewsets.ViewSet):
                 )
         else:
             account_list = all_accounts
-        queryset = Article.objects.filter(
-            public_account__in=account_list,
-        ).exclude(summary='')
+        queryset = self._base_queryset(account_list, request.user)
         
         date_from = data.get('date_from')
         if date_from:
