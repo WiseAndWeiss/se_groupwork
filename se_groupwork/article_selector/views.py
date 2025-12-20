@@ -208,6 +208,14 @@ class ArticleViewSet(viewsets.ViewSet):
                 examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
             ),
             OpenApiParameter(
+                name="limit",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="每页数量（默认20）",
+                required=False,
+                examples=[OpenApiExample(name="limit", value=20)]
+            ),
+            OpenApiParameter(
                 name="search_content",
                 type=str,
                 location=OpenApiParameter.QUERY,
@@ -225,6 +233,7 @@ class ArticleViewSet(viewsets.ViewSet):
         GET /api/articles/customized-latest/search/?start_rank=0&name=..
         """
         start_rank = int(request.query_params.get('start_rank', 0))
+        limit = int(request.query_params.get('limit', 20))
         search_content = request.query_params.get('search_content', '').strip()
 
         # 根据用户的自选偏好获取文章
@@ -241,9 +250,11 @@ class ArticleViewSet(viewsets.ViewSet):
                 Q(content__icontains=search_content)
             )
 
-        customized_articles = base_query.order_by('-publish_time')[start_rank:start_rank+21]
-        reached_end = len(customized_articles) < 21
-        customized_articles = customized_articles[:20]
+        base_query = base_query.order_by('-publish_time')
+
+        total_count = base_query.count()
+        customized_articles = list(base_query[start_rank:start_rank + limit])
+        reached_end = start_rank + len(customized_articles) >= total_count
         serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
