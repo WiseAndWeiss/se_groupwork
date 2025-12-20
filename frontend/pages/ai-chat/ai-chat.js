@@ -138,11 +138,15 @@ Page({
 
   appendAIContent(index, delta = '') {
     if (!delta || !this.data.messages[index]) return;
+    
+    // 关键修改：将流式返回的 \n 转换为实际换行符
+    const processedDelta = delta.replace(/\\n/g, '\n');
+    
     const key = `messages[${index}].content`;
-    const next = `${this.data.messages[index].content || ''}${delta}`;
+    const next = `${this.data.messages[index].content || ''}${processedDelta}`;
     this.setData({
-      [key]: next,
-      [`messages[${index}].nodes`]: this.formatContentToNodes(next)
+        [key]: next,
+        [`messages[${index}].nodes`]: this.formatContentToNodes(next)
     });
     this.scrollToBottom();
   },
@@ -195,25 +199,31 @@ Page({
   },
 
   formatContentToNodes(content = '') {
-    const paragraphs = String(content || '').split(/\n\s*\n/); // 按空行切段
+    // 关键修改：将字面的 \n 字符串转换为实际的换行符
+    let processedContent = String(content || '');
+    
+    // 将字面的 \n 转换为实际的换行符
+    processedContent = processedContent.replace(/\\n/g, '\n');
+    
+    const paragraphs = processedContent.split(/\n\s*\n/); // 按空行切段
     const nodes = [];
     paragraphs.forEach((para, pIdx) => {
-      const lines = para.split('\n');
-      const children = [];
-      lines.forEach((line, lIdx) => {
-        children.push({ type: 'text', text: line });
-        if (lIdx !== lines.length - 1) {
-          children.push({ name: 'br' });
+        const lines = para.split('\n');
+        const children = [];
+        lines.forEach((line, lIdx) => {
+            children.push({ type: 'text', text: line });
+            if (lIdx !== lines.length - 1) {
+                children.push({ name: 'br' });
+            }
+        });
+        nodes.push({
+            name: 'p',
+            attrs: { style: 'margin: 0 0 12rpx 0;' },
+            children
+        });
+        if (pIdx !== paragraphs.length - 1) {
+            nodes.push({ name: 'br' });
         }
-      });
-      nodes.push({
-        name: 'p',
-        attrs: { style: 'margin: 0 0 12rpx 0;' },
-        children
-      });
-      if (pIdx !== paragraphs.length - 1) {
-        nodes.push({ name: 'br' });
-      }
     });
     return nodes;
   },
