@@ -84,7 +84,7 @@ def get_stream_response(msg):
                 # 提取内容（适配DeepSeek/OpenAI格式）
                 content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
                 if content:  # 仅返回非空内容
-                    yield content.replace('\n', '\\n')  # 生成器逐段返回
+                    yield content.replace('\n', '\\n\n')  # 生成器逐段返回
             except json.JSONDecodeError:
                 # 忽略解析失败的行（如心跳包/非标准格式）
                 continue
