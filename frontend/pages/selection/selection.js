@@ -4,7 +4,12 @@ const request = require('../../utils/request');
 Page({
   data: {
     showLoadingAnimation: false,
+    lastSearchContent: '',
     searchContent: '',
+    selectionList: [],
+    isLoading: false,
+    reach_end: false,
+    start_rank: 0,
     currentSort: 'time',
     subscriptionList: [],
     tempSubscriptionList: [],
@@ -681,6 +686,7 @@ Page({
     this.stopAutoScroll();
     this.setData({
       searchContent: '',
+      lastSearchContent: '',
       selectionList: [],
       officialList: [],
       isLoading: false,
@@ -713,6 +719,15 @@ Page({
 
   handleLoadMore() {
     console.log('父页面接收到加载更多事件');
+    if (this.data.isLoading || this.data.reach_end) return;
+
+    const hasSearch = !!this.data.searchContent.trim();
+    if (hasSearch) {
+      const isSameQuery = this.data.lastSearchContent === this.data.searchContent;
+      this.loadFilteredCustomizedArticles(!isSameQuery);
+      return;
+    }
+
     this.loadCustomizedArticles(false); // false=追加数据
   },
 
@@ -794,6 +809,7 @@ Page({
     
     this.setData({
       searchContent: '',
+      lastSearchContent: '',
       currentSort: sortType,
       start_rank: 0,
       reach_end: false,
@@ -838,10 +854,14 @@ Page({
   },
 
   async loadFilteredCustomizedArticles(reset = false) {
-    if (this.data.isLoading) return;
+    if (this.data.isLoading || this.data.reach_end) return;
     this.setData({ 
         isLoading: true,
         showLoadingAnimation: true ,// 显示加载动画
+        lastSearchContent: this.data.searchContent,
+        reach_end: reset ? false : this.data.reach_end,
+        start_rank: reset ? 0 : this.data.start_rank,
+        selectionList: reset ? [] : this.data.selectionList
       });
     console.log('开始加载筛选的自选文章...');
     
@@ -851,9 +871,15 @@ Page({
       console.log('获取自选最新文章：', response);
 
       if (response && response.articles) {
-        const newList = reset ? response.articles : [...this.data.selectionList, ...response.articles];
+        const newArticles = response.articles;
+        const finalList = reset ? newArticles : [...this.data.selectionList, ...newArticles];
+
+        const reach_end = response.reach_end;
+        const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
         this.setData({
-          selectionList: newList
+          reach_end: reach_end,
+          start_rank: newStartRank,
+          selectionList: finalList
         });
       } else {
         console.warn('接口返回数据格式异常：', response);
