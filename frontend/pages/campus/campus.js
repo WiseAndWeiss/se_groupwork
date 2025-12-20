@@ -8,6 +8,7 @@ Page({
     isLoading: false,   // 加载状态
     start_rank: 0,      // 分页偏移量
     reach_end: false,   // 是否已加载完所有数据
+    scrollTop: 0,       // 控制 article-list 滚动位置
     searchContent: '',  // 搜索内容
     currentCategory: 'time', // 当前选中的类目（默认时间）
     showLoadingAnimation: false,
@@ -49,13 +50,15 @@ Page({
   // 页面生命周期 
   onShow() {
     console.log('校内页面加载完成');
+    // 切换回来时强制滚动到顶部，避免保留上次滚动位置
+    this.setData({ scrollTop: 0 });
     this.loadCampusArticles(true); // 加载文章数据
   },
 
   // 页面卸载时清理（比如跳转到其他Tab页面、关闭页面）
   onHide() {
     console.log('页面卸载，彻底清理数据');
-    this.clearPageData();
+    // this.clearPageData();
   },
 
   clearPageData() {
@@ -160,7 +163,7 @@ Page({
         const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
         
         // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
-        const reach_end = newArticles.length < this.data.pageSize;
+        const reach_end = response.reach_end;
         this.setData({
           selectionList: finalList,
           filteredList: finalList,
@@ -346,18 +349,22 @@ Page({
 
   // 其他方法
   goToAlllist() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/campus-all/campus-all' });
   },
 
   goToHome() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/home/home' });
   },
   
   goToSelection() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/selection/selection' });
   },
   
   goToUser() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/user/user' });
   }
 });

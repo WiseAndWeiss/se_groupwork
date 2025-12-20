@@ -24,6 +24,11 @@ Component({
       reachEnd: {
         type: Boolean,
         value: false
+      },
+      // 父页面可控的滚动位置（用于切换页面后强制回到顶部）
+      scrollTop: {
+        type: Number,
+        value: 0
       }
     },
   

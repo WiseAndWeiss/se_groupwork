@@ -563,27 +563,41 @@ Page({
 
   deleteSubscription(e) {
     const index = e.currentTarget.dataset.index;
+    const target = this.data.tempSubscriptionList[index];
+    const subscriptionId = target?.id;
+
+    if (!subscriptionId) {
+      wx.showToast({ title: '订阅ID无效，无法删除', icon: 'none' });
+      return;
+    }
+
     wx.showModal({
       title: '确认删除',
       content: '确定要取消关注这个公众号吗？',
       success: (res) => {
-        if (res.confirm) {
-          const tempSubscriptionList = [...this.data.tempSubscriptionList];
-          tempSubscriptionList.splice(index, 1);
-          
-          this.setData({ 
-            tempSubscriptionList,
-            subscriptionList: tempSubscriptionList 
+        if (!res.confirm) return;
+
+        wx.showLoading({ title: '正在取消...', mask: true });
+
+        request.deleteSubscription(subscriptionId)
+          .then(() => {
+            const tempSubscriptionList = [...this.data.tempSubscriptionList];
+            tempSubscriptionList.splice(index, 1);
+            this.setData({
+              tempSubscriptionList,
+              subscriptionList: tempSubscriptionList
+            });
+            // 删除后重新计算滚动范围
+            this.calculateMaxScrollTop();
+            wx.showToast({ title: '已取消关注', icon: 'success' });
+          })
+          .catch((err) => {
+            console.error('取消订阅失败：', err);
+            wx.showToast({ title: '取消失败，请重试', icon: 'none' });
+          })
+          .finally(() => {
+            wx.hideLoading();
           });
-          
-          // 删除项目后重新计算最大滚动距离
-          this.calculateMaxScrollTop();
-          
-          wx.showToast({
-            title: '已取消关注',
-            icon: 'success'
-          });
-        }
       }
     });
   },
@@ -660,7 +674,7 @@ Page({
       clearTimeout(this.data.longPressTimer);
     }
     this.stopAutoScroll();
-    this.clearPageData();
+    // this.clearPageData();
   },
 
   clearPageData() {
@@ -671,7 +685,7 @@ Page({
       officialList: [],
       isLoading: false,
       start_rank: 0,
-      reachEnd: false,
+      reach_end: false,
       subscriptionList: [],
       tempSubscriptionList: [],
       // scrollTop: 0, // 已禁用 scrollTop 维护
@@ -726,7 +740,7 @@ Page({
         const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
         
         // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
-        const reach_end = newArticles.length < this.data.pageSize;
+        const reach_end = response.reach_end;
         this.setData({
           selectionList: finalList,
           start_rank: newStartRank,
@@ -782,7 +796,7 @@ Page({
       searchContent: '',
       currentSort: sortType,
       start_rank: 0,
-      reachEnd: false,
+      reach_end: false,
       officialList: [],
       selectionList: [],
       // scrollTop: 0, // 已禁用 scrollTop 维护
@@ -906,18 +920,22 @@ Page({
   },
 
   goToAdd() {
+    this.clearPageData();
     wx.navigateTo({ url: '/packageA/add/add' });
   },
 
   goToHome() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/home/home' });
   },
   
   goToCampus() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/campus/campus' });
   },
   
   goToUser() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/user/user' });
   }
 });

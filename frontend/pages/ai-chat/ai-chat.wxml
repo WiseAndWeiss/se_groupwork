@@ -28,7 +28,7 @@
         </view>
         <view class="message-content">
           <view class="message-bubble">
-            <text class="message-text">{{item.content}}</text>
+            <rich-text class="message-text" nodes="{{item.nodes}}"></rich-text>
           </view>
           <!-- 参考文章列表 -->
           <view class="references-articles" wx:if="{{item.type === 'ai' && item.referencesArticles && item.referencesArticles.length > 0}}">

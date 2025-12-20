@@ -7,8 +7,8 @@ Page({
     accountName: '',
     articles: [],
     isLoading: false,
-    startRank: 0,
-    reachEnd: false,   // 是否已加载完所有数据
+    start_rank: 0,      // 分页偏移量
+    reach_end: false,   // 是否已加载完所有数据
   },
 
   // 返回上一页
@@ -47,33 +47,69 @@ Page({
         accountName: '',
         articles: [],
         isLoading: false,
-        startRank: 0,
-        reachEnd: false, 
+        start_rank: 0,      // 分页偏移量
+        reach_end: false,   // 是否已加载完所有数据
     });
   },
 
   // 加载指定公众号的文章（调用 Mock 接口 mockGetArticlesByAccount）
-  async loadAccountArticles() {
-    if (this.data.isLoading) return;
-    console.log('开始加载文章...');
-    this.setData({ isLoading: true });
-    try {
-      console.log('正在加载公众号文章，accountid:', this.data.accountid);
-      const data = {
-        account_id: this.data.accountid,
-        start_rank: this.data.startRank
-      }
-      const response = await request.getArticlesByAccount(data);
-      console.log('API 响应:', response);
-      this.setData({
-        articles: response.articles,
-      });
-      console.log('响应:', this.data.articles);
-    } catch (err) {
-        console.error('加载公众号文章失败：', err);
-        wx.showToast({ title: '加载失败', icon: 'none' });
-    } finally {
-      this.setData({ isLoading: false });
-    }
+  async loadAccountArticles(reset = false) {
+    if (this.data.isLoading || this.data.reach_end) return;
+        console.log('开始加载公众号文章...');
+        this.setData({ 
+            isLoading: true,
+            showLoadingAnimation: true 
+          });
+        
+        try {
+          let start_rank = reset ? 0 : this.data.start_rank;
+          console.log('请求start_rank:', start_rank);
+    
+          const response = await request.getArticlesByAccount({
+            account_id: this.data.accountid,
+            start_rank: start_rank
+          });
+          
+          if (response && response.articles) {
+            const newArticles = response.articles;
+            console.log('本次加载文章数量：', newArticles.length);
+            
+            // 3. 处理数据合并/重置
+            const finalList = reset ? newArticles : [...this.data.articles, ...newArticles];
+            
+            // 4. 计算新的start_rank（建议与pageSize对齐，或用返回数量）
+            const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
+            
+            // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
+            const reach_end = response.reach_end;
+            this.setData({
+              articles: finalList,
+              start_rank: newStartRank,
+              reach_end: reach_end
+            });
+          } else {
+            console.warn('接口返回数据格式异常：', response);
+            wx.showToast({ title: '数据加载异常', icon: 'none' });
+          }
+        } catch (error) {
+          console.error('加载校园文章失败：', error);
+          wx.showToast({ title: '加载失败: ' + error, icon: 'none' });
+          this.setData({
+            selectionList: [],
+            filteredList: []
+          });
+        } finally {
+          console.log('加载完成，设置 isLoading = false');
+          this.setData({ 
+            isLoading: false,
+            showLoadingAnimation: false // 隐藏加载动画
+          });
+        }
+  },
+
+  handleLoadMore() {
+    console.log('触发加载更多文章...');
+    this.loadAccountArticles();
   }
 });
+

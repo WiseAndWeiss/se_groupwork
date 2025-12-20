@@ -4,6 +4,7 @@
   <scroll-view 
     class="card-scroll" 
     scroll-y="true" 
+    scroll-top="{{scrollTop}}"
     style="height: {{article_list_scrollHeight}};"
   >
     <view class="card-list">

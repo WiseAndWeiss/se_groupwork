@@ -1,6 +1,24 @@
 const baseUrl = 'https://403app.xyz/api';
 export const resourceUrl = "https://403app.xyz/";
 
+// 兼容 TextDecoder 不可用的场景，保证流式响应可读
+const decodeBuffer = (buffer) => {
+  try {
+    return new TextDecoder('utf-8').decode(buffer);
+  } catch (err) {
+    let result = '';
+    const view = new Uint8Array(buffer || []);
+    for (let i = 0; i < view.length; i += 1) {
+      result += String.fromCharCode(view[i]);
+    }
+    try {
+      return decodeURIComponent(escape(result));
+    } catch (e) {
+      return result;
+    }
+  }
+};
+
 let access_token = wx.getStorageSync('access_token') || '';
 let refresh_token = wx.getStorageSync('refresh_token') || '';
 const MOCK_ENABLE = false; // 核心：关闭Mock，启用真实后端请求
@@ -680,7 +698,114 @@ const getLatestArticles = (data = {}) => request('/articles/latest/', 'GET', dat
 const getRecommendedArticles = () => request('/articles/recommended', 'GET');
 const getFilteredArticles = (data) => request('/articles/filter/', 'POST', data);
 
-// AI对话
+// AI对话（流式）
+const chatWithAIStream = ({ question, onMessage, onReferences, onDone, onError } = {}) => {
+  let buffer = '';
+  let finished = false;
+
+  const processLines = (text) => {
+    buffer += text;
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    lines.forEach((line) => {
+      let payload = line.trim();
+      if (!payload) return;
+
+      if (payload.startsWith('data:')) {
+        payload = payload.slice(5).trim();
+      }
+
+      // 兼容后端直接输出文本 + [[REFERENCES]] JSON 的格式
+      if (payload.includes('[[REFERENCES]]')) {
+        const parts = payload.split('[[REFERENCES]]');
+        const textPart = (parts[0] || '').trim();
+        const refsRaw = (parts[1] || '').trim();
+        if (textPart && onMessage) {
+          onMessage(textPart + '\n');
+        }
+        if (refsRaw) {
+          try {
+            const refs = JSON.parse(refsRaw);
+            if (onReferences) {
+              onReferences(refs);
+            }
+          } catch (err) {
+            // refs 解析失败时，不影响正文展示
+            console.warn('refs parse failed', err, refsRaw);
+          }
+        }
+        return;
+      }
+
+      if (payload === '[DONE]' || payload === '[done]') {
+        finish();
+        return;
+      }
+
+      try {
+        const json = JSON.parse(payload);
+        const delta = json.delta || json.answer || json.content || json.reply || '';
+        if (delta && onMessage) {
+          onMessage(delta);
+        }
+        const refs = json['references-articles'] || json.referencesArticles || json.references_articles || json.references;
+        if (refs && onReferences) {
+          onReferences(refs);
+        }
+        if (json.done === true) {
+          finish();
+        }
+      } catch (e) {
+        if (onMessage) {
+          onMessage(payload);
+        }
+      }
+    });
+  };
+
+  const finish = () => {
+    if (finished) return;
+    // 处理残留缓存，避免最后一段 refs 丢失
+    if (buffer) {
+      processLines('\n');
+    }
+    finished = true;
+    if (onDone) onDone();
+  };
+
+  const requestTask = wx.request({
+    url: `${baseUrl}/ask/stream/`,
+    method: 'POST',
+    data: { question },
+    enableChunked: true,
+    responseType: 'arraybuffer',
+    header: {
+      'Content-Type': 'application/json',
+      // 406 兼容：让后端返回任意可用类型（流式 text/event-stream 或常规 JSON）
+      'Accept': 'text/event-stream,application/json;q=0.9,*/*;q=0.8',
+      'Authorization': access_token ? `Bearer ${access_token}` : ''
+    },
+    success: () => finish(),
+    fail: (err) => {
+      if (onError) onError(err.errMsg || '网络失败');
+      finish();
+    }
+  });
+
+  if (requestTask && requestTask.onChunkReceived) {
+    requestTask.onChunkReceived((res) => {
+      const text = decodeBuffer(res.data);
+      processLines(text);
+    });
+  } else if (onError) {
+    onError('当前客户端不支持流式传输，请升级微信或使用非流式模式');
+  }
+
+  return requestTask;
+};
+
+// AI对话（非流式兜底）
 const chatWithAI = (data) => request('/ask/', 'POST', data);
 
 // 所有方法
@@ -730,5 +855,6 @@ module.exports = {
   updateTodo,
   deleteTodo,
   getArticleDetail ,
-  chatWithAI
+  chatWithAI,
+  chatWithAIStream
 };

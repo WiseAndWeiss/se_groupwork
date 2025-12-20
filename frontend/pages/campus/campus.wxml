@@ -33,6 +33,7 @@
     bind:loadmore="handleLoadMore" 
     isLoading="{{isLoading}}"
     reachEnd="{{reach_end}}"
+    scrollTop="{{scrollTop}}"
   />
 </view>
 

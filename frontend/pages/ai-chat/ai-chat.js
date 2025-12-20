@@ -8,7 +8,8 @@ Page({
     isLoading: false, // 是否正在加载
     scrollTop: 0, // 滚动位置
     iconUrl: '', // 缓存后的图片路径
-    fallbackIconUrl: '' 
+    fallbackIconUrl: '',
+    streamTask: null
   },
 
   onLoad() {
@@ -18,11 +19,19 @@ Page({
         {
           type: 'ai',
           content: '你好！我是你的AI助手，有什么可以帮助你的吗？',
+          nodes: [],
           time: this.getCurrentTime()
         }
       ]
     });
+    this.setData({
+      'messages[0].nodes': this.formatContentToNodes(this.data.messages[0].content)
+    });
     this.getPetGifCache();
+  },
+
+  onUnload() {
+    this.abortStreamTask();
   },
 
   getPetGifCache() {
@@ -51,7 +60,7 @@ Page({
     });
   },
 
-  // 发送消息
+  // 发送消息（流式优先）
   async sendMessage() {
     const inputText = this.data.inputText.trim();
     if (!inputText) {
@@ -70,58 +79,148 @@ Page({
     const userMessage = {
       type: 'user',
       content: inputText,
+      nodes: this.formatContentToNodes(inputText),
       time: this.getCurrentTime()
     };
 
     const messages = [...this.data.messages, userMessage];
+    const aiMessage = {
+      type: 'ai',
+      content: '',
+      nodes: [],
+      referencesArticles: [],
+      time: this.getCurrentTime()
+    };
+
+    const finalMessages = [...messages, aiMessage];
+
     this.setData({
-      messages,
+      messages: finalMessages,
       inputText: '',
       isLoading: true
     });
 
     // 滚动到底部
     this.scrollToBottom();
+    const aiIndex = finalMessages.length - 1;
+    this.startStream(inputText, aiIndex);
+  },
 
+  // 启动流式请求
+  startStream(question, aiIndex) {
+    this.abortStreamTask();
+
+    const task = request.chatWithAIStream({
+      question,
+      onMessage: (delta) => this.appendAIContent(aiIndex, delta),
+      onReferences: (refs) => this.updateAIReferences(aiIndex, refs),
+      onDone: () => this.finishStreaming(),
+      onError: (err) => this.handleStreamError(err, aiIndex)
+    });
+
+    if (task && task.onChunkReceived) {
+      this.setData({ streamTask: task });
+    } else {
+      // 回退到非流式接口
+      this.fetchAIOnce(question, aiIndex);
+    }
+  },
+
+  // 非流式兜底
+  async fetchAIOnce(question, aiIndex) {
     try {
-      // 调用AI接口
-      const response = await request.chatWithAI({
-        question: inputText
-      });
-
-      // 添加AI回复
-      const aiMessage = {
-        type: 'ai',
-        content: response.answer || response.reply || response.message || '抱歉，我暂时无法理解你的问题。',
-        referencesArticles: response['references-articles'] || [],
-        time: this.getCurrentTime()
-      };
-
-      this.setData({
-        messages: [...messages, aiMessage],
-        isLoading: false
-      });
-
-      // 滚动到底部
-      this.scrollToBottom();
+      const response = await request.chatWithAI({ question });
+      this.updateAIMessage(aiIndex, response);
     } catch (error) {
-      console.error('AI对话失败：', error);
-      wx.showToast({
-        title: error || '发送失败，请重试',
-        icon: 'none'
-      });
+      this.handleStreamError(error, aiIndex);
+    }
+  },
 
-      // 添加错误消息
-      const errorMessage = {
-        type: 'ai',
-        content: '抱歉，发送消息时出现了错误，请稍后再试。',
-        time: this.getCurrentTime()
-      };
+  appendAIContent(index, delta = '') {
+    if (!delta || !this.data.messages[index]) return;
+    const key = `messages[${index}].content`;
+    const next = `${this.data.messages[index].content || ''}${delta}`;
+    this.setData({
+      [key]: next,
+      [`messages[${index}].nodes`]: this.formatContentToNodes(next)
+    });
+    this.scrollToBottom();
+  },
 
+  updateAIReferences(index, refs = []) {
+    if (!this.data.messages[index]) return;
+    const key = `messages[${index}].referencesArticles`;
+    this.setData({ [key]: refs });
+  },
+
+  updateAIMessage(index, response = {}) {
+    const content = response.answer || response.reply || response.message || '抱歉，我暂时无法理解你的问题。';
+    const refs = response['references-articles'] || response.referencesArticles || [];
+    this.setData({
+      [`messages[${index}].content`]: content,
+      [`messages[${index}].nodes`]: this.formatContentToNodes(content),
+      [`messages[${index}].referencesArticles`]: refs,
+      isLoading: false,
+      streamTask: null
+    });
+    this.scrollToBottom();
+  },
+
+  finishStreaming() {
+    if (!this.data.isLoading) return;
+    this.setData({
+      isLoading: false,
+      streamTask: null
+    });
+  },
+
+  handleStreamError(error, aiIndex) {
+    console.error('AI对话失败：', error);
+    wx.showToast({
+      title: error || '发送失败，请重试',
+      icon: 'none'
+    });
+
+    if (this.data.messages[aiIndex]) {
       this.setData({
-        messages: [...messages, errorMessage],
-        isLoading: false
+        [`messages[${aiIndex}].content`]: '抱歉，发送消息时出现了错误，请稍后再试。',
+        [`messages[${aiIndex}].nodes`]: this.formatContentToNodes('抱歉，发送消息时出现了错误，请稍后再试。')
       });
+    }
+
+    this.setData({
+      isLoading: false,
+      streamTask: null
+    });
+  },
+
+  formatContentToNodes(content = '') {
+    const paragraphs = String(content || '').split(/\n\s*\n/); // 按空行切段
+    const nodes = [];
+    paragraphs.forEach((para, pIdx) => {
+      const lines = para.split('\n');
+      const children = [];
+      lines.forEach((line, lIdx) => {
+        children.push({ type: 'text', text: line });
+        if (lIdx !== lines.length - 1) {
+          children.push({ name: 'br' });
+        }
+      });
+      nodes.push({
+        name: 'p',
+        attrs: { style: 'margin: 0 0 12rpx 0;' },
+        children
+      });
+      if (pIdx !== paragraphs.length - 1) {
+        nodes.push({ name: 'br' });
+      }
+    });
+    return nodes;
+  },
+
+  abortStreamTask() {
+    if (this.data.streamTask && this.data.streamTask.abort) {
+      this.data.streamTask.abort();
     }
   },
 
@@ -152,6 +251,7 @@ Page({
               {
                 type: 'ai',
                 content: '对话已清空，有什么可以帮助你的吗？',
+                nodes: this.formatContentToNodes('对话已清空，有什么可以帮助你的吗？'),
                 time: this.getCurrentTime()
               }
             ]
@@ -170,7 +270,6 @@ Page({
   openArticle(e) {
     const url = e.currentTarget.dataset.url;
     if (url) {
-      // 对URL进行编码
       const encodedUrl = encodeURIComponent(url);
       console.log('打开文章链接：', url);
       wx.navigateTo({

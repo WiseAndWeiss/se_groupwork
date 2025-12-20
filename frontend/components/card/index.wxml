@@ -1,4 +1,4 @@
-<view class="card">
+<view class="card" bindtap="onExpand">
   <!-- 原有Card结构完全保留 -->
   <view class="header">
     <text class="title {{isExpanded ? 'expanded' : ''}}">{{title}}</text>
@@ -6,11 +6,8 @@
       <view class="star-container {{is_favorited ? 'favorited' : ''}} {{animateStar ? 'animate' : ''}}">
         <image class="icon icon-star"
           src="{{is_favorited ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}"
-          bindtap="onFavourite" mode="widthFix" />
+          catchtap="onFavourite" mode="widthFix" />
       </view>
-      <image class="icon icon-arrow"
-        src="{{isExpanded ? '/assets/icons/arrow-up.svg' : '/assets/icons/arrow-down.svg'}}"
-        bindtap="onExpand" mode="widthFix" />
     </view>
   </view>
 
@@ -29,8 +26,8 @@
     <view class="desc">{{desc}}</view>
     <!-- 原文链接 + 添加待办按钮 -->
     <view class="link-group">
-      <view class="original-link" bindtap="openWebView" data-url="{{url}}">原文链接</view>
-      <view class="add-todo-btn" bindtap="handleAddTodo">添加待办</view>
+      <view class="original-link" catchtap="openWebView" data-url="{{url}}">原文链接</view>
+      <view class="add-todo-btn" catchtap="handleAddTodo">添加待办</view>
     </view>
   </view>
 </view>

@@ -55,7 +55,7 @@ Page({
   // 页面卸载时清理（比如跳转到其他Tab页面、关闭页面）
   onHide() {
     console.log('首页页面卸载，彻底清理数据');
-    this.clearPageData();
+    // this.clearPageData();
   },
 
   clearPageData() {
@@ -192,7 +192,7 @@ Page({
         const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
         
         // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
-        const reach_end = newArticles.length < this.data.pageSize;
+        const reach_end = response.reach_end;
         
         this.setData({
           selectionList: finalList,
@@ -250,16 +250,19 @@ Page({
 
   // 跳转到校内页面（Tab 切换）
   goToCampus() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/campus/campus' });
   },
   
   // 跳转到自选页面（Tab 切换）
   goToSelection() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/selection/selection' });
   },
   
   // 跳转到我的页面（Tab 切换）
   goToUser() {
+    this.clearPageData();
     wx.switchTab({ url: '/pages/user/user' });
   }
 });
