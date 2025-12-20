@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+import threading
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework import status
@@ -10,6 +11,9 @@ from user.serializers import PublicAccountSerializer, SubscriptionSerializer
 from article_selector.article_selector import get_customized_accounts
 from article_selector.serializers import ArticleSerializer
 from webspider.webspider.biz_searcher import BizSearcher
+
+# 限制爬虫搜索并发，防止被封：每进程最多 3 个并发
+BIZ_SEARCH_SEMAPHORE = threading.Semaphore(3)
 # Create your views here.
 
 # 公众号相关API
@@ -107,29 +111,36 @@ class SearchNewAccountListView(APIView):
                 {'error': '请提供公众号名称参数'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
+        acquired = BIZ_SEARCH_SEMAPHORE.acquire(blocking=False)
+        if not acquired:
+            return Response({'error': '接口繁忙，请稍后再试'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
         # 安全性：确保数据库中没有该公众号再去爬取，减少爬虫负担
-        if PublicAccount.objects.filter(name=name).exists():
-            accounts = PublicAccount.objects.filter(name__icontains=name)
+        try:
+            if PublicAccount.objects.filter(name=name).exists():
+                accounts = PublicAccount.objects.filter(name__icontains=name)
+                serializer = PublicAccountSerializer(accounts, many=True, context={'request': request})
+                return Response({
+                    'count': accounts.count(),
+                    'public_accounts': serializer.data
+                })
+
+            # 调用 BizSearcher 爬取公众号信息
+            biz_searcher = BizSearcher(name)
+            mp_dict = biz_searcher.biz_search()
+
+            # 如果爬虫没有返回结果，返回空列表
+            if not mp_dict:
+                return Response([])
+
+            # 从数据库中获取公众号信息
+            accounts = PublicAccount.objects.filter(name__in=mp_dict.keys())
             serializer = PublicAccountSerializer(accounts, many=True, context={'request': request})
-            return Response({
-                'count': accounts.count(),
-                'public_accounts': serializer.data
-            })
 
-        # 调用 BizSearcher 爬取公众号信息
-        biz_searcher = BizSearcher(name)
-        mp_dict = biz_searcher.biz_search()
-
-        # 如果爬虫没有返回结果，返回空列表
-        if not mp_dict:
-            return Response([])
-
-        # 从数据库中获取公众号信息
-        accounts = PublicAccount.objects.filter(name__in=mp_dict.keys())
-        serializer = PublicAccountSerializer(accounts, many=True, context={'request': request})
-
-        return Response(serializer.data)
+            return Response(serializer.data)
+        finally:
+            BIZ_SEARCH_SEMAPHORE.release()
 
 
 @extend_schema(
