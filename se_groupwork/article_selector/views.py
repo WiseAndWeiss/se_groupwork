@@ -252,10 +252,12 @@ class ArticleViewSet(viewsets.ViewSet):
 
         base_query = base_query.order_by('-publish_time')
 
-        total_count = base_query.count()
-        customized_articles = list(base_query[start_rank:start_rank + limit])
-        reached_end = start_rank + len(customized_articles) >= total_count
-        serializer = ArticleSerializer(customized_articles, many=True, context={'request': request})
+        # 仿照 filter：先取 limit+1 条判断是否到末尾，再截断为 limit
+        page_items = list(base_query[start_rank:start_rank + limit + 1])
+        reached_end = len(page_items) < limit
+        page_items = page_items[:limit]
+
+        serializer = ArticleSerializer(page_items, many=True, context={'request': request})
         return Response({
             'articles': serializer.data,
             'reach_end': reached_end
