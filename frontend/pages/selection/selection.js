@@ -724,7 +724,8 @@ Page({
     const hasSearch = !!this.data.searchContent.trim();
     if (hasSearch) {
       const isSameQuery = this.data.lastSearchContent === this.data.searchContent;
-      this.loadFilteredCustomizedArticles(!isSameQuery);
+      this.setData({searchContent: this.data.lastSearchContent});
+      this.loadFilteredCustomizedArticles(false)
       return;
     }
 
@@ -732,7 +733,7 @@ Page({
   },
 
   async loadCustomizedArticles(reset = false) {
-    if (this.data.isLoading || this.data.reach_end) return; 
+    if (this.data.isLoading) return; 
     this.setData({ 
         isLoading: true,
         showLoadingAnimation: true ,// 显示加载动画
@@ -854,7 +855,7 @@ Page({
   },
 
   async loadFilteredCustomizedArticles(reset = false) {
-    if (this.data.isLoading || this.data.reach_end) return;
+    if (this.data.isLoading) return;
     this.setData({ 
         isLoading: true,
         showLoadingAnimation: true ,// 显示加载动画
