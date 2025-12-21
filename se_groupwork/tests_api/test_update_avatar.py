@@ -82,3 +82,26 @@ class AvatarUpdateTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.user.refresh_from_db()
         self.assertIsNotNone(self.user.avatar)
+
+    def test_update_avatar_too_large(self):
+        """测试上传超过1MB的图片"""
+        import numpy as np
+        # 生成随机像素，避免压缩
+        size = (1200, 1200)  # PNG格式下此尺寸通常大于1MB
+        arr = np.random.randint(0, 256, (size[1], size[0], 3), dtype=np.uint8)
+        image = Image.fromarray(arr, 'RGB')
+        buffer = BytesIO()
+        image.save(buffer, format='PNG')
+        buffer.seek(0)
+        # 确保图片大小大于1MB
+        self.assertTrue(buffer.getbuffer().nbytes > 1024 * 1024, f"图片大小为{buffer.getbuffer().nbytes}字节，未超过1MB")
+        image_file = SimpleUploadedFile(
+            'large_test.png',
+            buffer.getvalue(),
+            content_type='image/png'
+        )
+        data = {'avatar': image_file}
+        response = self.client.patch(self.url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+        self.assertIn('大小', response.data['error'])

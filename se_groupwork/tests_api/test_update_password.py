@@ -22,8 +22,8 @@ class PasswordUpdateTests(TestCase):
         """测试成功修改密码"""
         data = {
             'old_password': 'OldPass123!',
-            'new_password': 'NewStrongPass456!',
-            'confirm_password': 'NewStrongPass456!'
+            'new_password': 'NewStrongPass1!',
+            'confirm_password': 'NewStrongPass1!'
         }
         response = self.client.post(self.url, data)
         
@@ -33,7 +33,7 @@ class PasswordUpdateTests(TestCase):
         
         # 验证新密码可以登录
         self.user.refresh_from_db()
-        user = authenticate(username='testuser', password='NewStrongPass456!')
+        user = authenticate(username='testuser', password='NewStrongPass1!')
         self.assertIsNotNone(user)
 
     def test_change_password_wrong_old_password(self):

@@ -53,7 +53,7 @@ class SqliteVectorTool:
         
         self._init_db()
         if self.test_mode:
-            self._clear_index()
+            self.clear_index()
 
     def _check_connection(self, conn):
         """检查连接是否健康"""
