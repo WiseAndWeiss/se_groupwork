@@ -140,9 +140,41 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
               return;
             }
 
-            rejectUpload(res.data || '上传失败');
+            if (res.statusCode === 413) { 
+              rejectUpload({
+                statusCode: res.statusCode,
+                data: '文件过大，头像不能超过1MB',
+                error: '文件过大，头像不能超过1MB',
+                message: '上传失败'
+              });
+              return;
+            }
+
+            let errorMsg = '上传失败';
+            if (res.data) {
+              try {
+                const parsedData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                errorMsg = parsedData.error || parsedData.detail || parsedData.message || '上传失败';
+              } catch (e) {
+                errorMsg = res.data;
+              }
+            }
+
+            rejectUpload({
+              statusCode: res.statusCode,
+              data: res.data,
+              error: errorMsg,
+              message: errorMsg
+            });
           },
-          fail: (err) => rejectUpload(err.errMsg || '网络失败')
+          fail: (err) => {
+            rejectUpload({
+              statusCode: 0,
+              data: null,
+              error: err.errMsg || '网络失败',
+              message: err.errMsg || '网络失败'
+            });
+          }
         });
       });
 
@@ -668,10 +700,32 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
             return;
           }
 
-          const errorMsg = res.data?.message || res.data?.detail || `请求失败`;
-          rejectRequest(errorMsg);
+          let errorMsg = '请求失败';
+          if (res.data) {
+            // 尝试多种可能的错误信息字段
+            errorMsg = res.data.error || 
+                      res.data.detail || 
+                      res.data.message || 
+                      (typeof res.data === 'string' ? res.data : JSON.stringify(res.data));
+          }
+
+          rejectRequest({
+            statusCode: res.statusCode,
+            data: res.data,
+            error: errorMsg,
+            message: errorMsg
+          });
         },
-        fail: (err) => rejectRequest(err.errMsg || '网络失败')
+        fail: (err) => {
+          // reject 一个结构化的错误对象
+          rejectRequest({
+            statusCode: 0, // 网络错误没有状态码
+            data: null,
+            error: err.errMsg || '网络失败',
+            message: err.errMsg || '网络失败',
+            errMsg: err.errMsg
+          });
+        }
       });
     });
 

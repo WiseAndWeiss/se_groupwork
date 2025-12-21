@@ -22,12 +22,12 @@ Page({
   /*onPullDownRefresh: function() {
     console.log('下拉刷新：同步用户信息');
     this.getUserInfo(true); // 传 true 表示刷新场景
-  },
-
-   // 页面显示时获取（返回页面时触发）
-   onShow: function() {
-    this.getUserInfo(); 
   },*/
+
+  // 页面显示时获取（返回页面时触发）
+  onShow: function() {
+    this.getUserInfo(); 
+  },
 
 
   //从 Mock 接口获取用户信息（对接 GET /user/auth/profile/）
