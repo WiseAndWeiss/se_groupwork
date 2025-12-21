@@ -711,7 +711,7 @@ const deleteAllFavourite = () => request('/user/favorites/', 'DELETE');
 //历史
 const addHistory = (data) => request('/user/history/', 'POST', data);
 const deleteHistory = (articleId) => request(`/user/history/${articleId}/`, 'DELETE');
-const getHistoryList = () => request('/user/history/', 'GET');
+const getHistoryList = (startRank = 0) => request('/user/history/', 'GET', {start_rank: startRank});
 const deleteAllHistory = () => request('/user/history/', 'DELETE');
 //登陆与注册
 const login = (data) => {

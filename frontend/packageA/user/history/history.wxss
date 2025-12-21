@@ -66,7 +66,7 @@ page {
     
   /* 历史记录容器 */
   .history-container {
-    padding: 200rpx 30rpx 30rpx;
+    padding: 200rpx 0rpx 0rpx;
   }
   
   .card-scroll {
