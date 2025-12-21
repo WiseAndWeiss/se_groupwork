@@ -28,6 +28,11 @@ Page({
     const eventChannel = this.getOpenerEventChannel();
     eventChannel.on('passUserInfo', (data) => {
       console.log('修改页面接收的数据：', data.userInfo);
+
+      const userInfo = data.userInfo;
+      if (userInfo.avatar) {
+        userInfo.avatar = this.processAvatarUrl(userInfo.avatar);
+      }
       this.setData({ 
         form: data.userInfo,
         // 初始化临时数据为当前值
@@ -91,6 +96,24 @@ Page({
   },
 
   // ========== 头像选择与修改 ==========
+
+  processAvatarUrl(url) {
+    if (!url) return '';
+    // 如果是本地临时路径，直接返回
+    if (url.startsWith('wxfile://') || url.startsWith('http://tmp/')) {
+      return url;
+    }
+    // 如果已经是完整URL，直接返回
+    if (url.startsWith('http')) {
+      return url;
+    }
+    // 如果是相对路径，拼接完整URL
+    if (url.startsWith('/')) {
+      return 'https://' + url;
+    }
+    // 其他情况，可能是服务器返回的相对路径
+    return 'https://' + url;
+  },
   chooseTempAvatar() {
     wx.chooseImage({
       count: 1,
@@ -107,15 +130,20 @@ Page({
     }
     try {
       wx.showLoading({ title: '修改中...' });
-      await request.updateAvatar(this.data.tempAvatar);
+      const res = await request.updateAvatar(this.data.tempAvatar);
+      if (res && res.error) {
+        this.showErrorModal('头像修改失败', res.error);
+        return;
+      }
       this.setData({ 
         'form.avatar': this.data.tempAvatar,
         showAvatarModal: false 
       });
       wx.showToast({ title: '头像修改成功', icon: 'success' });
     } catch (err) {
+      const errorMsg = this.extractErrorMessage(err);
+      this.showErrorModal('头像修改失败', errorMsg);
       console.error('头像修改失败：', err);
-      wx.showToast({ title: '修改失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
@@ -138,15 +166,20 @@ Page({
     if (!this.validateUsername()) return;
     try {
       wx.showLoading({ title: '修改中...' });
-      await request.updateUsername({ new_username: this.data.tempUsername.trim() });
+      const res = await request.updateUsername({ new_username: this.data.tempUsername.trim() });
+      if (res && res.error) {
+        this.showErrorModal('昵称修改失败', res.error);
+        return;
+      }
       this.setData({ 
         'form.username': this.data.tempUsername.trim(),
         showUsernameModal: false 
       });
       wx.showToast({ title: '昵称修改成功', icon: 'success' });
     } catch (err) {
+      const errorMsg = this.extractErrorMessage(err);
+      this.showErrorModal('昵称修改失败', errorMsg);
       console.error('昵称修改失败：', err);
-      wx.showToast({ title: '修改失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
@@ -171,15 +204,20 @@ Page({
     if (!this.validateEmail()) return;
     try {
       wx.showLoading({ title: '修改中...' });
-      await request.updateEmail({ new_email: this.data.tempEmail.trim() });
+      const res = await request.updateEmail({ new_email: this.data.tempEmail.trim() });
+      if (res && res.error) {
+        this.showErrorModal('邮箱修改失败', res.error);
+        return;
+      }
       this.setData({ 
         'form.email': this.data.tempEmail.trim(),
         showEmailModal: false 
       });
       wx.showToast({ title: '邮箱修改成功', icon: 'success' });
     } catch (err) {
+      const errorMsg = this.extractErrorMessage(err);
+      this.showErrorModal('邮箱修改失败', errorMsg);
       console.error('邮箱修改失败：', err);
-      wx.showToast({ title: '修改失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
@@ -202,15 +240,20 @@ Page({
     if (!this.validatePhone()) return;
     try {
       wx.showLoading({ title: '修改中...' });
-      await request.updatePhone({ new_phone: this.data.tempPhone.trim() });
+      const res = await request.updatePhone({ new_phone: this.data.tempPhone.trim() });
+      if (res && res.error) {
+        this.showErrorModal('手机号修改失败', res.error);
+        return;
+      }
       this.setData({ 
         'form.phone_number': this.data.tempPhone.trim(),
         showPhoneModal: false 
       });
       wx.showToast({ title: '手机号修改成功', icon: 'success' });
     } catch (err) {
+      const errorMsg = this.extractErrorMessage(err);
+      this.showErrorModal('手机号修改失败', errorMsg);
       console.error('手机号修改失败：', err);
-      wx.showToast({ title: '修改失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
@@ -259,22 +302,63 @@ Page({
     if (!this.validatePwd()) return;
     try {
       wx.showLoading({ title: '修改中...' });
-      await request.updatePassword({ 
+      const res = await request.updatePassword({ 
         old_password: this.data.tempOldPwd,
         new_password: this.data.tempNewPwd,
         confirm_password: this.data.tempConfirmPwd
       });
+      if (res && res.error) {
+        this.showErrorModal('密码修改失败', res.error);
+        return;
+      }
       this.setData({ showPwdModal: false });
       wx.showToast({ title: '密码修改成功', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();
       }, 1000);
     } catch (err) {
+      const errorMsg = this.extractErrorMessage(err);
+      this.showErrorModal('密码修改失败', errorMsg);
       console.error('密码修改失败：', err);
-      wx.showToast({ title: err.message || '修改失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
+  },
+
+  // ========== 新增：统一错误信息提取方法 ==========
+  extractErrorMessage(err) {
+    // 优先从响应数据中提取错误信息[1,4](@ref)
+    if (err && err.data && err.data.error) {
+      return err.data.error;
+    }
+    // 处理HTTP 400状态码的响应[7](@ref)
+    if (err && err.statusCode === 400 && err.data && err.data.error) {
+      return err.data.error;
+    }
+    // 检查错误对象本身的error属性
+    if (err && err.error) {
+      return err.error;
+    }
+    // 检查错误消息
+    if (err && err.message) {
+      return err.message;
+    }
+    // 检查errMsg（微信小程序API错误常见字段）
+    if (err && err.errMsg) {
+      return err.errMsg;
+    }
+    // 默认错误信息
+    return '操作失败，请重试';
+  },
+
+  // ========== 新增：统一错误提示方法 ==========
+  showErrorModal(title, content) {
+    wx.showModal({
+      title: title,
+      content: content,
+      showCancel: false,
+      confirmText: '知道了'
+    });
   },
 
   // 返回上一页

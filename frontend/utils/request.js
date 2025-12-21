@@ -21,47 +21,164 @@ const decodeBuffer = (buffer) => {
 
 let access_token = wx.getStorageSync('access_token') || '';
 let refresh_token = wx.getStorageSync('refresh_token') || '';
+const LOGIN_URL = '/user/auth/login/';
+const REGISTER_URL = '/user/auth/register/';
+const TOKEN_REFRESH_URL = '/user/auth/token/refresh/';
+let refreshPromise = null;
 const MOCK_ENABLE = false; // 核心：关闭Mock，启用真实后端请求
 const mockApi = require('./mockConfig.js'); // 保留（若需临时开启Mock）
 
+const shouldSkipAuthHeader = (url) => [LOGIN_URL, REGISTER_URL, TOKEN_REFRESH_URL].includes(url);
+
+const persistTokens = ({ access, refresh }) => {
+  if (refresh) {
+    refresh_token = refresh;
+    wx.setStorageSync('refresh_token', refresh);
+  }
+  if (access) {
+    access_token = access;
+    wx.setStorageSync('access_token', access);
+  }
+};
+
+const clearTokens = () => {
+  access_token = '';
+  refresh_token = '';
+  wx.removeStorageSync('access_token');
+  wx.removeStorageSync('refresh_token');
+};
+
+const refreshAccessToken = () => {
+  if (!refresh_token) {
+    return Promise.reject('缺少 refresh token');
+  }
+
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = new Promise((resolve, reject) => {
+    wx.request({
+      url: `${baseUrl}${TOKEN_REFRESH_URL}`,
+      method: 'POST',
+      data: { refresh: refresh_token },
+      header: {
+        'Content-Type': 'application/json'
+      },
+      success: (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300 && (res.data?.access || res.data?.refresh)) {
+          persistTokens({ access: res.data.access, refresh: res.data.refresh });
+          resolve(res.data.access || access_token);
+          return;
+        }
+        clearTokens();
+        reject(res.data?.detail || res.data?.message || '刷新失败');
+      },
+      fail: (err) => {
+        clearTokens();
+        reject(err.errMsg || '网络失败');
+      }
+    });
+  }).finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+};
+
+const trySilentRefresh = async () => {
+  if (!refresh_token) return false;
+  try {
+    await refreshAccessToken();
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
   return new Promise((resolve, reject) => {
+    const needAuthHeader = !shouldSkipAuthHeader(url);
+
     // 检查是否是文件上传请求（通过特殊字段标识）
     if (!MOCK_ENABLE && data.__isFileUpload) {
-       // 确保 data 是对象类型
-       const uploadData = typeof data === 'string' ? { filePath: data } : data;
-      
-       // 提取必要的参数
-       const filePath = uploadData.filePath;
-       const fieldName = uploadData.fieldName || 'file';
-       const formData = uploadData.formData || {};
-      
-       // 验证 filePath 是否为字符串
-       if (typeof filePath !== 'string') {
-         reject('filePath 必须是字符串类型');
-         return;
-       }
-      wx.uploadFile({
-        url: `${baseUrl}${url}`,
-        filePath: filePath,
-        name: fieldName, // 动态字段名
-        header: {
-          'Authorization': access_token ? `Bearer ${access_token}` : ''
-        },
-        formData: formData,
-        success: (res) => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            try {
-              resolve(JSON.parse(res.data));
-            } catch (e) {
-              resolve(res.data);
+      // 确保 data 是对象类型
+      const uploadData = typeof data === 'string' ? { filePath: data } : data;
+
+      // 提取必要的参数
+      const filePath = uploadData.filePath;
+      const fieldName = uploadData.fieldName || 'file';
+      const formData = uploadData.formData || {};
+
+      // 验证 filePath 是否为字符串
+      if (typeof filePath !== 'string') {
+        reject('filePath 必须是字符串类型');
+        return;
+      }
+
+      const upload = (isRetry = false) => new Promise((resolveUpload, rejectUpload) => {
+        wx.uploadFile({
+          url: `${baseUrl}${url}`,
+          filePath: filePath,
+          name: fieldName, // 动态字段名
+          header: {
+            ...(needAuthHeader && access_token ? { 'Authorization': `Bearer ${access_token}` } : {})
+          },
+          formData: formData,
+          success: (res) => {
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                resolveUpload(JSON.parse(res.data));
+              } catch (e) {
+                resolveUpload(res.data);
+              }
+              return;
             }
-          } else {
-            reject(res.data || '上传失败');
+
+            if (res.statusCode === 401 && needAuthHeader && refresh_token && !isRetry) {
+              refreshAccessToken()
+                .then(() => upload(true).then(resolveUpload).catch(rejectUpload))
+                .catch((err) => rejectUpload(err || '登录已过期，请重新登录'));
+              return;
+            }
+
+            if (res.statusCode === 413) { 
+              rejectUpload({
+                statusCode: res.statusCode,
+                data: '文件过大，头像不能超过1MB',
+                error: '文件过大，头像不能超过1MB',
+                message: '上传失败'
+              });
+              return;
+            }
+
+            let errorMsg = '上传失败';
+            if (res.data) {
+              try {
+                const parsedData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                errorMsg = parsedData.error || parsedData.detail || parsedData.message || '上传失败';
+              } catch (e) {
+                errorMsg = res.data;
+              }
+            }
+
+            rejectUpload({
+              statusCode: res.statusCode,
+              data: res.data,
+              error: errorMsg,
+              message: errorMsg
+            });
+          },
+          fail: (err) => {
+            rejectUpload({
+              statusCode: 0,
+              data: null,
+              error: err.errMsg || '网络失败',
+              message: err.errMsg || '网络失败'
+            });
           }
-        },
-        fail: (err) => reject(err.errMsg || '网络失败')
+        });
       });
+
+      upload().then(resolve).catch(reject);
       return;
     }
     if (MOCK_ENABLE) {
@@ -559,29 +676,60 @@ const request = (url, method = 'GET', data = {}, isFileUpload = false) => {
     }
 
     // 后端接口逻辑（MOCK_ENABLE=false 时生效）
-    wx.request({
-      url: `${baseUrl}${url}`,
-      method,
-      data,
-      header: {
-        'Content-Type': 'application/json',
-        'Authorization': access_token ? `Bearer ${access_token}` : ''
-      },
-      
-      success: (res) => {
-        console.log('实际请求响应:', res); // 添加调试日志
-        // 根据HTTP状态码判断，2xx状态码都认为是成功
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(res.data); // 直接返回后端数据
-        } 
-        // 错误处理
-        else {
-            const errorMsg = res.data?.message || res.data?.detail || `请求失败`;
-            reject(errorMsg);
+    const doRequest = (isRetry = false) => new Promise((resolveRequest, rejectRequest) => {
+      wx.request({
+        url: `${baseUrl}${url}`,
+        method,
+        data,
+        header: {
+          'Content-Type': 'application/json',
+          ...(needAuthHeader && access_token ? { 'Authorization': `Bearer ${access_token}` } : {})
+        },
+        
+        success: (res) => {
+          console.log('实际请求响应:', res);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolveRequest(res.data);
+            return;
+          }
+
+          if (res.statusCode === 401 && needAuthHeader && refresh_token && !isRetry) {
+            refreshAccessToken()
+              .then(() => doRequest(true).then(resolveRequest).catch(rejectRequest))
+              .catch((err) => rejectRequest(err || '登录已过期，请重新登录'));
+            return;
+          }
+
+          let errorMsg = '请求失败';
+          if (res.data) {
+            // 尝试多种可能的错误信息字段
+            errorMsg = res.data.error || 
+                      res.data.detail || 
+                      res.data.message || 
+                      (typeof res.data === 'string' ? res.data : JSON.stringify(res.data));
+          }
+
+          rejectRequest({
+            statusCode: res.statusCode,
+            data: res.data,
+            error: errorMsg,
+            message: errorMsg
+          });
+        },
+        fail: (err) => {
+          // reject 一个结构化的错误对象
+          rejectRequest({
+            statusCode: 0, // 网络错误没有状态码
+            data: null,
+            error: err.errMsg || '网络失败',
+            message: err.errMsg || '网络失败',
+            errMsg: err.errMsg
+          });
         }
-      },
-      fail: (err) => reject(err.errMsg || '网络失败')
+      });
     });
+
+    doRequest().then(resolve).catch(reject);
   });
 };
 
@@ -617,7 +765,7 @@ const deleteAllFavourite = () => request('/user/favorites/', 'DELETE');
 //历史
 const addHistory = (data) => request('/user/history/', 'POST', data);
 const deleteHistory = (articleId) => request(`/user/history/${articleId}/`, 'DELETE');
-const getHistoryList = () => request('/user/history/', 'GET');
+const getHistoryList = (startRank = 0) => request('/user/history/', 'GET', {start_rank: startRank});
 const deleteAllHistory = () => request('/user/history/', 'DELETE');
 //登陆与注册
 const login = (data) => {
@@ -709,20 +857,27 @@ const chatWithAIStream = ({ question, onMessage, onReferences, onDone, onError }
     buffer = lines.pop() || '';
 
     lines.forEach((line) => {
-      let payload = line.trim();
-      if (!payload) return;
+      let payload = line;
 
+      // 去掉 data: 前缀但不整体 trim，保留前后空白换行信息
       if (payload.startsWith('data:')) {
-        payload = payload.slice(5).trim();
+        payload = payload.slice(5);
+        if (payload.startsWith(' ')) payload = payload.slice(1);
       }
+
+      // 去除行尾的回车符
+      if (payload.endsWith('\r')) payload = payload.slice(0, -1);
+
+      const sentinel = payload.trim();
+      if (!payload && !sentinel) return;
 
       // 兼容后端直接输出文本 + [[REFERENCES]] JSON 的格式
       if (payload.includes('[[REFERENCES]]')) {
         const parts = payload.split('[[REFERENCES]]');
-        const textPart = (parts[0] || '').trim();
+        const textPart = (parts[0] || '');
         const refsRaw = (parts[1] || '').trim();
         if (textPart && onMessage) {
-          onMessage(textPart + '\n');
+          onMessage(textPart);
         }
         if (refsRaw) {
           try {
@@ -731,14 +886,13 @@ const chatWithAIStream = ({ question, onMessage, onReferences, onDone, onError }
               onReferences(refs);
             }
           } catch (err) {
-            // refs 解析失败时，不影响正文展示
             console.warn('refs parse failed', err, refsRaw);
           }
         }
         return;
       }
 
-      if (payload === '[DONE]' || payload === '[done]') {
+      if (sentinel === '[DONE]' || sentinel === '[done]') {
         finish();
         return;
       }
@@ -808,6 +962,9 @@ const chatWithAIStream = ({ question, onMessage, onReferences, onDone, onError }
 // AI对话（非流式兜底）
 const chatWithAI = (data) => request('/ask/', 'POST', data);
 
+const logout = () => clearTokens();
+const getStoredTokens = () => ({ access: access_token, refresh: refresh_token });
+
 // 所有方法
 module.exports = {
   resourceUrl,
@@ -856,5 +1013,9 @@ module.exports = {
   deleteTodo,
   getArticleDetail ,
   chatWithAI,
-  chatWithAIStream
+  chatWithAIStream,
+  trySilentRefresh,
+  refreshToken: refreshAccessToken,
+  logout,
+  getStoredTokens
 };
