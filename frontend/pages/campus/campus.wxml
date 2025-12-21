@@ -6,20 +6,20 @@
   <view class="navbar-title">校内</view>
 </view>
 
-<!-- 搜索栏 -->
+<!-- 搜索栏 - 外部独立搜索 -->
 <view class="search-bar">
   <view class="search-box">
     <view class="search-inner">
-      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchArticles"></image>
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchByOuterInput"></image>
       <input 
         type="text"
         placeholder="快速搜索动态"
         placeholder-class="search-placeholder"
         class="search-input"
-        bindinput="onSearchInput"  
-        value="{{searchContent}}" 
+        bindinput="onOuterSearchInput"  
+        value="{{outerSearchContent}}"  
       />
-      <view class="search-text-btn" bindtap="searchArticles">搜索</view>
+      <view class="search-text-btn" bindtap="searchByOuterInput">搜索</view>
     </view>
   </view>
   <image class="filter-icon" bindtap="showFilterPopup" src="/assets/icons/filter.svg"></image>
@@ -28,7 +28,7 @@
 <view class="article-list-container">
   <article-list 
     list="{{selectionList}}" 
-    emptyText="暂无匹配标签的动态"   
+    emptyText="{{emptyTip}}"   
     article_list_scrollHeight="calc(100vh - 450rpx)" 
     bind:loadmore="handleLoadMore" 
     isLoading="{{isLoading}}"
@@ -37,13 +37,26 @@
   />
 </view>
 
-<!-- 标签筛选悬浮窗 -->
-<!--关闭按钮-->
+<!-- 标签筛选悬浮窗 - 内部独立筛选 -->
 <view class="filter-mask" wx:if="{{isFilterShow}}" ></view>
 <view class="filter-popup" wx:if="{{isFilterShow}}">
   <view class="popup-header">
     <view class="popup-title">筛选</view>
     <image class="close-icon" bindtap="hideFilterPopup" src="/assets/icons/close.svg"></image>
+    
+    <view class="search-box">
+      <view class="search-inner">
+        <image class="search-icon" src="/assets/icons/search.svg" ></image>
+        <input 
+          type="text"
+          placeholder="快速搜索动态"
+          placeholder-class="search-placeholder"
+          class="search-input"
+          bindinput="onInnerSearchInput"  
+          value="{{innerSearchContent}}"  
+        />
+      </view>
+  </view>
   </view>
 
   <view class="filter-container">
@@ -153,7 +166,7 @@
         </view>
       </view>
 
-           <!-- 公众号 -->
+      <!-- 公众号 -->
       <view wx:if="{{currentCategory === 'account'}}" class="account-content">
         <scroll-view class="tag-scroll-view" scroll-y="true" style="height: 320rpx;">
             <view class="tag-row">
@@ -167,7 +180,7 @@
             </block>
             </view>
         </scroll-view>
-        </view>
+      </view>
 
       <!-- 其他标签 -->
       <view wx:if="{{currentCategory === 'other'}}" class="tags-content">
@@ -188,7 +201,7 @@
   <!-- 底部操作按钮 -->
   <view class="filter-actions">
     <view class="filter-btn reset-btn" bindtap="resetFilters">重置</view>
-    <view class="filter-btn confirm-btn" bindtap="applyFilters">确认</view>
+    <view class="filter-btn confirm-btn" bindtap="searchByFilter">确认</view> <!-- 改为触发筛选搜索 -->
   </view>
 </view>
 
