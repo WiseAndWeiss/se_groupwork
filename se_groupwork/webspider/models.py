@@ -75,7 +75,7 @@ class Article(models.Model):
         verbose_name='所属公众号'
     )
     title = models.CharField(
-        max_length=50,
+        max_length=100,
         verbose_name='文章标题'
     )
     content = models.TextField(

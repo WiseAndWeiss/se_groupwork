@@ -1,7 +1,10 @@
 # signals.py
+from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from user.models import Subscription, Favorite, History, Collection, User
+
+HISTORY_MAX_RECORDS = getattr(settings, 'HISTORY_MAX_RECORDS', 100)
 
 @receiver(post_save, sender=User)
 def create_default_collection(sender, instance, created, **kwargs):
@@ -96,6 +99,22 @@ def update_history_count_on_save(sender, instance, created, **kwargs):
         user = instance.user
         user.history_count += 1
         user.save(update_fields=['history_count'])
+
+
+@receiver(post_save, sender=History)
+def enforce_history_cap(sender, instance, **kwargs):
+    """Ensure per-user history does not exceed HISTORY_MAX_RECORDS (keep latest)."""
+    if not HISTORY_MAX_RECORDS or HISTORY_MAX_RECORDS <= 0:
+        return
+
+    qs = (
+        History.objects
+        .filter(user=instance.user)
+        .order_by('-viewed_at', '-id')
+    )
+    stale_ids = list(qs.values_list('id', flat=True)[HISTORY_MAX_RECORDS:])
+    if stale_ids:
+        History.objects.filter(id__in=stale_ids).delete()
 
 @receiver(post_delete, sender=History)
 def update_history_count_on_delete(sender, instance, **kwargs):

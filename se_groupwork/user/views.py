@@ -1,8 +1,7 @@
 import os
 from datetime import datetime, time
-from django.db import transaction
-from django.db.models import Q
-from django.db import transaction
+from django.db import transaction, IntegrityError
+from django.db.models import Q, OuterRef, Subquery
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth import update_session_auth_hash
@@ -173,8 +172,12 @@ class SubscriptionListView(APIView):
         
         if Subscription.objects.is_subscribed(request.user, public_account):
             return Response({'error': '已经订阅过该公众号'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        subscription = Subscription.objects.create_subscription(request.user, public_account)
+        try:
+            subscription = Subscription.objects.create_subscription(request.user, public_account)
+        except IntegrityError:
+            # 并发下触发唯一约束，按已订阅处理
+            return Response({'error': '已经订阅过该公众号'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = SubscriptionSerializer(subscription)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -183,26 +186,7 @@ class SubscriptionListView(APIView):
         Subscription.objects.clear_user_subscriptions(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
-@extend_schema(
-    tags=['订阅管理'],
-    summary='在订阅中查询符合query的订阅',
-    description='在订阅中查询符合query的订阅，如果查询参数为空则返回所有订阅',
-    methods=['GET'],
-    responses={
-        200: OpenApiResponse(description='成功获取订阅列表'),
-    },
-    parameters=[
-            OpenApiParameter(
-                name="name",
-                type=str,
-                location=OpenApiParameter.QUERY,
-                description="公众号名称",
-                required=False,
-                examples=[OpenApiExample(name="name", value="清华大学")]
-            )
-        ],
-)
+
 class SearchSubscriptionListView(APIView):
     """
     在已订阅的公众号中查询符合query的公众号
@@ -555,8 +539,20 @@ class FavoriteListView(APIView):
         collection = None
         if collection_id:
             collection = get_object_or_404(Collection, pk=collection_id, user=request.user)
+        else:
+            # 使用默认收藏夹
+            collection = Collection.objects.get(user=request.user, is_default=True)
+        
+        # 检查收藏夹里的收藏数是否已达到100
+        if collection.favorite_count >= 100:
+            return Response({'error': '收藏夹已满，无法添加'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            favorite = Favorite.objects.create_favorite(request.user, article, collection)
+        except IntegrityError:
+            # 并发下触发唯一约束，按已收藏处理
+            return Response({'error': '已经收藏过该文章'}, status=status.HTTP_400_BAD_REQUEST)
 
-        favorite = Favorite.objects.create_favorite(request.user, article, collection)
         serializer = FavoriteSerializer(favorite)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -675,8 +671,18 @@ class FavoriteDetailView(APIView):
 @extend_schema(
     tags=['历史记录'],
     summary='历史记录列表',
-    description='获取用户的文章浏览历史',
+    description='获取用户的文章浏览历史（分页，start_rank，默认每次20条）',
     methods=['GET'],
+    parameters=[
+        OpenApiParameter(
+            name="start_rank",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="起始偏移量，默认0",
+            required=False,
+            examples=[OpenApiExample(name="start_rank", value=0), OpenApiExample(name="start_rank", value=20)]
+        ),
+    ],
     responses={
         200: OpenApiResponse(description='成功获取历史记录'),
         401: OpenApiResponse(description='未授权访问')
@@ -717,9 +723,32 @@ class HistoryListView(APIView):
     
     def get(self, request):
         """获取用户的所有浏览历史"""
-        histories = History.objects.get_user_history(request.user)
-        serializer = HistorySerializer(histories, many=True, context={'request': request})
-        return Response(serializer.data)
+        # 预取关联 + 注解收藏状态，避免 N+1 和大字段读取
+        start_rank = int(request.query_params.get('start_rank', 0))
+        favorite_subq = Favorite.objects.filter(user=request.user, article=OuterRef('article_id')).values('id')[:1]
+        qs = (
+            History.objects
+            .filter(user=request.user)
+            .select_related('article__public_account')
+            .annotate(is_favorited_id=Subquery(favorite_subq))
+            .only(
+                'id', 'viewed_at', 'article',
+                'article__id', 'article__title', 'article__article_url', 'article__publish_time',
+                'article__cover', 'article__summary', 'article__tags', 'article__key_info',
+                'article__relevant_time', 'article__public_account__name'
+            )
+        )
+
+        slice_qs = list(qs[start_rank:start_rank + 21])
+        reached_end = len(slice_qs) < 21
+        slice_qs = slice_qs[:20]
+
+        serializer = HistorySerializer(slice_qs, many=True, context={'request': request})
+        return Response({
+            'histories': serializer.data,
+            'reach_end': reached_end,
+            'start_rank': start_rank,
+        })
     
     def post(self, request):
         """创建或更新浏览历史记录"""

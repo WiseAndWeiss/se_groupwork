@@ -41,14 +41,14 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes')
-DEBUG = True
+DEBUG = False
 
 # Hosts allowed to serve the application. For development allow all hosts.
 allowed_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '')
 if allowed_hosts:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(',')]
 else:
-    ALLOWED_HOSTS = ['127.0.0.1','localhost','49.232.208.99']  # 开发环境默认
+    ALLOWED_HOSTS = ['127.0.0.1','localhost','49.232.208.99',]  # 开发环境默认
 
 
 # Application definition
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     "django_extensions",
     'rest_framework',
     'rest_framework.authtoken', 
@@ -165,6 +166,7 @@ SPECTACULAR_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -413,11 +415,22 @@ CSRF_COOKIE_SECURE = False # HTTP
 
 # CSRF 信任的来源
 CSRF_TRUSTED_ORIGINS = [
-    'http://49.232.208.99',   # 服务器地址
+    'https://403app.xyz',
+    'http://49.232.208.99',    # 服务器地址
     'http://localhost',        # 本地开发
     'http://127.0.0.1',        # 本地开发
 ]
 CSRF_COOKIE_SAMESITE = 'Lax'
+
+# CORS 配置
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://403app.xyz',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
 
 
 SECURE_HSTS_SECONDS = 31536000  # HSTS一年

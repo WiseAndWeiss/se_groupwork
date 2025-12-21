@@ -1,6 +1,7 @@
 import time
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from webspider.models import Article, PublicAccount
 from django.utils import timezone
 from user.models import History, User
@@ -170,6 +171,28 @@ class HistoryManagerTest(TestCase):
         
         self.assertFalse(History.objects.filter(id=history.id).exists())
         self.assertTrue(History.objects.filter(user=self.user, article=self.article2).exists())
+
+    def test_history_capped_at_max_records(self):
+        """历史记录应限制为最新N条"""
+        max_records = getattr(settings, 'HISTORY_MAX_RECORDS', 100)
+        articles = []
+        for i in range(max_records + 5):
+            time.sleep(0.001)
+            article = Article.objects.create(
+                title=f'测试文章cap{i}',
+                content=f'内容cap{i}',
+                public_account=self.public_account,
+                publish_time=timezone.now(),
+                article_url=f'http://example.com/article-cap-{i}',
+            )
+            articles.append(article)
+            History.objects.create_history(self.user, article)
+
+        histories = History.objects.filter(user=self.user)
+        self.assertEqual(histories.count(), max_records)
+        # 最早的几条应被清理
+        self.assertFalse(History.objects.filter(user=self.user, article=articles[0]).exists())
+        self.assertTrue(History.objects.filter(user=self.user, article=articles[-1]).exists())
 
 
 class HistoryRelationshipTest(TestCase):

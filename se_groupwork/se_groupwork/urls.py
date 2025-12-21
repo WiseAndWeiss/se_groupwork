@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from article_selector.views import ArticleViewSet
-from askAI.views import AskView
+from askAI.views import AskView, AskStreamView
 
 
 urlpatterns = [
@@ -42,6 +42,7 @@ urlpatterns = [
 
     # 智能体问答
     path('api/ask/', AskView.as_view(), name='ask'),
+    path('api/ask/stream/', AskStreamView.as_view(), name='ask-stream'),
 
     # API文档
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

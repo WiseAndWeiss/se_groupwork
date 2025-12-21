@@ -1,0 +1,1 @@
+测试方法：控制台输入 locust -f tests_pref/locust_XXX.py --host https://403app.xyz --users [用户数] --spawn-rate [每秒添加用户数] --run-time [运行时间，如5m] --headless
