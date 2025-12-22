@@ -46,21 +46,6 @@ def get_response(msg):
         response.raise_for_status()
         response_json = response.json()
         result = response_json.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-    except requests.exceptions.RequestException as e:
-        # TODO: 日志
-        print(f"[Error at ai_request.py::get_response] 请求出错: {e}")
-    except requests.exceptions.ConnectTimeout:
-        # TODO: 日志
-        print("[Error at ai_request.py::get_response] 网络连接超时")
-    except requests.exceptions.ReadTimeout:
-        # TODO: 日志
-        print("[Error at ai_request.py::get_response] 等待返回超时")
-    except requests.exceptions.HTTPError as e:
-        # TODO: 日志
-        print(f"[Error at ai_request.py::get_response] HTTP状态码: {e}")
-    except json.JSONDecodeError:
-        # TODO: 日志
-        print("[Error at ai_request.py::get_response] JSON解析错误")
     except Exception as e:
         # TODO: 日志
         print(f"[Error at ai_request.py::get_response] 未知错误: {e}")
@@ -68,12 +53,3 @@ def get_response(msg):
         session.close()
         return str(result)
     
-    
-
-if __name__ == "__main__":
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Why is the sky blue?"}
-    ]
-    response = get_response(messages)
-    print("\nFull Response:", response)

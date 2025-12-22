@@ -88,25 +88,22 @@ class TaskManager:
                 return resp | {"id": article_id}
         except Exception as e:
             # TODO: 日志
-            print(f"线程出错：{article_info['title']}")
-            print(e)
+            print(f"线程出错：{article_info['title']} | {e}")
             return None
         
     def startrun_fortest(self, task_pool):
         '''测试用方法，指定任务id，不操作数据库'''
-        self.task_pool = task_pool
         self.result = []
         with ThreadPoolExecutor(max_workers=self.max_workers, thread_name_prefix="remoteAIWorker") as executor:
             future_to_article = {
                 executor.submit(self._process_article, ArticleDAO.get_article_info(article_id)): article_id
-                for article_id in self.task_pool
+                for article_id in task_pool
             }
             for future in as_completed(future_to_article):
                 article_info = future_to_article[future]
                 try:
                     article_info = future.result()
-                    if article_info:
-                        self.result.append(article_info)
+                    article_info and self.result.append(article_info) # 等价与if article_info: .....
                 except Exception:
                     # TODO: 日志
                     print(f"线程出错：{article_info['title']}")
@@ -141,7 +138,7 @@ class TaskManager:
         self.task_pool.clear()
         return True
         
-if __name__ == "__main__":
-    # 实例用法
-    task_manager = TaskManager()
-    task_manager.startrun()
+# if __name__ == "__main__":
+#     # 实例用法
+#     task_manager = TaskManager()
+#     task_manager.startrun()

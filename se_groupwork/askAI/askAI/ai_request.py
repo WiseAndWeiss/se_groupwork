@@ -88,35 +88,9 @@ def get_stream_response(msg):
             except json.JSONDecodeError:
                 # 忽略解析失败的行（如心跳包/非标准格式）
                 continue
-
-    except requests.exceptions.RequestException as e:
-        print(f"[Error at ai_request.py::get_stream_response] 请求出错: {e}")
-        yield f"[错误] 请求AI服务失败：{str(e)[:50]}..."  # 流式返回错误信息
-    except requests.exceptions.ConnectTimeout:
-        print("[Error at ai_request.py::get_stream_response] 网络连接超时")
-        yield "[错误] 网络连接超时，请稍后重试"
-    except requests.exceptions.ReadTimeout:
-        print("[Error at ai_request.py::get_stream_response] 等待返回超时")
-        yield "[错误] AI响应超时，请稍后重试"
-    except requests.exceptions.HTTPError as e:
-        print(f"[Error at ai_request.py::get_stream_response] HTTP状态码: {e}")
-        yield f"[错误] AI服务返回异常状态码：{e}"
     except Exception as e:
         print(f"[Error at ai_request.py::get_stream_response] 未知错误: {e}")
         yield f"[错误] 未知错误：{str(e)[:50]}..."
     finally:
         session.close()
 
-    
-    
-
-if __name__ == "__main__":
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Why is the sky blue?"}
-    ]
-    full_response = ""
-    for chunk in get_stream_response(messages):
-        print(chunk, end="")
-        full_response += chunk
-    print("\n\nFull response:", full_response)

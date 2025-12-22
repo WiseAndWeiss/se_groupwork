@@ -6,9 +6,11 @@ from user.models import User, Subscription, History, Favorite
 from webspider.models import Article, PublicAccount
 from django.utils import timezone
 from remoteAI.remoteAI.vectorize import keywords_vectorize, tags_vectorize
+from se_groupwork.global_tools import global_meili_tool_load
 
 from datetime import datetime, timedelta
 import json
+import time
 
 class ArticleSelectorTests(TestCase):
 
@@ -16,6 +18,8 @@ class ArticleSelectorTests(TestCase):
     user = None
 
     def setUp(self):
+        meili_tool = global_meili_tool_load()
+        meili_tool.clear_index()
         with open('tests_api/testdata_articles_selector.json', 'r', encoding='utf-8') as f:
             self.testdata = json.load(f)
         # 创建测试用的User数据
@@ -145,14 +149,14 @@ class ArticleSelectorTests(TestCase):
         Subscription.objects.create_subscription(self.user, account_c2)
         # 测试
         require_1 ={
-            'accounts_id': [PublicAccount.objects.get(fakeid='T1').id, PublicAccount.objects.get(fakeid='C1').id],
+            'account_names': [PublicAccount.objects.get(fakeid='T1').name, PublicAccount.objects.get(fakeid='C1').name],
             'range': 'd',
             'tags': ['通知'],
             'date_from': (timezone.now() - timedelta(days=1)).date().strftime('%Y-%m-%d'),
             'date_to': (timezone.now() + timedelta(days=1)).date().strftime('%Y-%m-%d')
         }
         require_2 = {
-            'accounts_id': [PublicAccount.objects.get(fakeid='C1').id],
+            'account_names': ["Undefined"],
             'range': 'd'
         }
         date_from = timezone.datetime.strptime(require_1['date_from'], '%Y-%m-%d')
@@ -195,4 +199,15 @@ class ArticleSelectorTests(TestCase):
             content_type='application/json'
         )
         # 检查
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(reverse('articles-customized-latest-search'), data={'search_content': '2022'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        meili_tool = global_meili_tool_load()
+        meili_tool.sync_articles_index_with_mysql()
+        time.sleep(1)
+        response = self.client.post(
+            reverse('articles-filter'),
+            data=json.dumps(require),
+            content_type='application/json'
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

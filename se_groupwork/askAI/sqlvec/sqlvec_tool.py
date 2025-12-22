@@ -23,10 +23,6 @@ def serialize_f32(vector: List[float]) -> bytes:
     """将浮点向量序列化为bytes（sqlite-vec原生要求）"""
     return struct.pack("%sf" % len(vector), *vector)
 
-def deserialize_f32(data: bytes) -> List[float]:
-    """将bytes反序列化为浮点向量（可选，搜索时无需）"""
-    return list(struct.unpack("%sf" % (len(data) // 4), data))
-
 class SqliteVectorTool:
     _instance = None
     initialized = False
@@ -44,13 +40,9 @@ class SqliteVectorTool:
         self.test_mode = test_mode
         self.embedding = global_embedding_load()
         self.embedding_dim = settings.EMBEDDING_DIM  # 比如768
-        
+        print("[Info at sqlvec_tool.py::__init__] SqliteVectorTool 初始化", "testmode" if self.test_mode else "")
         # 数据库路径设置
-        if not self.test_mode:
-            self.db_path = settings.SQLITEVECTOR_DB_PATH
-        else:
-            self.db_path = settings.TMP_SQLITEVECTOR_DB_PATH_FOR_TEST
-        
+        self.db_path = settings.SQLITEVECTOR_DB_PATH if not self.test_mode else settings.TMP_SQLITEVECTOR_DB_PATH_FOR_TEST
         self._init_db()
         if self.test_mode:
             self.clear_index()
@@ -131,38 +123,12 @@ class SqliteVectorTool:
                     [chunk_rowid, article_id]
                 )
             conn.commit()
-            print(f"[Success] 文章{article_id}添加到向量库")
+            if not self.test_mode:
+                print(f"[Success] 文章{article_id}添加到向量库")
         except Exception as e:
             conn.rollback()
             print(f"[Error in _add_content_to_index] {e}")
             raise e
-        finally:
-            pass
-
-    def _delete_article_chunks(self, article_id: int):
-        """删除文章对应的所有chunk向量"""
-        conn = self._update_connection()
-        try:
-            # 先查该文章的所有chunk_rowid
-            cursor = conn.execute(
-                "SELECT chunk_rowid FROM chunk_article_mapping WHERE article_id = ?",
-                [article_id]
-            )
-            chunk_rowids = [row[0] for row in cursor.fetchall()]
-            if not chunk_rowids:
-                return
-            conn.execute(
-                f"DELETE FROM chunk_embeddings WHERE rowid IN ({','.join(['?']*len(chunk_rowids))})",
-                chunk_rowids
-            )
-            conn.execute(
-                "DELETE FROM chunk_article_mapping WHERE article_id = ?",
-                [article_id]
-            )
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            print(f"[Error in _delete_article_chunks] {e}")
         finally:
             pass
 

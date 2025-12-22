@@ -28,29 +28,15 @@ class MeilisearchTool:
 		if MeilisearchTool.initialized:
 			return
 		MeilisearchTool.initialized = True
-		print("[Info at meili_tools.py::__init__] MeilisearchTool 初始化", test_mode)
+		self.valid = False
+		self.test_mode = test_mode
+		print("[Info at meili_tools.py::__init__] MeilisearchTool 初始化", "testmode" if test_mode else "")
 		self.client = Client(settings.MEILISEARCH_HOST, settings.MEILISEARCH_API_KEY)
-		if not test_mode:
-			self.index_name = settings.MEILISEARCH_INDEX_NAME
-			self.index = self.check_and_create_index()
-			self.valid = self.index is not None
-		else:
-			self.index_name = settings.TMP_MEILISEARCH_INDEX_NAME_FOR_TEST
-			indexes = self.client.get_indexes()
-			uids = [index.uid for index in indexes['results']]
-			if self.index_name not in uids:
-				self.client.create_index(
-					uid = self.index_name,
-					options={"primaryKey": "id"}
-				)
-				time.sleep(0.1)
-				print("[Info at meili_tools.py::__init__] 索引创建成功")
-				self.index = self.client.get_index(self.index_name)
-			else:
-				self.index = self.client.get_index(self.index_name)
-				self.clear_index()
-			self.valid = self.index is not None
-
+		self.index_name = settings.MEILISEARCH_INDEX_NAME if not test_mode else settings.TMP_MEILISEARCH_INDEX_NAME_FOR_TEST
+		self.index = self.check_and_create_index()
+		self.valid = self.index is not None
+		if test_mode:
+			self.clear_index()
 
 	def check_and_create_index(self):
 		'''
@@ -60,10 +46,7 @@ class MeilisearchTool:
 			indexes = self.client.get_indexes()
 			uids = [index.uid for index in indexes['results']]
 			if self.index_name not in uids:
-				self.client.create_index(
-					uid = self.index_name,
-					options={"primaryKey": "id"}
-				)
+				self.client.create_index(uid = self.index_name, options={"primaryKey": "id"})
 				time.sleep(0.1)
 				print("[Info at meili_tools.py::check_and_create_index] 索引创建成功")
 			return self.client.get_index(self.index_name)
@@ -133,7 +116,7 @@ class MeilisearchTool:
 					"fields": ["id", "title"]
 				}
 			).results
-			return {documents.id : documents.title for documents in documents}
+			return {doc.id : doc.title for doc in documents}
 		except Exception as e:
 			print("[Error at meili_tools.py::get_all_articles_index] 获取文章索引失败", e)
 			return None
@@ -159,7 +142,7 @@ class MeilisearchTool:
 			print("[Error at meili_tools.py::update_article] 数据库中不存在该文章")
 		except Exception as e:
 			print("[Error at meili_tools.py::update_article] 文章更新失败", e)
-			return False
+			return None
 		
 	def update_batch_articles(self, articles_id):
 		'''
@@ -189,7 +172,7 @@ class MeilisearchTool:
 			print("[Error at meili_tools.py::update_batch_articles] 数据库中不存在该文章")
 		except Exception as e:
 			print("[Error at meili_tools.py::update_batch_articles] 文章更新失败", e)
-			return False
+			return None
 		
 	def delete_article(self, article_id):
 		'''
@@ -203,7 +186,7 @@ class MeilisearchTool:
 			return True
 		except Exception as e:
 			print("[Error at meili_tools.py::delete_article] 文章删除失败", e)
-			return False
+			return None
 	
 	def sync_articles_index_with_mysql(self):
 		'''
@@ -256,7 +239,7 @@ class MeilisearchTool:
 			return True
 		except Exception as e:
 			print("[Error at meili_tools.py::sync_articles_index_with_mysql] 索引同步失败", e)
-			return False
+			return None
 		
 	def clear_index(self):
 		'''
@@ -270,7 +253,7 @@ class MeilisearchTool:
 			return True
 		except Exception as e:
 			print("[Error at meili_tools.py::clear_index] 索引清空失败", e)
-			return False
+			return None
 		
 	def rebuild_index(self):
 		'''
@@ -302,4 +285,4 @@ class MeilisearchTool:
 			return True
 		except Exception as e:
 			print("[Error at meili_tools.py::rebuild_index] 索引重建失败", e)
-			return False
+			return None

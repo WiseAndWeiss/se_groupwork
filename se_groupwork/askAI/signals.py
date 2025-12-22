@@ -9,4 +9,3 @@ def update_sqlvec_index(sender, instance, created, **kwargs):
         article_id = instance.id
         sqlvecTool = global_sqlvec_tool_load()
         sqlvecTool.update_article(article_id)
-        print(f"sqlvec index updated for article {article_id}")

@@ -328,7 +328,7 @@ class FavoriteManager(models.Manager):
         return self.filter(user=user, article=article).exists()
     
     # 创建收藏并更新用户的收藏计数
-    def create_favorite(self, user, article, collection):
+    def create_favorite(self, user, article, collection = None):
         # 如果没有指定收藏夹，则使用默认收藏夹（如果没有，则会自动创建）
         if not collection:
            collection, created = Collection.objects.get_or_create(
