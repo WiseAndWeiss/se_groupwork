@@ -75,8 +75,9 @@ def update_favorite_count_on_save(sender, instance, created, **kwargs):
         user.favorite_count += 1
         user.save(update_fields=['favorite_count'])
         collection = instance.collection
-        collection.favorite_count += 1
-        collection.save(update_fields=['favorite_count'])
+        if collection:
+            collection.favorite_count += 1
+            collection.save(update_fields=['favorite_count'])
 
 @receiver(post_delete, sender=Favorite)
 def update_favorite_count_on_delete(sender, instance, **kwargs):
@@ -87,8 +88,9 @@ def update_favorite_count_on_delete(sender, instance, **kwargs):
     user.favorite_count -= 1
     user.save(update_fields=['favorite_count'])
     collection = instance.collection
-    collection.favorite_count -= 1
-    collection.save(update_fields=['favorite_count'])
+    if collection:
+        collection.favorite_count -= 1
+        collection.save(update_fields=['favorite_count'])
 
 @receiver(post_save, sender=History)
 def update_history_count_on_save(sender, instance, created, **kwargs):
