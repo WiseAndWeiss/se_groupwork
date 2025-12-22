@@ -15,55 +15,9 @@
     <text class="empty-tip">展开文章后会在这里显示</text>
   </view>
 
-  <!-- 历史记录列表：复用 card 组件，添加滑动删除 -->
+  <!-- 历史记录列表：复用 article-list 组件，支持分页加载 -->
   <view wx:else class="history-list">
-    <scroll-view class="card-scroll" scroll-y="true">
-      <block wx:for="{{historyList}}" wx:key="id" wx:for-index="index">
-        <view class="swipe-item">
-          <!-- 滑动操作按钮 -->
-          <view class="swipe-actions">
-            <!-- <view class="swipe-btn-container">
-              <view class="icon-circle cancel-circle" bindtap="onCancelSwipe" data-index="{{index}}">
-                <image class="swipe-icon" src="/assets/icons/close.svg" mode="aspectFit"></image>
-              </view>
-            </view> -->
-            <view class="swipe-btn-container">
-              <view class="icon-circle delete-circle" bindtap="deleteHistory" data-id="{{item.id}}" data-index="{{index}}">
-                <image class="swipe-icon" src="/assets/icons/bin.svg" mode="aspectFit"></image>
-              </view>
-            </view>
-          </view>
-          
-          <!-- 可滑动的内容区域 -->
-          <view 
-            class="swipe-content {{item.swipeClass || ''}}"
-            bindtouchstart="onTouchStart"
-            bindtouchmove="onTouchMove" 
-            bindtouchend="onTouchEnd"
-            data-index="{{index}}"
-          >
-            <!-- 复用 card 组件展示历史记录 -->
-            <card-component
-              class="card-component-{{index}}" 
-              id_="{{item.article.id}}"
-              title="{{item.article.title}}"
-              time="{{item.article.publish_time}}"
-              tags="{{item.article.tags}}"
-              desc="{{item.article.summary}}"
-              url="{{item.article.article_url}}"
-              avatar="{{item.article.avatar}}"   
-              key_info="{{item.article.key_info}}"
-              name="{{item.article.account_name}}"   
-              is_favorited="{{item.article.is_favorited}}"  
-              data-isExpanded="{{true}}"
-              bind:ready="initCardExpand"
-              bind:collectionOperationStart="onCollectionOperationStart"
-              bind:collectionOperationEnd="onCollectionOperationEnd"
-            />
-          </view>
-        </view>
-      </block>
-    </scroll-view>
+    <article-list list="{{historyList}}" emptyText="暂无浏览历史" article_list_scrollHeight="calc(100vh - 400rpx)" bind:loadmore="onReachBottom" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
   </view>
   <!-- 删除全部按钮 -->
   <view class="delete-all-btn {{isCollectionOperating ? 'hidden' : ''}}" bindtap="deleteAllHistory">

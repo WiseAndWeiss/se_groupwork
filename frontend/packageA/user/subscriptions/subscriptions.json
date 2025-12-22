@@ -1,8 +1,8 @@
 {
-    "usingComponents": {
-        "account-card": "/components/account/index" ,
-        "loading": "/components/loading/index"
-    },
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "usingComponents": {
+    "account-card": "/components/account/index",
+    "loading": "/components/loading/index"
+  },
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}

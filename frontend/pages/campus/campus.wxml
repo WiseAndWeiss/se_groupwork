@@ -6,78 +6,53 @@
   <view class="navbar-title">校内</view>
 </view>
 
-<!-- 搜索栏 -->
+<!-- 搜索栏 - 外部独立搜索 -->
 <view class="search-bar">
   <view class="search-box">
     <view class="search-inner">
-      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchArticles"></image>
-      <input 
-        type="text"
-        placeholder="快速搜索动态"
-        placeholder-class="search-placeholder"
-        class="search-input"
-        bindinput="onSearchInput"  
-        value="{{searchContent}}" 
-      />
-      <view class="search-text-btn" bindtap="searchArticles">搜索</view>
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchByOuterInput"></image>
+      <input type="text" placeholder="快速搜索动态" placeholder-class="search-placeholder" class="search-input" bindinput="onOuterSearchInput" value="{{outerSearchContent}}" />
+      <view class="search-text-btn" bindtap="searchByOuterInput">搜索</view>
     </view>
   </view>
   <image class="filter-icon" bindtap="showFilterPopup" src="/assets/icons/filter.svg"></image>
 </view>
 
 <view class="article-list-container">
-  <article-list 
-    list="{{filteredList}}" 
-    emptyText="暂无匹配标签的动态"   
-    article_list_scrollHeight="calc(100vh - 450rpx)" 
-  />
+  <article-list list="{{selectionList}}" emptyText="{{emptyTip}}" article_list_scrollHeight="calc(100vh - 450rpx)" bind:loadmore="handleLoadMore" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" scrollTop="{{scrollTop}}" />
 </view>
 
-<!-- 标签筛选悬浮窗 -->
-<!--关闭按钮-->
-<view class="filter-mask" wx:if="{{isFilterShow}}" ></view>
+<!-- 标签筛选悬浮窗 - 内部独立筛选 -->
+<view class="filter-mask" wx:if="{{isFilterShow}}"></view>
 <view class="filter-popup" wx:if="{{isFilterShow}}">
   <view class="popup-header">
     <view class="popup-title">筛选</view>
     <image class="close-icon" bindtap="hideFilterPopup" src="/assets/icons/close.svg"></image>
+
+    <view class="search-box">
+      <view class="search-inner">
+        <image class="search-icon" src="/assets/icons/search.svg"></image>
+        <input type="text" placeholder="输入搜索内容" placeholder-class="search-placeholder" class="search-input" bindinput="onInnerSearchInput" value="{{innerSearchContent}}" />
+      </view>
+    </view>
   </view>
 
   <view class="filter-container">
     <!-- 左侧类目导航 -->
     <scroll-view class="category-nav" scroll-y="true">
-      <view 
-        class="category-item {{currentCategory === 'time' ? 'category-active' : ''}}"
-        bindtap="switchCategory"
-        data-category="time"
-      >
+      <view class="category-item {{currentCategory === 'time' ? 'category-active' : ''}}" bindtap="switchCategory" data-category="time">
         时间
       </view>
-      <view 
-        class="category-item {{currentCategory === 'type' ? 'category-active' : ''}}"
-        bindtap="switchCategory"
-        data-category="type"
-      >
+      <view class="category-item {{currentCategory === 'type' ? 'category-active' : ''}}" bindtap="switchCategory" data-category="type">
         文章类型
       </view>
-      <view 
-        class="category-item {{currentCategory === 'content' ? 'category-active' : ''}}"
-        bindtap="switchCategory"
-        data-category="content"
-      >
+      <view class="category-item {{currentCategory === 'content' ? 'category-active' : ''}}" bindtap="switchCategory" data-category="content">
         内容领域
       </view>
-      <view 
-        class="category-item {{currentCategory === 'account' ? 'category-active' : ''}}"
-        bindtap="switchCategory"
-        data-category="account"
-      >
+      <view class="category-item {{currentCategory === 'account' ? 'category-active' : ''}}" bindtap="switchCategory" data-category="account">
         公众号
       </view>
-      <view 
-        class="category-item {{currentCategory === 'other' ? 'category-active' : ''}}"
-        bindtap="switchCategory"
-        data-category="other"
-      >
+      <view class="category-item {{currentCategory === 'other' ? 'category-active' : ''}}" bindtap="switchCategory" data-category="other">
         其他
       </view>
     </scroll-view>
@@ -88,35 +63,19 @@
       <view wx:if="{{currentCategory === 'time'}}" class="time-filter">
         <view class="time-input-group">
           <view class="time-label">起始时间</view>
-          <picker 
-               mode="date" 
-               value="{{timeFilter.start}}" 
-               start="2000-01-01" 
-               end="{{currentDate}}"
-               format="YYYY-MM-DD"
-               bindchange="onTimeInput"
-               data-type="start"
-          >
-          <view class="time-input">
-                {{timeFilter.start || '请选择起始时间'}}
-          </view>
+          <picker mode="date" value="{{timeFilter.start}}" format="YYYY-MM-DD" bindchange="onTimeInput" data-type="start">
+            <view class="time-input">
+              {{timeFilter.start || '请选择起始时间'}}
+            </view>
           </picker>
         </view>
         <view class="time-input-group">
           <view class="time-label">终止时间</view>
-          <picker 
-                mode="date" 
-                value="{{timeFilter.end}}" 
-                start="2000-01-01" 
-                end="{{currentDate}}"
-                format="YYYY-MM-DD"
-                bindchange="onTimeInput"
-                data-type="end"
-          >
-          <view class="time-input">
-          {{timeFilter.end || '请选择终止时间'}}
-          </view>
-        </picker>
+          <picker mode="date" value="{{timeFilter.end}}" format="YYYY-MM-DD" bindchange="onTimeInput" data-type="end">
+            <view class="time-input">
+              {{timeFilter.end || '请选择终止时间'}}
+            </view>
+          </picker>
         </view>
       </view>
 
@@ -124,12 +83,7 @@
       <view wx:if="{{currentCategory === 'type'}}" class="tags-content">
         <view class="tag-row">
           <block wx:for="{{typeTags}}" wx:key="index">
-            <view 
-              class="tag-item {{wxmltools.includes(tempSelectedFilters.type,item) ? 'tag-selected' : ''}}"
-              bindtap="toggleTag"
-              data-category="type"
-              data-tag="{{item}}"
-            >{{item}}
+            <view class="tag-item {{wxmltools.includes(tempSelectedFilters.type,item) ? 'tag-selected' : ''}}" bindtap="toggleTag" data-category="type" data-tag="{{item}}">{{item}}
             </view>
           </block>
         </view>
@@ -139,42 +93,27 @@
       <view wx:if="{{currentCategory === 'content'}}" class="tags-content">
         <view class="tag-row">
           <block wx:for="{{contentTags}}" wx:key="index">
-            <view 
-              class="tag-item {{wxmltools.includes(tempSelectedFilters.content,item) ? 'tag-selected' : ''}}"
-              bindtap="toggleTag"
-              data-category="content"
-              data-tag="{{item}}"
-            >{{item}}</view>
+            <view class="tag-item {{wxmltools.includes(tempSelectedFilters.content,item) ? 'tag-selected' : ''}}" bindtap="toggleTag" data-category="content" data-tag="{{item}}">{{item}}</view>
           </block>
         </view>
       </view>
 
-           <!-- 公众号 -->
+      <!-- 公众号 -->
       <view wx:if="{{currentCategory === 'account'}}" class="account-content">
         <scroll-view class="tag-scroll-view" scroll-y="true" style="height: 320rpx;">
-            <view class="tag-row">
+          <view class="tag-row">
             <block wx:for="{{accountTags}}" wx:key="index">
-                <view 
-                class="tag-item {{wxmltools.includes(tempSelectedFilters.account,item) ? 'tag-selected' : ''}}"
-                bindtap="toggleTag"
-                data-category="account"
-                data-tag="{{item}}"
-                >{{item}}</view>
+              <view class="tag-item {{wxmltools.includes(tempSelectedFilters.account,item) ? 'tag-selected' : ''}}" bindtap="toggleTag" data-category="account" data-tag="{{item}}">{{item}}</view>
             </block>
-            </view>
+          </view>
         </scroll-view>
-        </view>
+      </view>
 
       <!-- 其他标签 -->
       <view wx:if="{{currentCategory === 'other'}}" class="tags-content">
         <view class="tag-row">
           <block wx:for="{{otherTags}}" wx:key="index">
-            <view 
-              class="tag-item {{wxmltools.includes(tempSelectedFilters.other,item) ? 'tag-selected' : ''}}"
-              bindtap="toggleTag"
-              data-category="other"
-              data-tag="{{item}}"
-            >{{item}}</view>
+            <view class="tag-item {{wxmltools.includes(tempSelectedFilters.other,item) ? 'tag-selected' : ''}}" bindtap="toggleTag" data-category="other" data-tag="{{item}}">{{item}}</view>
           </block>
         </view>
       </view>
@@ -184,7 +123,7 @@
   <!-- 底部操作按钮 -->
   <view class="filter-actions">
     <view class="filter-btn reset-btn" bindtap="resetFilters">重置</view>
-    <view class="filter-btn confirm-btn" bindtap="applyFilters">确认</view>
+    <view class="filter-btn confirm-btn" bindtap="searchByFilter">确认</view> <!-- 改为触发筛选搜索 -->
   </view>
 </view>
 
@@ -207,3 +146,6 @@
     <text class="tab-text">我的</text>
   </view>
 </view>
+
+<!-- 桌宠组件 -->
+<floating-pet />

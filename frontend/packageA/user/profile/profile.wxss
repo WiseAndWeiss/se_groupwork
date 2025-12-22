@@ -20,12 +20,14 @@ page {
   color: #591bb7;
   font-weight: 600;
 }
+
 .navbar-title {
   font-size: 35rpx;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
+
 .return-icon {
   width: 50rpx;
   height: 50rpx;
@@ -33,7 +35,7 @@ page {
   left: 30rpx;
   bottom: 17rpx;
 }
-  
+
 /* 容器 */
 .profile-container {
   padding: 200rpx 30rpx 40rpx;
@@ -107,7 +109,7 @@ page {
   font-size: 30rpx;
   color: #1a1a1a;
   font-weight: 400;
-  max-width: 60%;
+  max-width: 80%;
   text-align: right;
   word-break: break-all;
 }

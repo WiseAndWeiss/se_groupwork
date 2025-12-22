@@ -1,0 +1,12 @@
+function processAvatar(url) {
+  if (!url) return '';
+  if (url.indexOf('http') === 0) {
+    return url;
+  } else {
+    return 'https://' + url;
+  }
+}
+
+module.exports = {
+  processAvatar: processAvatar
+}

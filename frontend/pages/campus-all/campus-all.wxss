@@ -1,131 +1,134 @@
 page {
-    background-color: rgba(239, 239, 239, 0.6);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* 顶部导航栏 */
-  .custom-navbar {
-    position: fixed;
-    width: 100%;
-    height: 170rpx;
-    background: #ffffff;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 20rpx;
-    box-sizing: border-box;
-    z-index: 1000;
-    color: #591bb7;
-    font-weight: 600;
-  }
-  .navbar-title {
-    font-size: 35rpx;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .return-icon {
-    width: 50rpx;
-    height: 50rpx;
-    position: absolute;
-    left: 30rpx;
-    bottom: 17rpx;
-  }
-  
-  .card-scroll {
-    height: calc(100vh - 350rpx);
-  }
-  
-  .list-area {
-    padding: 200rpx 30rpx 140rpx 0; /* 顶部和底部空出导航栏 */
-  }
-  
-  /* 公众号列表布局 */
-  .campusAccount-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    background-color: #f5f5f5;
-  }
-  
-  /* 确保 card-picture 组件宽度适合三列布局 */
-  .campusAccount-list card-picture {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30rpx;
-    margin-left: 30rpx;
-  }
-  
-  .tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 120rpx;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1rpx solid #eee;
-    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-    z-index: 100;
-  }
-  
-  .tab-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #666;
-    font-size: 26rpx;
-  }
-  
-  .tab-item .menu-icon {
-    width: 40rpx;
-    height: 40rpx;
-    margin-bottom: 6rpx;
-    filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
-  }
-  
-  .tab-item.active {
-    color: #7b2ff7;
-    font-weight: bold;
-  }
-  
-  .tab-item.active .menu-icon {
-    filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
-  }
-  
-  /* 核心修复：加载动画居中样式 */
-  .loading-animation-container {
-    /* fixed定位：脱离文档流，基于视口定位 */
-    position: fixed;
-    /* 让容器左上角到屏幕中心 */
-    top: 50%;
-    left: 50%;
-    /* 向左/向上偏移自身50%，实现容器整体居中 */
-    transform: translate(-50%, -50%);
-    /* 加载框大小（可按需调整） */
-    width: 120rpx;
-    height: 120rpx;
-    /* 半透明白背景 + 圆角，视觉更友好 */
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 12rpx;
-    /* 内部GIF居中 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* z-index必须高于导航栏（1000）和底部Tab（100），设9999确保置顶 */
-    z-index: 9999 !important;
-    /* 可选：加阴影，突出加载框 */
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
-  }
-  
-  /* 加载GIF样式：适配容器大小 */
-  .loading-gif {
-    width: 80rpx;
-    height: 80rpx;
-  }
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+.navbar-title {
+  font-size: 35rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.return-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+}
+
+.card-scroll {
+  height: calc(100vh - 350rpx);
+}
+
+.list-area {
+  padding: 200rpx 30rpx 140rpx 0;
+  /* 顶部和底部空出导航栏 */
+}
+
+/* 公众号列表布局 */
+.campusAccount-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+/* 确保 card-picture 组件宽度适合三列布局 */
+.campusAccount-list card-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+  margin-left: 30rpx;
+}
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1rpx solid #eee;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.tab-item .menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 6rpx;
+  filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+}
+
+.tab-item.active {
+  color: #7b2ff7;
+  font-weight: bold;
+}
+
+.tab-item.active .menu-icon {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+}
+
+/* 核心修复：加载动画居中样式 */
+.loading-animation-container {
+  /* fixed定位：脱离文档流，基于视口定位 */
+  position: fixed;
+  /* 让容器左上角到屏幕中心 */
+  top: 50%;
+  left: 50%;
+  /* 向左/向上偏移自身50%，实现容器整体居中 */
+  transform: translate(-50%, -50%);
+  /* 加载框大小（可按需调整） */
+  width: 120rpx;
+  height: 120rpx;
+  /* 半透明白背景 + 圆角，视觉更友好 */
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12rpx;
+  /* 内部GIF居中 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* z-index必须高于导航栏（1000）和底部Tab（100），设9999确保置顶 */
+  z-index: 9999 !important;
+  /* 可选：加阴影，突出加载框 */
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 加载GIF样式：适配容器大小 */
+.loading-gif {
+  width: 80rpx;
+  height: 80rpx;
+}

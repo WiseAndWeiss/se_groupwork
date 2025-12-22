@@ -5,9 +5,6 @@
   <view class="navbar-title">我的订阅</view>
 </view>
 
-
-
-
 <!-- 订阅列表容器（不变） -->
 <view class="subscription-container">
   <!-- 空状态（不变） -->
@@ -23,14 +20,7 @@
       <block wx:for="{{subscriptionList}}" wx:key="id">
         <view class="subscription-item">
           <!-- 公众号卡片 -->
-          <account-card 
-            class="card-component-{{index}}" 
-            accountId="{{item.public_account.id}}"
-            name="{{item.public_account.name}}"
-            avatar="{{item.public_account.icon}}"
-            isSubscribed="{{item.id}}"
-            show-subscribe-btn="{{false}}" 
-          />
+          <account-card class="card-component-{{index}}" accountId="{{item.public_account.id}}" name="{{item.public_account.name}}" avatar="{{item.public_account.icon}}" isSubscribed="{{item.id}}" show-subscribe-btn="{{false}}" />
         </view>
       </block>
     </scroll-view>
@@ -38,5 +28,5 @@
 </view>
 
 <view class="delete-all-btn" bindtap="deleteAllSubscriptions">
-    <text class="delete-btn-text">删除全部</text>
+  <text class="delete-btn-text">删除全部</text>
 </view>

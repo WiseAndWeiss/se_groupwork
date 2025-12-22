@@ -10,7 +10,7 @@
   <view class="info-item" bindtap="showAvatarModal">
     <view class="info-label">头像</view>
     <view class="info-content">
-      <image class="avatar-img" src="{{form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="avatar-img" src="{{form.avatar}}" mode="aspectFill"></image>
       <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
     </view>
   </view>
@@ -57,7 +57,7 @@
 <view class="modal-content" wx:if="{{showAvatarModal}}">
   <view class="modal-title">修改头像</view>
   <view class="avatar-modal-body">
-    <image class="modal-avatar-preview" src="{{tempAvatar || form.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill"></image>
+    <image class="modal-avatar-preview" src="{{tempAvatar || form.avatar}}" mode="aspectFill"></image>
     <button class="choose-avatar-btn" bindtap="chooseTempAvatar">选择图片</button>
   </view>
   <view class="modal-btn-group">
@@ -71,12 +71,7 @@
 <view class="modal-content" wx:if="{{showUsernameModal}}">
   <view class="modal-title">修改昵称</view>
   <view class="modal-input-group">
-    <input 
-      class="modal-input" 
-      placeholder="请输入昵称（2-10字）" 
-      value="{{tempUsername}}"
-      bindinput="handleTempUsernameInput"
-    />
+    <input class="modal-input" placeholder="请输入昵称（2-10字）" value="{{tempUsername}}" bindinput="handleTempUsernameInput" />
   </view>
   <view class="modal-btn-group">
     <button class="modal-cancel-btn" bindtap="hideUsernameModal">取消</button>
@@ -89,13 +84,7 @@
 <view class="modal-content" wx:if="{{showEmailModal}}">
   <view class="modal-title">修改邮箱</view>
   <view class="modal-input-group">
-    <input 
-      class="modal-input" 
-      type="email"
-      placeholder="请输入合法邮箱" 
-      value="{{tempEmail}}"
-      bindinput="handleTempEmailInput"
-    />
+    <input class="modal-input" type="email" placeholder="请输入合法邮箱" value="{{tempEmail}}" bindinput="handleTempEmailInput" />
   </view>
   <view class="modal-btn-group">
     <button class="modal-cancel-btn" bindtap="hideEmailModal">取消</button>
@@ -108,13 +97,7 @@
 <view class="modal-content" wx:if="{{showPhoneModal}}">
   <view class="modal-title">修改手机号</view>
   <view class="modal-input-group">
-    <input 
-      class="modal-input" 
-      type="number"
-      placeholder="请输入11位手机号" 
-      value="{{tempPhone}}"
-      bindinput="handleTempPhoneInput"
-    />
+    <input class="modal-input" type="number" placeholder="请输入11位手机号" value="{{tempPhone}}" bindinput="handleTempPhoneInput" />
   </view>
   <view class="modal-btn-group">
     <button class="modal-cancel-btn" bindtap="hidePhoneModal">取消</button>
@@ -127,27 +110,9 @@
 <view class="modal-content" wx:if="{{showPwdModal}}">
   <view class="modal-title">修改密码</view>
   <view class="modal-input-group">
-    <input 
-      class="modal-input" 
-      type="password"
-      placeholder="请输入原密码" 
-      value="{{tempOldPwd}}"
-      bindinput="handleTempOldPwdInput"
-    />
-    <input 
-      class="modal-input" 
-      type="password"
-      placeholder="请输入新密码（8-16位）" 
-      value="{{tempNewPwd}}"
-      bindinput="handleTempNewPwdInput"
-    />
-    <input 
-      class="modal-input" 
-      type="password"
-      placeholder="请再次输入新密码" 
-      value="{{tempConfirmPwd}}"
-      bindinput="handleTempConfirmPwdInput"
-    />
+    <input class="modal-input" type="password" placeholder="请输入原密码" value="{{tempOldPwd}}" bindinput="handleTempOldPwdInput" />
+    <input class="modal-input" type="password" placeholder="请输入新密码（8-16位）" value="{{tempNewPwd}}" bindinput="handleTempNewPwdInput" />
+    <input class="modal-input" type="password" placeholder="请再次输入新密码" value="{{tempConfirmPwd}}" bindinput="handleTempConfirmPwdInput" />
     <view class="password-strength">
       <view class="strength-tip-item">● 密码由8-16位数字、字母或符号"!@#$%^&*"组成</view>
       <view class="strength-tip-item">● 至少含有两种及以上的字符</view>

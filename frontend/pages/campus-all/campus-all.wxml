@@ -10,14 +10,10 @@
 <view class="list-area">
   <scroll-view class="card-scroll" scroll-y="true">
     <view class="campusAccount-list">
-        <block wx:for="{{campusAccountList}}" wx:key="id">
-            <!-- 公众号卡片 -->
-            <card-picture 
-            avatar="{{item.icon}}"
-            name="{{item.name}}"
-            accountId="{{item.id}}"
-            />
-        </block>
+      <block wx:for="{{campusAccountList}}" wx:key="id">
+        <!-- 公众号卡片 -->
+        <card-picture avatar="{{item.icon}}" name="{{item.name}}" accountId="{{item.id}}" />
+      </block>
     </view>
   </scroll-view>
 </view>
@@ -41,4 +37,3 @@
     <text class="tab-text">我的</text>
   </view>
 </view>
-

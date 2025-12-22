@@ -42,8 +42,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  max-width: 200rpx; /* 防止过宽 */
-  padding: 0 40rpx;  /* 添加左右内边距 */
+  max-width: 200rpx;
+  /* 防止过宽 */
+  padding: 0 40rpx;
+  /* 添加左右内边距 */
   height: 64rpx;
   font-size: 26rpx;
   border-radius: 24rpx;

@@ -7,10 +7,5 @@
 </view>
 
 <view class="article-list-container">
-  <article-list 
-      list="{{articles}}" 
-      emptyText="暂无最新文章"
-      bind:loadmore="handleLoadMore" 
-      article_list_scrollHeight="calc(100vh - 240rpx)" 
-  />
+  <article-list list="{{articles}}" reachEnd="{{reach_end}}" emptyText="暂无最新文章" bind:loadmore="handleLoadMore" article_list_scrollHeight="calc(100vh - 240rpx)" />
 </view>

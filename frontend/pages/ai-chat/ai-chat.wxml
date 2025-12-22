@@ -1,0 +1,56 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <image class="back-icon" bindtap="goBack" src="/assets/icons/return.svg" mode="widthFix"></image>
+  <view class="navbar-title">AI助手</view>
+</view>
+
+<!-- 消息列表 -->
+<scroll-view class="chat-container" scroll-y="true" scroll-top="{{scrollTop}}" scroll-with-animation="true">
+  <view class="message-list">
+    <view class="message-item {{item.type === 'user' ? 'user-message' : 'ai-message'}}" wx:for="{{messages}}" wx:key="index">
+      <view class="message-avatar">
+        <image wx:if="{{item.type === 'ai'}}" class="avatar-image" src="{{petGifUrl || 'https://403app.xyz/static/pet.gif'}}" mode="aspectFit"></image>
+        <image wx:elif="{{userAvatar}}" class="avatar-image user-avatar-img" src="{{userAvatar}}" mode="aspectFill"></image>
+        <view wx:else class="avatar-image user-avatar">我</view>
+      </view>
+      <view class="message-content">
+        <!-- 加载中的 loading dots -->
+        <view class="message-bubble loading-bubble" wx:if="{{item.type === 'ai' && item.isLoading}}">
+          <view class="loading-dots">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
+        </view>
+        <!-- 正常消息内容 -->
+        <view wx:else>
+          <view class="message-bubble" wx:if="{{item.content}}">
+            <text class="message-text">{{item.content}}</text>
+          </view>
+          <!-- 参考文章列表 -->
+          <view class="references-articles" wx:if="{{item.type === 'ai' && item.referencesArticles && item.referencesArticles.length > 0}}">
+            <view class="references-title">参考文章：</view>
+            <view class="article-item" wx:for="{{item.referencesArticles}}" wx:for-item="article" wx:key="id" bindtap="openArticle" data-url="{{article.article_url}}">
+              <text class="article-title">{{article.title}}</text>
+            </view>
+          </view>
+          <view class="message-time-wrapper">
+            <text class="message-time">{{item.time}}</text>
+          </view>
+        </view>
+        <!-- 思考时间显示（在loading或返回过程中显示） -->
+        <view class="message-time-wrapper thinking-time-wrapper" wx:if="{{item.type === 'ai' && item.thinkingTime}}">
+          <text class="thinking-time">{{item.thinkingTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 输入区域 -->
+<view class="input-area">
+  <input class="input-box" type="text" placeholder="输入消息..." value="{{inputText}}" bindinput="onInputChange" confirm-type="send" bindconfirm="sendMessage" disabled="{{isLoading}}" />
+  <view class="send-button {{inputText ? 'active' : ''}}" bindtap="sendMessage" disabled="{{isLoading || !inputText}}">
+    发送
+  </view>
+</view>

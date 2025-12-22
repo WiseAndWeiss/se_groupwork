@@ -1,13 +1,13 @@
 {
-    "usingComponents": {
-      "card-component": "/components/card/index"  ,
-      "loading": "/components/loading/index",
-      "article-list":"/components/article-list/index"
-    },
-    "enablePullDownRefresh": true, 
-    "onReachBottomDistance": 50,   
-    "backgroundTextStyle": "dark", 
-    "backgroundColor": "#f5f5f5",  
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "usingComponents": {
+    "card-component": "/components/card/index",
+    "loading": "/components/loading/index",
+    "article-list": "/components/article-list/index",
+    "floating-pet": "/components/floating-pet/index"
+  },
+  "onReachBottomDistance": 50,
+  "backgroundTextStyle": "dark",
+  "backgroundColor": "#f5f5f5",
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}

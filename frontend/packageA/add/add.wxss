@@ -1,139 +1,175 @@
 page {
-    background-color: rgba(239, 239, 239, 0.6);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* 顶部导航栏 */
-  .custom-navbar {
-    position: fixed;
-    width: 100%;
-    height: 170rpx;
-    background: #ffffff;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 20rpx;
-    box-sizing: border-box;
-    z-index: 1000;
-    color: #591bb7;
-    font-weight: 600;
-  }
-  .navbar-title {
-    font-size: 35rpx;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .return-icon {
-    width: 50rpx;
-    height: 50rpx;
-    position: absolute;
-    left: 30rpx;
-    bottom: 17rpx;
-  }
-  
-    /* 搜索栏整体 */
-    .search-bar {
-      display: flex;
-      align-items: center;
-      width: 92%;
-      margin: 200rpx auto 30rpx;
-      gap: 16rpx;
-    }
-    
-    /* 输入框 */
-    .search-box {
-      flex: 1;
-    }
-    .search-inner {
-      display: flex;
-      align-items: center;
-      background-color: #fff;
-      border: 2rpx solid #7b2ff7;
-      border-radius: 50rpx;
-      height: 70rpx;
-      padding: 0 16rpx 0 24rpx;
-    }
-    .search-icon {
-      width: 36rpx;
-      height: 36rpx;
-      margin-right: 14rpx;
-    }
-    .search-input {
-      flex: 1;
-      font-size: 26rpx;
-      color: #333;
-      border: none;
-      background: transparent;
-      padding-right: 10rpx;
-    }
-    .search-placeholder {
-      color: #aaa;
-    }
-    
-    /* 搜索文字按钮样式 */
-    .search-text-btn {
-      font-size: 26rpx;
-      color: #fff;
-      background-color: #7b2ff7;
-      padding: 8rpx 20rpx;
-      border-radius: 30rpx;
-      margin-left: 10rpx;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-  
-    /* 按钮点击态 */
-    .search-text-btn:active {
-      background-color: #6a1cd6;
-      transform: scale(0.98);
-    }
-  
-    .list-area {
-      width: 100%;
-      padding: 0 30rpx;
-      box-sizing: border-box;
-    }
-  
-  /* 卡片列表 */
-  .list-scroll {
-    height: calc(100vh - 440rpx);
-  }
-  .campusAccount-list {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* 底部按钮样式 */
-  .more-accounts-container {
-      /* 容器不再需要固定定位，按钮自己定位 */
-      display: none;
-    }
-  
-    /* 按钮样式 - 参考 like 页面的删除全部按钮样式 */
-  .more-accounts-btn {
-      position: fixed;
-      bottom: 40rpx;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 400rpx;
-      height: 80rpx;
-      background: #7b2ff7;
-      border-radius: 40rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8rpx 20rpx rgba(123, 47, 247, 0.3);
-      z-index: 1001;
-      color: #fff;
-      font-size: 32rpx;
-      font-weight: 600;
-    }
-    
-    /* 按钮点击态 */
-    .more-accounts-btn:active {
-      transform: translateX(-50%) scale(0.98);
-      box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.25);
-    }
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+.navbar-title {
+  font-size: 35rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.return-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+}
+
+/* 搜索栏整体 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 92%;
+  margin: 200rpx auto 30rpx;
+  gap: 16rpx;
+}
+
+/* 输入框 */
+.search-box {
+  flex: 1;
+}
+
+.search-inner {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 2rpx solid #7b2ff7;
+  border-radius: 50rpx;
+  height: 70rpx;
+  padding: 0 16rpx 0 24rpx;
+}
+
+.search-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 14rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+  border: none;
+  background: transparent;
+  padding-right: 10rpx;
+}
+
+.search-placeholder {
+  color: #aaa;
+}
+
+/* 搜索文字按钮样式 */
+.search-text-btn {
+  font-size: 26rpx;
+  color: #fff;
+  background-color: #7b2ff7;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+  margin-left: 10rpx;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+/* 按钮点击态 */
+.search-text-btn:active {
+  background-color: #6a1cd6;
+  transform: scale(0.98);
+}
+
+.list-area {
+  width: 100%;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+}
+
+/* 卡片列表 */
+.list-scroll {
+  height: calc(100vh - 440rpx);
+}
+
+.campusAccount-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 底部按钮样式 */
+.more-accounts-container {
+  /* 容器不再需要固定定位，按钮自己定位 */
+  display: none;
+}
+
+/* 按钮样式 - 参考 like 页面的删除全部按钮样式 */
+.more-accounts-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400rpx;
+  height: 80rpx;
+  background: #7b2ff7;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(123, 47, 247, 0.3);
+  z-index: 1001;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* 按钮点击态 */
+.more-accounts-btn:active {
+  transform: translateX(-50%) scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.25);
+}
+
+/* 无结果提示样式 */
+.no-results-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.no-results-icon {
+  width: 160rpx;
+  height: 160rpx;
+  opacity: 0.6;
+  margin-bottom: 40rpx;
+}
+
+.no-results-text {
+  font-size: 32rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.no-results-hint {
+  font-size: 28rpx;
+  color: #aaa;
+}
