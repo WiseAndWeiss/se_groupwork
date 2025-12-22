@@ -4,10 +4,13 @@
   flex-direction: column;
   align-items: center;
   background-color: #fff;
-  width: 196rpx; /* 固定宽度，适配横向滚动 */
+  width: 196rpx;
+  /* 固定宽度，适配横向滚动 */
   padding: 20rpx 8rpx;
-  border-radius: 24rpx; /* 圆润圆角，和文章卡片呼应 */
-  box-shadow: 0 3rpx 12rpx rgba(0, 0, 0, 0.04); /* 柔和阴影，不突兀 */
+  border-radius: 24rpx;
+  /* 圆润圆角，和文章卡片呼应 */
+  box-shadow: 0 3rpx 12rpx rgba(0, 0, 0, 0.04);
+  /* 柔和阴影，不突兀 */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 

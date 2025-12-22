@@ -1,197 +1,311 @@
-/* 卡片基础样式 */
+/* ========== 卡片基础样式（优化：更现代的阴影和圆角） ========== */
 .todo-card {
-    padding: 20rpx;
-    margin: 16rpx;
-    background: #fff;
-    border-radius: 12rpx;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s;
-  }
-  .todo-card:active {
-    transform: scale(0.98); /* 点击卡片反馈 */
-  }
-  
-  /* 标题+状态行 */
-  .todo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16rpx;
-  }
-  .todo-title {
-    font-size: 28rpx;
-    font-weight: 500;
-    color: #333;
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .todo-completed {
-    color: #999;
-    text-decoration: line-through;
-  }
-  .todo-status {
-    font-size: 22rpx;
-    padding: 4rpx 12rpx;
-    border-radius: 20rpx;
-    flex-shrink: 0;
-  }
-  .status-done {
-    background: #f0f9ff;
-    color: #1890ff;
-  }
-  .status-undone {
-    background: #fff7e6;
-    color: #faad14;
-  }
-  
-  /* 内容行 */
-  .todo-row {
-    display: flex;
-    margin-bottom: 12rpx;
-    font-size: 24rpx;
-    align-items: flex-start;
-  }
-  .todo-label {
-    color: #666;
-    min-width: 100rpx;
-    flex-shrink: 0;
-  }
-  .todo-value {
-    color: #333;
-    flex: 1;
-    word-break: break-all;
-  }
-  .todo-content-text {
-    line-height: 1.6;
-  }
-  
-  /* 弹窗样式（核心：可视窗口居中，适配小程序） */
-  .modal-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999; /* 层级高于所有页面元素 */
-    animation: maskFade 0.2s ease-out forwards;
-  }
-  
-  /* 关键修复：50vh/50vw 基于可视窗口居中 */
-  .modal-container {
-    position: fixed;
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    max-width: 600rpx; /* 限制最大宽度，适配平板/大屏 */
-    z-index: 10000; /* 高于遮罩层 */
-    max-height: 90vh; /* 防止弹窗超出屏幕 */
-    overflow-y: auto; /* 内容过多时滚动 */
-    animation: modalPop 0.3s ease-out forwards;
-    box-sizing: border-box;
-  }
-  
-  .modal-content {
-    background: #fff;
-    border-radius: 12rpx;
-    padding: 30rpx;
-    box-sizing: border-box;
-  }
-  
-  .modal-item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20rpx;
-  }
-  .modal-label {
-    font-size: 26rpx;
-    color: #333;
-    margin-bottom: 8rpx;
-  }
-  .modal-input {
-    font-size: 24rpx;
-    padding: 12rpx;
-    border: 1rpx solid #e5e5e5;
-    border-radius: 8rpx;
-    box-sizing: border-box;
-  }
-  .desc-input {
-    min-height: 120rpx;
-    resize: none;
-    line-height: 1.6;
-  }
-  .modal-text {
-    font-size: 24rpx;
-    color: #333;
-    line-height: 1.6;
-  }
-  .modal-btn-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 16rpx;
-    margin-top: 10rpx;
-  }
-  .modal-btn {
-    font-size: 24rpx;
-    padding: 12rpx 24rpx;
-    border-radius: 8rpx;
-    transition: opacity 0.2s;
-  }
-  .modal-btn:active {
-    opacity: 0.8; /* 点击反馈 */
-  }
-  .edit-btn {
-    background: #e6f7ff;
-    color: #1890ff;
-  }
-  .save-btn {
-    background: #f0f9ff;
-    color: #1890ff;
-  }
-  .exit-btn {
-    background: #f5f5f5;
-    color: #666;
-  }
-  .delete-btn {
-    background: #fff2f0;
-    color: #f5222d;
-  }
-  
-  /* 日期选择器占位符样式 */
-  .placeholder-style {
-    color: #999;
-  }
-  
-  /* 弹窗动画 */
-  @keyframes maskFade {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  @keyframes modalPop {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -45%) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
+  padding: 24rpx;
+  margin: 30rpx 0rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+}
+
+.todo-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.12);
+}
+
+/* ========== 标题+状态行（优化：更突出的标题样式） ========== */
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  /* 添加分隔线 */
+}
+
+.todo-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.todo-completed {
+  color: #999;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.todo-status {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+
+.status-done {
+  background: #f0f9ff;
+  color: #1890ff;
+}
+
+.status-undone {
+  background: #fff7e6;
+  color: #faad14;
+}
+
+/* ========== 内容行（优化：更好的间距和排版） ========== */
+.todo-row {
+  display: flex;
+  margin-bottom: 16rpx;
+  font-size: 26rpx;
+  align-items: flex-start;
+  line-height: 1.6;
+}
+
+.todo-row:last-child {
+  margin-bottom: 0;
+}
+
+.todo-label {
+  color: #666;
+  min-width: 120rpx;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.todo-value {
+  color: #333;
+  flex: 1;
+  word-break: break-all;
+  line-height: 1.6;
+}
+
+.todo-content-text {
+  line-height: 1.7;
+  color: #444;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========== 弹窗样式（与calendar页面保持一致） ========== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2002;
+  animation: fadeIn 0.25s ease-out;
+  will-change: opacity;
+  pointer-events: auto;
+  backface-visibility: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 
-  /* 关联文章链接样式 */
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-container {
+  position: fixed !important;
+  /* 强制固定在屏幕 */
+  top: 50% !important;
+  /* 垂直居中 */
+  left: 50% !important;
+  /* 水平居中 */
+  width: 85%;
+  max-width: 600rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  z-index: 2003;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+  animation: slideUpModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  /* 固定在屏幕中间：使用 translate(-50%, -50%) 居中 */
+  transform: translate(-50%, -50%) translate3d(0, 0, 0) !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  /* 确保不受父元素影响 */
+  margin: 0 !important;
+  padding: 0;
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 30rpx, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0);
+  }
+}
+
+.modal-content {
+  padding: 30rpx;
+}
+
+.modal-item {
+  margin-bottom: 24rpx;
+}
+
+.modal-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  font-weight: 600;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 22rpx 20rpx;
+  min-height: 88rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+  backface-visibility: hidden;
+}
+
+.modal-input:focus {
+  border-color: #7b2ff7;
+  outline: none;
+}
+
+.desc-input {
+  min-height: 120rpx;
+  padding: 18rpx 20rpx;
+  line-height: 1.6;
+  resize: none;
+  vertical-align: top;
+}
+
+.modal-text {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.7;
+  padding: 12rpx 0;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+/* ========== 按钮组（优化：与calendar页面保持一致） ========== */
+.modal-btn-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 16rpx 28rpx;
+  border-radius: 30rpx;
+  font-size: 28rpx;
+  font-weight: 550;
+  transition: all 0.25s ease;
+  will-change: transform, background;
+  text-align: center;
+}
+
+.modal-btn:active {
+  transform: scale(0.97);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #7b2ff7 0%, #6a27d8 100%);
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.2);
+  color: #fff;
+  border: none;
+}
+
+.edit-btn:active {
+  background: linear-gradient(135deg, #6a27d8 0%, #591bb7 100%);
+  box-shadow: 0 2rpx 8rpx rgba(123, 47, 247, 0.3);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #7b2ff7 0%, #6a27d8 100%);
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.2);
+  color: #fff;
+  border: none;
+}
+
+.save-btn:active {
+  background: linear-gradient(135deg, #6a27d8 0%, #591bb7 100%);
+  box-shadow: 0 2rpx 8rpx rgba(123, 47, 247, 0.3);
+}
+
+.exit-btn {
+  background: #f8f8f8;
+  color: #666;
+  border: 2rpx solid #e8e8e8;
+}
+
+.exit-btn:active {
+  background: #f0f0f0;
+}
+
+.delete-btn {
+  background: #fff2f0;
+  color: #f5222d;
+  border: 2rpx solid #ffccc7;
+}
+
+.delete-btn:active {
+  background: #ffe7e5;
+  border-color: #ffa39e;
+}
+
+/* ========== 日期选择器占位符样式 ========== */
+.placeholder-style {
+  color: #999;
+  line-height: 1.5;
+}
+
+/* ========== 关联文章链接样式（优化：更美观的链接样式） ========== */
+.article-value {
+  display: flex;
+  align-items: center;
+}
+
 .article-link {
-    color: #0066cc; /* 蓝色，模拟超链接 */
-    text-decoration: underline; /* 下划线 */
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  
-  /* 链接点击态 */
-  .article-link-hover {
-    color: #004999; /* 深一点的蓝色 */
-    background-color: #f0f8ff; /* 轻微背景色反馈 */
-  }
-  
+  color: #333;
+  text-decoration: none;
+  font-size: 26rpx;
+  line-height: 1.6;
+  padding: 4rpx 8rpx;
+  border-radius: 8rpx;
+  transition: all 0.2s ease;
+  border: 1rpx solid #e5e5e5;
+}
+
+.article-link:active {
+  color: #333;
+  background: #f9f9f9;
+}
+
+.article-error {
+  color: #999;
+  font-size: 24rpx;
+}

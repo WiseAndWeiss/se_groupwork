@@ -5,12 +5,14 @@
   top: 0;
   width: 180rpx;
   height: 180rpx;
-  pointer-events: auto; /* 宠物本身可以点击和拖动 */
+  pointer-events: auto;
+  /* 宠物本身可以点击和拖动 */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9998;
-  will-change: transform; /* 优化 transform 性能 */
+  will-change: transform;
+  /* 优化 transform 性能 */
 }
 
 .pet-cover-image {
@@ -18,5 +20,3 @@
   height: 180rpx;
   border-radius: 50%;
 }
-
-

@@ -9,11 +9,7 @@
 <view class="profile-container">
   <!-- 头像+昵称 -->
   <view class="avatar-section">
-    <image 
-      class="avatar-img" 
-      src="https://{{userInfo.avatar}}" 
-      mode="aspectFill"
-    ></image>
+    <image class="avatar-img" src="https://{{userInfo.avatar}}" mode="aspectFill"></image>
     <view class="nickname">{{userInfo.username || '未设置'}}</view>
   </view>
 

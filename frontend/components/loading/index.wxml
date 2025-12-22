@@ -4,10 +4,6 @@
   <view class="blur-background"></view>
   <!-- 加载动画 -->
   <view class="loading">
-    <image 
-      class="loading-gif" 
-      src="{{loadingGifUrl || 'https://403app.xyz/static/loading.gif'}}" 
-      mode="aspectFit"
-    ></image>
+    <image class="loading-gif" src="{{loadingGifUrl || 'https://403app.xyz/static/loading.gif'}}" mode="aspectFit"></image>
   </view>
 </view>

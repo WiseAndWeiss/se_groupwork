@@ -163,3 +163,31 @@ page {
 .tab-item.active .menu-icon {
   filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
 }
+
+/* 退出登录按钮 */
+.logout-btn {
+  position: fixed;
+  bottom: 160rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250rpx;
+  height: 80rpx;
+  background: #ff4a4a;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(247, 47, 47, 0.3);
+  z-index: 1001;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.logout-btn:active {
+  background: #6a1dd6;
+}
+
+.logout-btn-text {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+}

@@ -1,12 +1,7 @@
 <!-- 顶部标题栏 -->
 <view class="header">
   <view class="title-container">
-    <image 
-      class="app-icon" 
-      src="{{iconUrl || '/assets/icon.png'}}" 
-      mode="widthFix"
-      lazy-load="true" 
-    ></image>
+    <image class="app-icon" src="{{iconUrl || '/assets/icon.png'}}" mode="widthFix" lazy-load="true"></image>
     <text class="app-name">小助手</text>
     <text class="app-desc">校内公众号信息整合助手</text>
   </view>
@@ -14,71 +9,34 @@
 
 <!-- 登录/注册切换按钮 -->
 <view class="tab-container">
-  <view 
-    class="tab {{isLogin ? 'active' : ''}}" 
-    bindtap="switchToLogin"
-  >
+  <view class="tab {{isLogin ? 'active' : ''}}" bindtap="switchToLogin">
     登录
   </view>
-  <view 
-    class="tab {{!isLogin ? 'active' : ''}}" 
-    bindtap="switchToRegister"
-  >
+  <view class="tab {{!isLogin ? 'active' : ''}}" bindtap="switchToRegister">
     注册
   </view>
 </view>
 
 <!-- 登录表单 -->
 <view class="form-container" wx:if="{{isLogin}}">
-<view class="input-group">
-<!-- <canvas id="canvas" type="2d"></canvas> -->
-<input 
-    class="input" 
-    type="text" 
-    placeholder="用户名" 
-    value="{{loginData.username}}"
-    bindinput="onLoginUsernameInput"
-    bindfocus="onLoginUsernameFocus"
-    adjust-position="{{true}}"
-/>
-</view>
-<view class="input-group">
-<input 
-    class="input" 
-    type="password" 
-    placeholder="密码" 
-    value="{{loginData.password}}"
-    bindinput="onLoginPasswordInput"
-    adjust-position="{{true}}"
-/>
-</view>
-<button class="submit-btn" hover-class="btn-hover" bindtap="handleLogin">登录</button>
+  <view class="input-group">
+    <!-- <canvas id="canvas" type="2d"></canvas> -->
+    <input class="input" type="text" placeholder="用户名" value="{{loginData.username}}" bindinput="onLoginUsernameInput" bindfocus="onLoginUsernameFocus" adjust-position="{{true}}" />
+  </view>
+  <view class="input-group">
+    <input class="input" type="password" placeholder="密码" value="{{loginData.password}}" bindinput="onLoginPasswordInput" adjust-position="{{true}}" />
+  </view>
+  <button class="submit-btn" hover-class="btn-hover" bindtap="handleLogin">登录</button>
 </view>
 
 <!-- 注册表单 -->
 <view class="form-container" wx:if="{{!isLogin}}">
   <view class="input-group">
-    <input 
-        class="input" 
-        type="text" 
-        placeholder="用户名" 
-        value="{{registerData.username}}"
-        bindinput="onRegisterUsernameInput"
-        bindfocus="onRegisterUsernameFocus"
-        adjust-position="{{true}}"
-    />
+    <input class="input" type="text" placeholder="用户名" value="{{registerData.username}}" bindinput="onRegisterUsernameInput" bindfocus="onRegisterUsernameFocus" adjust-position="{{true}}" />
   </view>
 
   <view class="input-group">
-    <input 
-        class="input" 
-        type="password" 
-        placeholder="输入密码" 
-        value="{{registerData.password}}"
-        bindinput="onRegisterPasswordInput"  
-        bindfocus="scrollToStrength"
-        adjust-position="{{true}}"
-    />
+    <input class="input" type="password" placeholder="输入密码" value="{{registerData.password}}" bindinput="onRegisterPasswordInput" bindfocus="scrollToStrength" adjust-position="{{true}}" />
   </view>
 
   <!-- 密码强度提示视图 -->
@@ -105,16 +63,8 @@
   </view>
 
   <view class="input-group">
-    <input 
-        class="input" 
-        type="password" 
-        placeholder="确认密码" 
-        value="{{registerData.confirmPassword}}"
-        bindinput="onRegisterConfirmPasswordInput"
-        adjust-position="{{true}}"
-    />
+    <input class="input" type="password" placeholder="确认密码" value="{{registerData.confirmPassword}}" bindinput="onRegisterConfirmPasswordInput" adjust-position="{{true}}" />
   </view>
 
   <button class="submit-btn" hover-class="btn-hover" bindtap="handleRegister">注册并登录</button>
 </view>
-

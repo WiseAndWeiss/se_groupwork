@@ -1,10 +1,9 @@
 {
-    "component": true,
-    "usingComponents": {
-      "card-component": "/components/card/index",
-      "article-list":"/components/article-list/index"  
-    },
-
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "component": true,
+  "usingComponents": {
+    "card-component": "/components/card/index",
+    "article-list": "/components/article-list/index"
+  },
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}
