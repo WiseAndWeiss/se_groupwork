@@ -1,9 +1,9 @@
 {
-    "component": true,
-    "usingComponents": {
-      "card-picture": "/components/card-picture/index" ,
-      "loading": "/components/loading/index"
-    },
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "component": true,
+  "usingComponents": {
+    "card-picture": "/components/card-picture/index",
+    "loading": "/components/loading/index"
+  },
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}

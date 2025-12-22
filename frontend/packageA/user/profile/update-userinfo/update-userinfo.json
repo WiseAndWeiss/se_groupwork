@@ -1,5 +1,5 @@
 {
-    "usingComponents": {},
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "usingComponents": {},
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}

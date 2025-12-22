@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-      "card-component": "/components/card/index"  
+    "card-component": "/components/card/index"
   },
   "navigationStyle": "custom",
   "renderer": "webview"

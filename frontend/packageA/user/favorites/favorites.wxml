@@ -10,16 +10,7 @@
 <!-- 收藏列表 -->
 <view class="favorites-container">
   <scroll-view class="card-scroll" scroll-y="true">
-    <collection 
-      wx:for="{{collectionList}}" 
-      wx:key="id" 
-      item="{{item}}"
-      bind:collectionUpdated="onCollectionUpdated"
-      bind:collectionDeleted="onCollectionDeleted"
-      bind:favouriteMoved="onFavouriteMoved"
-      bind:editPopupOpened="onEditPopupOpened"
-      bind:editPopupClosed="onEditPopupClosed"
-    ></collection>
+    <collection wx:for="{{collectionList}}" wx:key="id" item="{{item}}" bind:collectionUpdated="onCollectionUpdated" bind:collectionDeleted="onCollectionDeleted" bind:favouriteMoved="onFavouriteMoved" bind:editPopupOpened="onEditPopupOpened" bind:editPopupClosed="onEditPopupClosed"></collection>
   </scroll-view>
 </view>
 
@@ -31,20 +22,14 @@
     <image class="return-icon" catchtap="closeCreatePopup" src="../../../assets/icons/return.svg" mode="widthFix"></image>
     <text class="complete-btn" catchtap="saveCreateCollection">完成</text>
   </view>
-  
+
   <!-- 浮窗内容 -->
   <view class="popup-content">
     <!-- 名称 -->
     <view class="form-item">
       <text class="form-label">收藏夹名称</text>
       <view class="input-wrapper">
-        <input 
-          class="form-input" 
-          value="{{tempName}}" 
-          bindinput="onCreateNameInput"
-          placeholder="请输入收藏夹名称"
-          maxlength="10" 
-        />
+        <input class="form-input" value="{{tempName}}" bindinput="onCreateNameInput" placeholder="请输入收藏夹名称" maxlength="10" />
         <!-- 剩余字数 -->
         <text class="remain-count">{{remainNameCount}}</text>
       </view>
@@ -54,14 +39,7 @@
     <view class="form-item">
       <text class="form-label">收藏夹描述</text>
       <view class="input-wrapper">
-        <textarea 
-          class="form-textarea" 
-          value="{{tempDesc}}" 
-          bindinput="onCreateDescInput"
-          placeholder="请输入收藏夹描述（选填）"
-          maxlength="30" 
-          auto-height
-        />
+        <textarea class="form-textarea" value="{{tempDesc}}" bindinput="onCreateDescInput" placeholder="请输入收藏夹描述（选填）" maxlength="30" auto-height />
         <!-- 剩余字数 -->
         <text class="remain-count">{{remainDescCount}}</text>
       </view>

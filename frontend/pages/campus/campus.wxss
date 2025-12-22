@@ -3,7 +3,8 @@ page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 避免页面整体滚动，由article-list容器内部滚动 */
+  overflow: hidden;
+  /* 避免页面整体滚动，由article-list容器内部滚动 */
 }
 
 /* 顶部导航栏：原有样式不变，仅补充box-sizing */
@@ -21,12 +22,14 @@ page {
   color: #591bb7;
   font-weight: 600;
 }
+
 .navbar-title {
   font-size: 35rpx;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
+
 .alllist-icon {
   width: 50rpx;
   height: 50rpx;
@@ -39,18 +42,24 @@ page {
 .search-bar {
   display: flex;
   align-items: center;
-  width: 100%; /* 改为100%宽度 */
-  margin-top: 200rpx; /* 去掉auto，左右无margin */
-  padding: 0 30rpx; /* 用内边距代替margin，保持和导航栏一致的左右间距 */
-  box-sizing: border-box; /* 内边距包含在宽度内 */
+  width: 100%;
+  /* 改为100%宽度 */
+  margin-top: 200rpx;
+  /* 去掉auto，左右无margin */
+  padding: 0 30rpx;
+  /* 用内边距代替margin，保持和导航栏一致的左右间距 */
+  box-sizing: border-box;
+  /* 内边距包含在宽度内 */
   gap: 16rpx;
-  flex-shrink: 0; /* 固定高度，不被压缩 */
+  flex-shrink: 0;
+  /* 固定高度，不被压缩 */
 }
 
 /* 输入框：原有样式不变 */
 .search-box {
   flex: 1;
 }
+
 .search-inner {
   display: flex;
   align-items: center;
@@ -60,11 +69,13 @@ page {
   height: 70rpx;
   padding: 0 16rpx 0 24rpx;
 }
+
 .search-icon {
   width: 36rpx;
   height: 36rpx;
   margin-right: 14rpx;
 }
+
 .search-input {
   flex: 1;
   font-size: 26rpx;
@@ -73,6 +84,7 @@ page {
   background: transparent;
   padding-right: 10rpx;
 }
+
 .search-placeholder {
   color: #aaa;
 }
@@ -88,6 +100,7 @@ page {
   white-space: nowrap;
   transition: all 0.2s;
 }
+
 .search-text-btn:active {
   background-color: #6a1cd6;
   transform: scale(0.98);
@@ -100,15 +113,17 @@ page {
 
 /* article-list 容器 */
 .article-list-container {
-  flex: 1; /* 占满搜索栏到底部导航栏的所有剩余空间 */
+  flex: 1;
+  /* 占满搜索栏到底部导航栏的所有剩余空间 */
   width: 100%;
   box-sizing: border-box;
   padding: 0 0;
-  overflow: auto; /* 内容过多时内部滚动，不影响页面 */
-  -webkit-overflow-scrolling: touch; 
-  padding-bottom: 0; 
+  overflow: auto;
+  /* 内容过多时内部滚动，不影响页面 */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0;
 }
-  
+
 /* 空状态提示 */
 .empty-tip {
   text-align: center;
@@ -133,6 +148,7 @@ page {
   z-index: 999;
   backdrop-filter: blur(2rpx);
 }
+
 .filter-popup {
   position: fixed;
   top: 50%;
@@ -148,23 +164,27 @@ page {
   flex-direction: column;
   overflow: hidden;
 }
+
 .popup-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 35rpx 100rpx;
+  padding: 35rpx 100rpx 35rpx 50rpx;
   border-bottom: 2rpx solid #e0e0e0;
   background-color: #fff;
   position: relative;
   flex-shrink: 0;
+  gap: 50rpx;
 }
+
 .popup-title {
   font-size: 32rpx;
   font-weight: 600;
   color: #333;
   text-align: center;
-  flex: 1;
+
 }
+
 .close-icon {
   position: absolute;
   right: 35rpx;
@@ -174,12 +194,14 @@ page {
   height: 32rpx;
   z-index: 1;
 }
+
 .filter-container {
   flex: 1;
   display: flex;
   height: 100%;
   overflow: hidden;
 }
+
 .category-nav {
   width: 143rpx;
   background-color: #f8f8f8;
@@ -187,20 +209,23 @@ page {
   overflow-y: auto;
   flex-shrink: 0;
 }
+
 .category-item {
-  padding: 28rpx 20rpx;
+  padding: 28rpx 10rpx;
   font-size: 26rpx;
   color: #666;
   text-align: center;
   border-bottom: 1rpx solid #e0e0e0;
   transition: all 0.3s;
 }
+
 .category-active {
   background-color: #fff;
   color: #7b2ff7;
   font-weight: bold;
   border-left: 4rpx solid #7b2ff7;
 }
+
 .category-content {
   flex: 1;
   padding: 20rpx;
@@ -210,9 +235,11 @@ page {
   box-sizing: border-box;
   overflow: hidden;
 }
+
 .time-input-group {
   margin-bottom: 30rpx;
 }
+
 .time-label {
   font-size: 28rpx;
   color: #333;
@@ -220,6 +247,7 @@ page {
   font-weight: 600;
   padding-left: 4rpx;
 }
+
 .time-input {
   border: 2rpx solid #e0e0e0;
   border-radius: 24rpx;
@@ -229,11 +257,13 @@ page {
   width: 100%;
   box-sizing: border-box;
 }
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;
   gap: 20rpx;
 }
+
 .tag-item {
   width: calc(50% - 10rpx);
   padding: 18rpx 30rpx;
@@ -246,12 +276,14 @@ page {
   transition: all 0.3s;
   box-sizing: border-box;
 }
+
 .tag-selected {
   background-color: #a277e6;
   color: #fff;
   border-color: #7b2ff7;
   box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.3);
 }
+
 .filter-actions {
   display: flex;
   border-top: 2rpx solid #e0e0e0;
@@ -260,6 +292,7 @@ page {
   gap: 60rpx;
   flex-shrink: 0;
 }
+
 .filter-btn {
   flex: 1;
   padding: 22rpx;
@@ -269,19 +302,23 @@ page {
   font-weight: 600;
   transition: all 0.3s;
 }
+
 .reset-btn {
   background-color: #f5f5f5;
   color: #666;
   border: 2rpx solid #e0e0e0;
 }
+
 .reset-btn:active {
   background-color: #e8e8e8;
 }
+
 .confirm-btn {
   background-color: #7b2ff7;
   color: #fff;
   border: 2rpx solid #7b2ff7;
 }
+
 .confirm-btn:active {
   background-color: #6a1cd6;
   border-color: #6a1cd6;
@@ -301,8 +338,10 @@ page {
   border-top: 1rpx solid #eee;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
   z-index: 100;
-  flex-shrink: 0; /* 固定在底部，不被压缩 */
+  flex-shrink: 0;
+  /* 固定在底部，不被压缩 */
 }
+
 .tab-item {
   display: flex;
   flex-direction: column;
@@ -310,16 +349,19 @@ page {
   color: #666;
   font-size: 26rpx;
 }
+
 .tab-item .menu-icon {
   width: 40rpx;
   height: 40rpx;
   margin-bottom: 6rpx;
   filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
 }
+
 .tab-item.active {
   color: #7b2ff7;
   font-weight: bold;
 }
+
 .tab-item.active .menu-icon {
   filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
 }
@@ -337,10 +379,12 @@ page {
   align-items: center;
   z-index: 9999 !important;
 }
+
 .loading-gif {
   width: 120rpx;
   height: 120rpx;
 }
+
 .loading-tip {
   text-align: center;
   padding: 40rpx 0;
@@ -357,6 +401,7 @@ page {
   width: 100%;
   overflow: hidden;
 }
+
 .tag-scroll-view {
   width: 100%;
   flex: 1;
@@ -365,12 +410,14 @@ page {
   padding-right: 10rpx;
   box-sizing: border-box;
 }
+
 .account-content .tag-row {
   display: flex;
   flex-wrap: wrap;
   gap: 20rpx;
   width: 100%;
 }
+
 .account-content .tag-item {
   width: calc(50% - 10rpx);
   flex-shrink: 0;
@@ -381,9 +428,11 @@ page {
   text-overflow: ellipsis;
   box-sizing: border-box;
 }
+
 .tag-scroll-view::-webkit-scrollbar {
   width: 4rpx;
 }
+
 .tag-scroll-view::-webkit-scrollbar-thumb {
   background-color: #eee;
   border-radius: 2rpx;

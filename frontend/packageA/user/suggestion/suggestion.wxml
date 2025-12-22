@@ -12,7 +12,7 @@
   <view class="tip-card">
     <view class="tip-text">如有任何建议或意见，欢迎通过以下方式联系我，我会认真考虑并持续优化产品体验。</view>
   </view>
-  
+
   <view class="contact-title">联系方式-后端Ruben</view>
   <view class="contact-list">
     <view class="contact-item">

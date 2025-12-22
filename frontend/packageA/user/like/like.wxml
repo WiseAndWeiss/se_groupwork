@@ -20,7 +20,7 @@
     <text class="empty-text">暂无收藏</text>
     <text class="empty-tip">点击文章的收藏按钮添加喜欢的内容</text>
   </view>
-  
+
   <!-- 有收藏内容时显示 -->
   <view wx:else class="favourite-content">
     <scroll-view class="card-scroll" scroll-y="true">
@@ -28,21 +28,7 @@
         <block wx:for="{{favouriteList}}" wx:key="id">
           <view class="favourite-item">
             <!-- 复用 card 组件展示收藏内容 -->
-            <card-component
-              class="card-component-{{index}}" 
-              id_="{{item.article.id}}"
-              title="{{item.article.title}}"
-              time="{{item.article.publish_time}}"
-              tags="{{item.article.tags}}"
-              desc="{{item.article.summary}}"
-              url="{{item.article.article_url}}"
-              key_info="{{item.key_info}}"
-              avatar="{{item.article.avatar}}"   
-              name="{{item.article.account_name}}"   
-              is_favorited="{{item.id}}"  
-              data-isExpanded="{{false}}"
-              bind:ready="initCardExpand"
-            />
+            <card-component class="card-component-{{index}}" id_="{{item.article.id}}" title="{{item.article.title}}" time="{{item.article.publish_time}}" tags="{{item.article.tags}}" desc="{{item.article.summary}}" url="{{item.article.article_url}}" key_info="{{item.key_info}}" avatar="{{item.article.avatar}}" name="{{item.article.account_name}}" is_favorited="{{item.id}}" data-isExpanded="{{false}}" bind:ready="initCardExpand" />
           </view>
         </block>
       </view>

@@ -1,4 +1,9 @@
-const { getTodos, addTodo, updateTodo, deleteTodo } = require('../../../utils/request.js'); 
+const {
+  getTodos,
+  addTodo,
+  updateTodo,
+  deleteTodo
+} = require('../../../utils/request.js');
 
 Page({
   data: {
@@ -8,15 +13,17 @@ Page({
     todayDate: '',
     weekHeaders: ['一', '二', '三', '四', '五', '六', '日'],
     calendarDateList: [],
-    timeAxisList: Array.from({ length: 24 }, (_, i) => ({
+    timeAxisList: Array.from({
+      length: 24
+    }, (_, i) => ({
       time: `${i.toString().padStart(2, '0')}:00`,
       height: 70
     })),
     scheduleList: [],
     weekScheduleList: [],
     weekScheduleGrouped: {},
-    todoList: [], 
-    allTodoList: [], 
+    todoList: [],
+    allTodoList: [],
     showAddTodoModal: false,
     timeRange: [],
     newTodoStartTimeIndex: [0, 0, 0, 0, 0],
@@ -26,8 +33,8 @@ Page({
     newTodoData: {
       title: '',
       content: '',
-      startTime: '', 
-      endTime: '',   
+      startTime: '',
+      endTime: '',
       status: 0
     },
     showTodoPopup: false,
@@ -38,8 +45,8 @@ Page({
     console.log('===== 【1/7】页面初始化 =====');
     const today = new Date();
     const todayDate = this.formatDate(today);
-    this.setData({ 
-      todayDate, 
+    this.setData({
+      todayDate,
       selectedDate: todayDate
     }, () => {
       console.log('初始化后selectedDate：', this.data.selectedDate);
@@ -57,7 +64,7 @@ Page({
       console.log('weekScheduleGrouped 完整数据：', JSON.stringify(this.data.weekScheduleGrouped, null, 2));
       console.log('weekScheduleList 长度：', this.data.weekScheduleList.length);
       console.log('weekScheduleList 数据：', JSON.stringify(this.data.weekScheduleList, null, 2));
-      
+
       // 查询待办条DOM节点，确认是否渲染
       wx.createSelectorQuery().selectAll('.week-schedule-bar').boundingClientRect(rects => {
         console.log('===== 待办条DOM节点检测 =====');
@@ -82,7 +89,7 @@ Page({
           if (isNaN(date.getTime())) return '';
           return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
         };
-  
+
         const formattedTodo = {
           id: todo.id,
           title: todo.title || '',
@@ -97,17 +104,30 @@ Page({
         console.log(`格式化后待办${index}：`, formattedTodo);
         return formattedTodo;
       });
-      this.setData({ allTodoList }, () => {
+      this.setData({
+        allTodoList
+      }, () => {
         console.log('全量待办列表长度：', this.data.allTodoList.length);
         if (this.data.currentView === 'all') {
-          this.setData({ todoList: allTodoList });
+          this.setData({
+            todoList: allTodoList
+          });
         }
         callback && callback();
       });
     }).catch(err => {
       console.error('加载全量待办失败：', err);
-      wx.showToast({ title: '加载待办失败', icon: 'none' });
-      this.setData({ allTodoList: [], todoList: [], scheduleList: [], weekScheduleList: [], weekScheduleGrouped: {} });
+      wx.showToast({
+        title: '加载待办失败',
+        icon: 'none'
+      });
+      this.setData({
+        allTodoList: [],
+        todoList: [],
+        scheduleList: [],
+        weekScheduleList: [],
+        weekScheduleGrouped: {}
+      });
       callback && callback();
     });
   },
@@ -128,8 +148,8 @@ Page({
     const end = this.parseTimeStr(todo.endTime);
     if (!start || !end) return false;
     const isSameDay = start.getFullYear() === end.getFullYear() &&
-                      start.getMonth() === end.getMonth() &&
-                      start.getDate() === end.getDate();
+      start.getMonth() === end.getMonth() &&
+      start.getDate() === end.getDate();
     console.log(`待办${todo.id}是否单天：`, isSameDay, 'start：', todo.startTime, 'end：', todo.endTime);
     return isSameDay;
   },
@@ -137,7 +157,7 @@ Page({
   getWeekDayIndex(dateStr) {
     const date = this.parseTimeStr(dateStr + ' 00:00');
     if (!date) return -1;
-    let day = date.getDay(); 
+    let day = date.getDay();
     const index = day === 0 ? 6 : day - 1;
     console.log(`日期${dateStr}在周内索引：`, index);
     return index;
@@ -159,7 +179,7 @@ Page({
   mergeOverlappingTodos(todos) {
     console.log('===== 【3/7】合并重叠待办 =====');
     console.log('合并前待办数量：', todos.length);
-    
+
     if (todos.length === 0) return [];
 
     const sortedTodos = [...todos].sort((a, b) => a.startTs - b.startTs);
@@ -203,7 +223,7 @@ Page({
     const minuteOffsetRpx = startMinute * (HOUR_HEIGHT_RPX / 60);
     let heightRpx = durationHours * HOUR_HEIGHT_RPX;
 
-    
+
 
     let item = {};
     if (group.todos.length === 1) {
@@ -280,15 +300,17 @@ Page({
     const currentDate = new Date(this.data.selectedDate);
     currentDate.setFullYear(currentDate.getFullYear() + (type === 'prev' ? -1 : 1));
     const newDate = this.formatDate(currentDate);
-    this.setData({ selectedDate: newDate }, () => {
+    this.setData({
+      selectedDate: newDate
+    }, () => {
       this.renderCalendar('year');
       this.loadTodoList(newDate);
     });
   },
 
   handleYearMonthClick(e) {
-    const month = e.currentTarget.dataset.month; 
-    const currentYear = new Date(this.data.selectedDate).getFullYear(); 
+    const month = e.currentTarget.dataset.month;
+    const currentYear = new Date(this.data.selectedDate).getFullYear();
     const targetDate = this.formatDate(new Date(currentYear, month - 1, 1));
     this.setData({
       currentView: 'month',
@@ -303,17 +325,24 @@ Page({
     console.log('===== 【4/7】筛选待办 =====');
     console.log('筛选日期：', selectDate, '当前视图：', this.data.currentView);
     console.log('全量待办长度：', this.data.allTodoList.length);
-    
+
     if (this.data.currentView === 'all') return;
-  
+
     if (!selectDate || !this.data.allTodoList.length) {
       console.log('筛选条件不满足，清空数据');
-      this.setData({ todoList: [], scheduleList: [], weekScheduleList: [], weekScheduleGrouped: {} });
+      this.setData({
+        todoList: [],
+        scheduleList: [],
+        weekScheduleList: [],
+        weekScheduleGrouped: {}
+      });
       return;
     }
-  
+
     let todoList = [];
-    const { currentView } = this.data;
+    const {
+      currentView
+    } = this.data;
 
     if (currentView === 'month') {
       todoList = this.data.allTodoList.filter((todo, index) => {
@@ -345,13 +374,15 @@ Page({
     }
 
     console.log('筛选后待办长度：', todoList.length);
-    this.setData({ todoList });
+    this.setData({
+      todoList
+    });
   },
 
   convertTodoToSchedule(todoList, viewType) {
     console.log('===== 【5/7】转换为', viewType, '视图日程 =====');
     console.log('待转换待办长度：', todoList.length);
-    
+
     if (viewType === 'month') {
       const scheduleList = [];
       todoList.forEach((todo, index) => {
@@ -370,7 +401,7 @@ Page({
                 time: `${hour.toString().padStart(2, '0')}:00`,
                 duration: duration,
                 title: todo.title,
-                articleid: todo.articleid || '' 
+                articleid: todo.articleid || ''
               };
               scheduleList.push(scheduleItem);
             }
@@ -378,7 +409,9 @@ Page({
         }
       });
       console.log('月视图转换后日程长度：', scheduleList.length);
-      this.setData({ scheduleList });
+      this.setData({
+        scheduleList
+      });
     } else if (viewType === 'week') {
       const HOUR_HEIGHT_RPX = 70;
       const rawWeekTodos = [];
@@ -426,7 +459,10 @@ Page({
 
       const weekScheduleGrouped = {};
       validWeekItems.forEach((item, index) => {
-        const { dayIndex, startHour } = item;
+        const {
+          dayIndex,
+          startHour
+        } = item;
         if (!weekScheduleGrouped[dayIndex]) {
           weekScheduleGrouped[dayIndex] = {};
         }
@@ -440,9 +476,9 @@ Page({
       console.log('===== 【关键】周视图分组数据 =====');
       console.log('分组数据结构：', JSON.stringify(weekScheduleGrouped, null, 2));
 
-      this.setData({ 
+      this.setData({
         weekScheduleList: validWeekItems,
-        weekScheduleGrouped: weekScheduleGrouped 
+        weekScheduleGrouped: weekScheduleGrouped
       }, () => {
         console.log('setData后分组数据：', JSON.stringify(this.data.weekScheduleGrouped, null, 2));
       });
@@ -451,24 +487,37 @@ Page({
 
   goBack() {
     const pages = getCurrentPages();
-    pages.length <= 1 
-      ? wx.switchTab({ url: '/pages/index/index' }) 
-      : wx.navigateBack({ delta: 1 });
+    pages.length <= 1 ?
+      wx.switchTab({
+        url: '/pages/index/index'
+      }) :
+      wx.navigateBack({
+        delta: 1
+      });
   },
 
   switchView(e) {
     const view = e?.currentTarget?.dataset?.view || 'month';
     console.log('===== 【6/7】切换视图 =====', view);
-    this.setData({ currentView: view }, () => {
+    this.setData({
+      currentView: view
+    }, () => {
       if (!this.data.selectedDate) {
-        this.setData({ selectedDate: this.formatDate(new Date()) });
+        this.setData({
+          selectedDate: this.formatDate(new Date())
+        });
       }
       this.renderCalendar(view);
-      
+
       if (view === 'month' || view === 'week') {
         this.loadTodoList(this.data.selectedDate);
       } else if (view === 'all') {
-        this.setData({ todoList: this.data.allTodoList, scheduleList: [], weekScheduleList: [], weekScheduleGrouped: {} });
+        this.setData({
+          todoList: this.data.allTodoList,
+          scheduleList: [],
+          weekScheduleList: [],
+          weekScheduleGrouped: {}
+        });
       }
     });
   },
@@ -477,7 +526,9 @@ Page({
     const selectedDate = e?.currentTarget?.dataset?.date || this.formatDate(new Date());
     console.log('===== 选择日期 =====', selectedDate);
     if (!selectedDate) return;
-    this.setData({ selectedDate }, () => {
+    this.setData({
+      selectedDate
+    }, () => {
       this.renderCalendar(this.data.currentView);
       if (['month', 'week'].includes(this.data.currentView)) {
         this.loadTodoList(selectedDate);
@@ -489,7 +540,9 @@ Page({
     const currentDate = new Date(this.data.selectedDate);
     currentDate.setMonth(currentDate.getMonth() + (type === 'prev' ? -1 : 1));
     const newDate = this.formatDate(currentDate);
-    this.setData({ selectedDate: newDate }, () => {
+    this.setData({
+      selectedDate: newDate
+    }, () => {
       this.renderCalendar('month');
       this.loadTodoList(newDate);
     });
@@ -503,17 +556,19 @@ Page({
   },
 
   getTimeIndexByStr(timeStr) {
-    const { timeRange } = this.data;
+    const {
+      timeRange
+    } = this.data;
     if (!timeStr || typeof timeStr !== 'string' || timeStr.trim() === '') {
       return [0, 0, 0, 0, 0];
     }
-    
+
     const [datePart = '', timePart = ''] = timeStr.split(' ');
     const yearArr = (datePart || '').split('-').map(Number);
     const timeArr = (timePart || '').split(':').map(Number);
     const [year = 0, month = 0, day = 0] = yearArr;
     const [hour = 0, minute = 0] = timeArr;
-  
+
     const result = [
       timeRange[0]?.findIndex(item => item === `${year}年`) || 0,
       timeRange[1]?.findIndex(item => item === `${month}月`) || 0,
@@ -530,10 +585,18 @@ Page({
     const month = now.getMonth() + 1;
 
     const yearList = [year - 2, year - 1, year, year + 1, year + 2].map(y => `${y}年`);
-    const monthList = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);
-    const dayList = Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => `${i + 1}日`);
-    const hourList = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}时`);
-    const minuteList = Array.from({ length: 60 }, (_, i) => `${String(i).padStart(2, '0')}分`);
+    const monthList = Array.from({
+      length: 12
+    }, (_, i) => `${i + 1}月`);
+    const dayList = Array.from({
+      length: new Date(year, month, 0).getDate()
+    }, (_, i) => `${i + 1}日`);
+    const hourList = Array.from({
+      length: 24
+    }, (_, i) => `${String(i).padStart(2, '0')}时`);
+    const minuteList = Array.from({
+      length: 60
+    }, (_, i) => `${String(i).padStart(2, '0')}分`);
 
     this.setData({
       timeRange: [yearList, monthList, dayList, hourList, minuteList],
@@ -543,12 +606,20 @@ Page({
   },
 
   handleTimeColumnChange(e, type) {
-    const { column, value } = e.detail;
+    const {
+      column,
+      value
+    } = e.detail;
     const indexKey = type === 'start' ? 'newTodoStartTimeIndex' : 'newTodoEndTimeIndex';
-    const { timeRange, [indexKey]: index, currentYear, currentMonth } = this.data;
-    
+    const {
+      timeRange,
+      [indexKey]: index,
+      currentYear,
+      currentMonth
+    } = this.data;
+
     if (!timeRange.length) return;
-    
+
     const newIndex = [...index];
     newIndex[column] = value;
     let newTimeRange = JSON.parse(JSON.stringify(timeRange));
@@ -558,7 +629,9 @@ Page({
       const targetMonth = column === 1 ? parseInt(newTimeRange[1][value]) : currentMonth;
       const validMonth = Math.max(1, Math.min(12, targetMonth));
       const dayCount = new Date(targetYear, validMonth, 0).getDate();
-      newTimeRange[2] = Array.from({ length: dayCount }, (_, i) => `${i + 1}日`);
+      newTimeRange[2] = Array.from({
+        length: dayCount
+      }, (_, i) => `${i + 1}日`);
       newIndex[2] = Math.min(newIndex[2], newTimeRange[2].length - 1);
       this.setData({
         currentYear: targetYear,
@@ -573,22 +646,29 @@ Page({
   },
 
   confirmTime(e, type) {
-    const { value } = e.detail;
-    const { timeRange } = this.data;
+    const {
+      value
+    } = e.detail;
+    const {
+      timeRange
+    } = this.data;
     const timeKey = type === 'start' ? 'startTime' : 'endTime';
-    
+
     if (!timeRange[0] || !timeRange[1] || !timeRange[2] || !timeRange[3] || !timeRange[4]) {
-      wx.showToast({ title: '时间选择异常', icon: 'none' });
+      wx.showToast({
+        title: '时间选择异常',
+        icon: 'none'
+      });
       return;
     }
-    
+
     const year = timeRange[0][value[0]].replace('年', '');
     const month = String(timeRange[1][value[1]].replace('月', '')).padStart(2, '0');
     const day = String(timeRange[2][value[2]].replace('日', '')).padStart(2, '0');
     const hour = timeRange[3][value[3]].replace('时', '');
     const minute = timeRange[4][value[4]].replace('分', '');
     const timeStr = `${year}-${month}-${day} ${hour}:${minute}`;
-    
+
     this.setData({
       [`newTodoData.${timeKey}`]: timeStr,
       [type === 'start' ? 'newTodoStartTimeIndex' : 'newTodoEndTimeIndex']: value
@@ -615,25 +695,46 @@ Page({
   },
 
   closeAddTodoModal() {
-    this.setData({ showAddTodoModal: false });
+    this.setData({
+      showAddTodoModal: false
+    });
   },
 
   inputTodoData(e, type) {
-    this.setData({ [`newTodoData.${type}`]: e.detail.value });
+    this.setData({
+      [`newTodoData.${type}`]: e.detail.value
+    });
   },
 
   handleAddTodoConfirm() {
-    const { newTodoData } = this.data;
-    if (!newTodoData.title) return wx.showToast({ title: '标题不能为空', icon: 'none' });
-    if (!newTodoData.startTime) return wx.showToast({ title: '请选择开始时间', icon: 'none' });
-    if (!newTodoData.endTime) return wx.showToast({ title: '请选择结束时间', icon: 'none' });
-    
+    const {
+      newTodoData
+    } = this.data;
+    if (!newTodoData.title) return wx.showToast({
+      title: '标题不能为空',
+      icon: 'none'
+    });
+    if (!newTodoData.startTime) return wx.showToast({
+      title: '请选择开始时间',
+      icon: 'none'
+    });
+    if (!newTodoData.endTime) return wx.showToast({
+      title: '请选择结束时间',
+      icon: 'none'
+    });
+
     const startTime = this.parseTimeStr(newTodoData.startTime);
     const endTime = this.parseTimeStr(newTodoData.endTime);
     if (!startTime || !endTime || isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
-      return wx.showToast({ title: '时间格式错误', icon: 'none' });
+      return wx.showToast({
+        title: '时间格式错误',
+        icon: 'none'
+      });
     }
-    if (startTime >= endTime) return wx.showToast({ title: '结束时间需晚于开始时间', icon: 'none' });
+    if (startTime >= endTime) return wx.showToast({
+      title: '结束时间需晚于开始时间',
+      icon: 'none'
+    });
 
     const requestData = {
       title: newTodoData.title,
@@ -645,7 +746,10 @@ Page({
     };
 
     addTodo(requestData).then(() => {
-      wx.showToast({ title: '创建成功', icon: 'success' });
+      wx.showToast({
+        title: '创建成功',
+        icon: 'success'
+      });
       this.closeAddTodoModal();
       this.loadAllTodoList(() => {
         if (['month', 'week'].includes(this.data.currentView)) {
@@ -654,14 +758,19 @@ Page({
       });
     }).catch(err => {
       console.error('创建待办失败：', err);
-      wx.showToast({ title: `创建失败：${err}`, icon: 'none' });
+      wx.showToast({
+        title: `创建失败：${err}`,
+        icon: 'none'
+      });
     });
   },
 
   handleUpdateTodo(e) {
-    const { todoData } = e.detail;
+    const {
+      todoData
+    } = e.detail;
     if (!todoData?.id) return;
-    
+
     const updateData = {
       title: todoData.title,
       note: todoData.content || "",
@@ -670,13 +779,16 @@ Page({
       remind: true,
       status: todoData.status
     };
-  
+
     if (todoData.article !== undefined && todoData.article !== null && !isNaN(Number(todoData.article))) {
       updateData.article = Number(todoData.article);
     }
-  
+
     updateTodo(todoData.id, updateData).then(() => {
-      wx.showToast({ title: '修改成功', icon: 'success' });
+      wx.showToast({
+        title: '修改成功',
+        icon: 'success'
+      });
       this.loadAllTodoList(() => {
         if (['month', 'week'].includes(this.data.currentView)) {
           this.loadTodoList(this.data.selectedDate);
@@ -684,15 +796,23 @@ Page({
       });
     }).catch(err => {
       console.error('修改待办失败：', err);
-      wx.showToast({ title: `修改失败：${err}`, icon: 'none' });
+      wx.showToast({
+        title: `修改失败：${err}`,
+        icon: 'none'
+      });
     });
   },
 
   handleDeleteTodo(e) {
-    const { todoId } = e.detail;
+    const {
+      todoId
+    } = e.detail;
     if (!todoId) return;
     deleteTodo(todoId).then(() => {
-      wx.showToast({ title: '删除成功', icon: 'success' });
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
       this.loadAllTodoList(() => {
         if (['month', 'week'].includes(this.data.currentView)) {
           this.loadTodoList(this.data.selectedDate);
@@ -700,7 +820,10 @@ Page({
       });
     }).catch(err => {
       console.error('删除待办失败：', err);
-      wx.showToast({ title: `删除失败：${err}`, icon: 'none' });
+      wx.showToast({
+        title: `删除失败：${err}`,
+        icon: 'none'
+      });
     });
   },
 
@@ -712,13 +835,16 @@ Page({
     console.log('currentTarget：', e.currentTarget);
     console.log('target：', e.target);
     console.log('dataset：', e.currentTarget?.dataset || e.target?.dataset);
-    
+
     // 兼容获取item
     const item = e.currentTarget?.dataset?.item || e.target?.dataset?.item || {};
     console.log('最终获取的item：', JSON.stringify(item, null, 2));
-    
+
     if (Object.keys(item).length === 0) {
-      wx.showToast({ title: '未获取到待办数据', icon: 'none' });
+      wx.showToast({
+        title: '未获取到待办数据',
+        icon: 'none'
+      });
       console.error('待办数据为空！');
       return;
     }
@@ -727,26 +853,41 @@ Page({
     let popupData = {};
     try {
       if (item.type === 'single') {
-        popupData = { type: 'single', todo: item.todos?.[0] || {} };
+        popupData = {
+          type: 'single',
+          todo: item.todos?.[0] || {}
+        };
         console.log('Single待办articleid：', popupData.todo.articleid);
       } else if (item.type === 'group') {
-        popupData = { type: 'group', todos: item.todos || [] };
+        popupData = {
+          type: 'group',
+          todos: item.todos || []
+        };
       } else {
         throw new Error('待办类型错误：' + item.type);
       }
       console.log('组装弹窗数据：', JSON.stringify(popupData, null, 2));
 
-      this.setData({ showTodoPopup: true, popupData }, () => {
+      this.setData({
+        showTodoPopup: true,
+        popupData
+      }, () => {
         console.log(' 弹窗状态已更新：showTodoPopup=', this.data.showTodoPopup);
       });
     } catch (err) {
       console.error(' 弹窗组装失败：', err);
-      wx.showToast({ title: '无法显示详情：' + err.message, icon: 'none' });
+      wx.showToast({
+        title: '无法显示详情：' + err.message,
+        icon: 'none'
+      });
     }
   },
 
   closeTodoPopup() {
-    this.setData({ showTodoPopup: false, popupData: {} });
+    this.setData({
+      showTodoPopup: false,
+      popupData: {}
+    });
   },
 
   formatDate(date) {
@@ -762,10 +903,13 @@ Page({
     if (isNaN(currentRenderDate.getTime())) {
       currentRenderDate.setTime(new Date().getTime());
     }
-    
+
     let dateList = [];
     let viewTitle = '';
-    const { weekHeaders, todayDate } = this.data;
+    const {
+      weekHeaders,
+      todayDate
+    } = this.data;
 
     switch (view) {
       case 'year':
@@ -777,7 +921,12 @@ Page({
           firstDayWeek = firstDayWeek === 0 ? 6 : firstDayWeek - 1;
           const monthDateList = [];
           for (let i = 0; i < firstDayWeek; i++) {
-            monthDateList.push({ day: '', dateStr: '', isCurrent: false, isSelected: false });
+            monthDateList.push({
+              day: '',
+              dateStr: '',
+              isCurrent: false,
+              isSelected: false
+            });
           }
           for (let i = 1; i <= monthLastDay.getDate(); i++) {
             const date = new Date(currentRenderDate.getFullYear(), month - 1, i);
@@ -789,7 +938,10 @@ Page({
               isSelected: dateStr === this.data.selectedDate
             });
           }
-          dateList.push({ month, dateList: monthDateList });
+          dateList.push({
+            month,
+            dateList: monthDateList
+          });
         }
         break;
 
@@ -799,7 +951,13 @@ Page({
         const monthLastDay = new Date(currentRenderDate.getFullYear(), currentRenderDate.getMonth() + 1, 0);
         const firstDayWeekIndex = (monthFirstDay.getDay() || 7) - 1;
         for (let i = 0; i < firstDayWeekIndex; i++) {
-          dateList.push({ dateStr: '', day: '', week: '', isCurrent: false, isSelected: false });
+          dateList.push({
+            dateStr: '',
+            day: '',
+            week: '',
+            isCurrent: false,
+            isSelected: false
+          });
         }
         for (let i = 1; i <= monthLastDay.getDate(); i++) {
           const date = new Date(currentRenderDate.getFullYear(), currentRenderDate.getMonth(), i);
@@ -839,6 +997,9 @@ Page({
     }
 
     console.log(view, '视图渲染后dateList长度：', dateList.length);
-    this.setData({ calendarDateList: dateList, currentViewTitle: viewTitle });
+    this.setData({
+      calendarDateList: dateList,
+      currentViewTitle: viewTitle
+    });
   }
 });

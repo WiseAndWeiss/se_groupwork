@@ -1,6 +1,6 @@
 {
-    "component": true,
-    "usingComponents": {},
-    "navigationStyle": "custom",
-    "renderer": "webview"
-  }
+  "component": true,
+  "usingComponents": {},
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}

@@ -13,14 +13,7 @@
   <view class="search-box">
     <view class="search-inner">
       <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchAccount"></image>
-      <input 
-        type="text"
-        placeholder="快速搜索公众号"
-        placeholder-class="search-placeholder"
-        class="search-input"
-        bindinput="onSearchInput"  
-        value="{{searchContent}}" 
-      />
+      <input type="text" placeholder="快速搜索公众号" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
       <view class="search-text-btn" bindtap="searchAccount">搜索</view>
     </view>
   </view>
@@ -34,19 +27,12 @@
       <text class="no-results-text">数据库内未搜索到相关信息</text>
       <text class="no-results-hint">请尝试底部"获取更多公众号"</text>
     </view>
-    
+
     <!-- 公众号列表 -->
     <view class="campusAccount-list" wx:if="{{!showNoResults}}">
       <block wx:for="{{campusAccountList}}" wx:key="id">
-          <!-- 公众号卡片 -->
-          <account-card 
-            class="card-component-{{index}}" 
-            accountId="{{item.id}}"
-            name="{{item.name}}"
-            avatar="{{item.icon}}"
-            isSubscribed="{{item.is_subscribed}}"
-            show-subscribe-btn="{{true}}" 
-          />
+        <!-- 公众号卡片 -->
+        <account-card class="card-component-{{index}}" accountId="{{item.id}}" name="{{item.name}}" avatar="{{item.icon}}" isSubscribed="{{item.is_subscribed}}" show-subscribe-btn="{{true}}" />
       </block>
     </view>
   </scroll-view>

@@ -8,13 +8,13 @@ Page({
     duration: 500,
     interval: 5000,
     swiperList: [], // 轮播图数据 
-    selectionList: [],// 卡片数据
+    selectionList: [], // 卡片数据
     isLoading: false, // 加载状态
     isSwiperLoading: false, // 轮播图加载状态
-    processedList: [],// 文章推送数据
-    start_rank: 0,// 分页起始位置
+    processedList: [], // 文章推送数据
+    start_rank: 0, // 分页起始位置
     pageSize: 10, // 每页固定加载10条
-    reach_end: false,   // 是否已加载完所有数据
+    reach_end: false, // 是否已加载完所有数据
   },
 
   onReady() {
@@ -78,23 +78,25 @@ Page({
    * 加载推荐文章（轮播图）
    */
   async loadRecommendedArticles() {
-    this.setData({ 
-        showLoadingAnimation: true // 显示加载动画
-      });
+    this.setData({
+      showLoadingAnimation: true // 显示加载动画
+    });
     if (this.data.isSwiperLoading) return;
     console.log('开始加载推荐文章...');
-    this.setData({ isSwiperLoading: true });
-    
+    this.setData({
+      isSwiperLoading: true
+    });
+
     try {
       const response = await request.getRecommendedArticles();
       console.log('获取推荐文章：', response);
-      
+
       if (response && response.articles) {
         console.log('成功获取推荐文章列表，数量：', response.articles.length);
         const processedList = response.articles.map(item => {
           // 计算paddingRight：摘要长度 × 5
           const paddingRight = item.summary.length;
-          
+
           return {
             ...item,
             padding_right: paddingRight
@@ -120,7 +122,7 @@ Page({
       });
     };
   },
-  
+
   /**
    * 轮播栏收藏逻辑（和card组件同一接口、状态、提示）
    */
@@ -131,16 +133,21 @@ Page({
     const articleId = article.id;
 
     if (!articleId) {
-      wx.showToast({ title: '操作失败：文章ID无效', icon: 'none' });
+      wx.showToast({
+        title: '操作失败：文章ID无效',
+        icon: 'none'
+      });
       return;
     }
     try {
-    if (article.is_favorited) {
+      if (article.is_favorited) {
         // 取消收藏：调用 DELETE 接口
         await request.deleteFavourite(article.is_favorited);
         article.is_favorited = 0;
-        wx.showToast({ title: '取消收藏成功' });
-        console.log('swiperlist',swiperList);
+        wx.showToast({
+          title: '取消收藏成功'
+        });
+        console.log('swiperlist', swiperList);
         this.loadLatestArticles(true); // 加载首页文章数据（卡片）
         console.log('重新加载');
       } else {
@@ -150,17 +157,26 @@ Page({
         };
         const response = await request.addFavourite(articleData);
         swiperList[index].is_favorited = response.id;
-        wx.showToast({ title: '收藏成功' });
-        this.setData({ swiperList });
-        console.log('swiperlist',swiperList);
+        wx.showToast({
+          title: '收藏成功'
+        });
+        this.setData({
+          swiperList
+        });
+        console.log('swiperlist', swiperList);
         this.loadLatestArticles(true); // 加载首页文章数据（卡片）
         console.log('重新加载');
       }
-      this.setData({ swiperList });
-      console.log('swiperlist',swiperList)
+      this.setData({
+        swiperList
+      });
+      console.log('swiperlist', swiperList)
     } catch (err) {
       console.error('收藏操作失败：', err);
-      wx.showToast({ title: err || '操作失败', icon: 'none' });
+      wx.showToast({
+        title: err || '操作失败',
+        icon: 'none'
+      });
     }
   },
 
@@ -170,47 +186,59 @@ Page({
   async loadLatestArticles(reset = false) {
     if (this.data.isLoading || this.data.reach_end) return; // 新增：已到末尾则不加载
     console.log('开始加载首页文章...');
-    this.setData({ isLoading: true });
-    
+    this.setData({
+      isLoading: true
+    });
+
     try {
 
       let start_rank = reset ? 0 : this.data.start_rank;
       console.log('请求start_rank:', start_rank);
-      
-      const response = await request.getLatestArticles({ start_rank }); 
-      
+
+      const response = await request.getLatestArticles({
+        start_rank
+      });
+
       console.log('获取首页最新文章：', response);
-      
+
       if (response && response.articles) {
         const newArticles = response.articles;
         console.log('本次加载文章数量：', newArticles.length);
-        
+
         // 3. 处理数据合并/重置
         const finalList = reset ? newArticles : [...this.data.selectionList, ...newArticles];
-        
+
         // 4. 计算新的start_rank（建议与pageSize对齐，或用返回数量）
         const newStartRank = start_rank + (newArticles.length || this.data.pageSize);
-        
+
         // 5. 标记是否已到数据末尾（返回数量小于pageSize则为末尾）
         const reach_end = response.reach_end;
-        
+
         this.setData({
           selectionList: finalList,
           start_rank: newStartRank,
           reach_end: reach_end // 新增：标记末尾
         });
-        
+
         console.log('加载后data.start_rank:', this.data.start_rank); // 修正：打印data中的值
         console.log('是否已到末尾:', this.data.reach_end);
       } else {
         console.warn('首页文章接口返回数据格式异常：', response);
-        wx.showToast({ title: '数据加载异常', icon: 'none' });
+        wx.showToast({
+          title: '数据加载异常',
+          icon: 'none'
+        });
       }
     } catch (error) {
       console.error('加载首页文章失败：', error);
-      wx.showToast({ title: '加载失败: ' + error.message, icon: 'none' });
+      wx.showToast({
+        title: '加载失败: ' + error.message,
+        icon: 'none'
+      });
     } finally {
-      this.setData({ isLoading: false });
+      this.setData({
+        isLoading: false
+      });
     }
   },
 
@@ -221,7 +249,7 @@ Page({
     const index = e.currentTarget.dataset.index;
     const article = this.data.swiperList[index];
     console.log('轮播图点击文章：', article);
-    
+
     if (article && article.article_url) {
       console.log(article.article_url);
       // 跳转到文章链接
@@ -229,7 +257,10 @@ Page({
         url: `/pages/webview/webview?url=${encodeURIComponent(article.article_url)}&title=${encodeURIComponent(article.title)}`
       });
     } else {
-      wx.showToast({ title: '文章链接无效', icon: 'none' });
+      wx.showToast({
+        title: '文章链接无效',
+        icon: 'none'
+      });
     }
   },
 
@@ -239,9 +270,14 @@ Page({
   },
 
   onChange(e) {
-    const { current, source } = e.detail;
-    this.setData({ current });
-    console.log('轮播图切换到：', current, source);  
+    const {
+      current,
+      source
+    } = e.detail;
+    this.setData({
+      current
+    });
+    console.log('轮播图切换到：', current, source);
   },
 
   onImageLoad(e) {
@@ -251,18 +287,24 @@ Page({
   // 跳转到校内页面（Tab 切换）
   goToCampus() {
     this.clearPageData();
-    wx.switchTab({ url: '/pages/campus/campus' });
+    wx.switchTab({
+      url: '/pages/campus/campus'
+    });
   },
-  
+
   // 跳转到自选页面（Tab 切换）
   goToSelection() {
     this.clearPageData();
-    wx.switchTab({ url: '/pages/selection/selection' });
+    wx.switchTab({
+      url: '/pages/selection/selection'
+    });
   },
-  
+
   // 跳转到我的页面（Tab 切换）
   goToUser() {
     this.clearPageData();
-    wx.switchTab({ url: '/pages/user/user' });
+    wx.switchTab({
+      url: '/pages/user/user'
+    });
   }
 });

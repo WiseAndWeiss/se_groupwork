@@ -4,9 +4,7 @@
     <text class="title {{isExpanded ? 'expanded' : ''}}">{{title}}</text>
     <view class="icon-group">
       <view class="star-container {{is_favorited ? 'favorited' : ''}} {{animateStar ? 'animate' : ''}}">
-        <image class="icon icon-star"
-          src="{{is_favorited ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}"
-          catchtap="onFavourite" mode="widthFix" />
+        <image class="icon icon-star" src="{{is_favorited ? '/assets/icons/star-filled.svg' : '/assets/icons/star.svg'}}" catchtap="onFavourite" mode="widthFix" />
       </view>
     </view>
   </view>
@@ -46,15 +44,7 @@
     <view class="select-title">选择收藏夹</view>
     <scroll-view class="collection-scroll" scroll-y="true">
       <view class="collection-list">
-        <text 
-          class="collection-item {{defaultCollection && item.id === defaultCollection.id ? 'active' : ''}}"
-          wx:for="{{collectionList}}"
-          wx:key="id"
-          bindtap="moveFavouriteToCollection"
-          data-collectionid="{{item.id}}"
-        >
-          {{item.name}}
-          <text wx:if="{{item.is_default}}" class="default-tag">默认</text>
+        <text class="collection-item {{defaultCollection && item.id === defaultCollection.id ? 'active' : ''}}" wx:for="{{collectionList}}" wx:key="id" bindtap="moveFavouriteToCollection" data-collectionid="{{item.id}}">{{item.name}}<text wx:if="{{item.is_default}}" class="default-tag">默认</text>
         </text>
       </view>
     </scroll-view>
@@ -68,65 +58,35 @@
     <!-- 标题输入 -->
     <view class="modal-item">
       <text class="modal-label">标题：</text>
-      <input 
-        class="modal-input" 
-        value="{{newTodoData.title}}" 
-        bindinput="inputTodoData"
-        data-type="title"
-        placeholder="请输入待办标题"
-        placeholder-class="placeholder-style"
-      />
+      <input class="modal-input" value="{{newTodoData.title}}" bindinput="inputTodoData" data-type="title" placeholder="请输入待办标题" placeholder-class="placeholder-style" />
     </view>
-    
+
     <!-- 内容输入 -->
     <view class="modal-item">
       <text class="modal-label">内容：</text>
-      <textarea 
-        class="modal-input desc-input" 
-        value="{{newTodoData.content}}" 
-        bindinput="inputTodoData"
-        data-type="content"
-        placeholder="请输入待办内容"
-        placeholder-class="placeholder-style"
-        auto-height
-        maxlength="-1"
-      />
+      <textarea class="modal-input desc-input" value="{{newTodoData.content}}" bindinput="inputTodoData" data-type="content" placeholder="请输入待办内容" placeholder-class="content-placeholder-style" auto-height maxlength="-1" />
     </view>
-    
+
     <!-- 开始时间选择 -->
     <view class="modal-item">
       <text class="modal-label">开始时间：</text>
-      <picker 
-        mode="multiSelector"
-        range="{{timeRange}}"
-        value="{{newTodoStartTimeIndex}}"
-        bindcolumnchange="handleTimeColumnChange"
-        bindchange="confirmTime"
-        data-type="start"
-      >
+      <picker mode="multiSelector" range="{{timeRange}}" value="{{newTodoStartTimeIndex}}" bindcolumnchange="handleTimeColumnChange" bindchange="confirmTime" data-type="start">
         <view class="modal-input {{!newTodoData.startTime ? 'placeholder-style' : ''}}">
           {{newTodoData.startTime || '请选择开始时间'}}
         </view>
       </picker>
     </view>
-    
+
     <!-- 结束时间选择 -->
     <view class="modal-item">
       <text class="modal-label">结束时间：</text>
-      <picker 
-        mode="multiSelector"
-        range="{{timeRange}}"
-        value="{{newTodoEndTimeIndex}}"
-        bindcolumnchange="handleTimeColumnChange"
-        bindchange="confirmTime"
-        data-type="end"
-      >
+      <picker mode="multiSelector" range="{{timeRange}}" value="{{newTodoEndTimeIndex}}" bindcolumnchange="handleTimeColumnChange" bindchange="confirmTime" data-type="end">
         <view class="modal-input {{!newTodoData.endTime ? 'placeholder-style' : ''}}">
           {{newTodoData.endTime || '请选择结束时间'}}
         </view>
       </picker>
     </view>
-    
+
     <!-- 操作按钮组 -->
     <view class="modal-btn-group">
       <view class="modal-btn cancel-btn" bindtap="closeAddTodoModal">取消</view>

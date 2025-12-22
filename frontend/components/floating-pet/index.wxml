@@ -1,18 +1,5 @@
 <!-- 优化cover-view渲染，增加加载状态兜底 -->
-<cover-view 
-  class="pet-cover-view"
-  style="left: {{x}}rpx; top: {{y}}rpx; width: {{petSize}}rpx; height: {{petSize}}rpx; z-index: 999999;"
-  catchtouchstart="onTouchStart"
-  catchtouchmove="onTouchMove"
-  catchtouchend="onTouchEnd"
-  catchtouchcancel="onTouchCancel"
->
+<cover-view class="pet-cover-view" style="left: {{x}}rpx; top: {{y}}rpx; width: {{petSize}}rpx; height: {{petSize}}rpx; z-index: 999999;" catchtouchstart="onTouchStart" catchtouchmove="onTouchMove" catchtouchend="onTouchEnd" catchtouchcancel="onTouchCancel">
   <!-- 增加默认图兜底，解决加载空白 -->
-  <cover-image 
-    class="pet-cover-image" 
-    src="{{petGifUrl || fallbackGifUrl}}"
-    style="width: 100%; height: 100%;"
-    bindload="onImgLoad"
-    binderror="onImgError"
-  ></cover-image>
+  <cover-image class="pet-cover-image" src="{{petGifUrl || fallbackGifUrl}}" style="width: 100%; height: 100%;" bindload="onImgLoad" binderror="onImgError"></cover-image>
 </cover-view>

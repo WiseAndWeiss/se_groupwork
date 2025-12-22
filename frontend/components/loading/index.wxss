@@ -9,7 +9,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: auto; /* 阻止点击穿透 */
+  pointer-events: auto;
+  /* 阻止点击穿透 */
 }
 
 /* 模糊背景层 */

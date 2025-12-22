@@ -17,14 +17,7 @@
 
   <!-- 历史记录列表：复用 article-list 组件，支持分页加载 -->
   <view wx:else class="history-list">
-    <article-list 
-      list="{{historyList}}" 
-      emptyText="暂无浏览历史"   
-      article_list_scrollHeight="calc(100vh - 400rpx)" 
-      bind:loadmore="onReachBottom" 
-      isLoading="{{isLoading}}"
-      reachEnd="{{reach_end}}"
-    />
+    <article-list list="{{historyList}}" emptyText="暂无浏览历史" article_list_scrollHeight="calc(100vh - 400rpx)" bind:loadmore="onReachBottom" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
   </view>
   <!-- 删除全部按钮 -->
   <view class="delete-all-btn {{isCollectionOperating ? 'hidden' : ''}}" bindtap="deleteAllHistory">

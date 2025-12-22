@@ -10,14 +10,20 @@ const allArticleSources = {
 };
 
 // 模拟用户数据库（存储注册用户，用于登录校验）
-let mockUsers = [
-  { id: 1, username: "test", password: "123456" },
-  { id: 2, username: "1", password: "1" }
+let mockUsers = [{
+    id: 1,
+    username: "test",
+    password: "123456"
+  },
+  {
+    id: 2,
+    username: "1",
+    password: "1"
+  }
 ];
 
 // 首页推荐文章（轮播图）- 统一ID+完善is_favorited
-let mockRecommendedArticles = [
-  {
+let mockRecommendedArticles = [{
     id: 1001, // 改为数字ID，避免字符串ID问题
     title: "2025年AI技术发展白皮书发布",
     image: "/assets/icons/add.svg",
@@ -56,8 +62,7 @@ let mockRecommendedArticles = [
 ];
 
 // 首页最新文章（卡片）- 确保is_favorited字段存在
-let mockLatestArticles = [
-  {
+let mockLatestArticles = [{
     id: 1,
     title: "多次加印，清华这本教材“接地气”！",
     account_name: "清华大学",
@@ -265,8 +270,7 @@ let mockUserInfo = {
 
 // ========== 收藏夹核心 Mock 数据 ==========
 // 收藏夹列表（默认收藏夹id=1）
-let mockCollectionList = [
-  {
+let mockCollectionList = [{
     "id": 5,
     "name": "收藏夹1",
     "description": "收藏夹",
@@ -318,7 +322,7 @@ let mockCollectionList = [
 
 // 收藏夹-文章映射（key=收藏夹id，value=文章id数组）
 const collectionArticleMap = {
-  "1": [],  // 默认收藏夹（id=1）
+  "1": [], // 默认收藏夹（id=1）
   "4": [],
   "5": [],
   "3": [],
@@ -332,181 +336,213 @@ let mockFavorites = [];
 let favIdCounter = 1000;
 
 // 1. 重构mockTodos数据结构（匹配后端返回格式）
-let mockTodos = [
-    {
-      id: 1,
-      title: "完成日历",
-      note: "软工日历", // 对应前端content
-      start_time: "2025-12-12 09:00:00", // 前端需要的startTime源字段
-      end_time: "2025-12-13 10:00:00",   // 前端需要的endTime源字段
-      status: 0, 
-      created_at: "2025-12-01 10:00:00",
-      updated_at: "2025-12-01 10:00:00",
-      remind: true,
-      article: 0
-    },
-    {
-      id: 2,
-      title: "完成桌宠",
-      note: "小程序桌宠",
-      start_time: "2025-12-12 14:00:00",
-      end_time: "2025-12-12 16:00:00",
-      status: 0,
-      created_at: "2025-12-01 11:00:00",
-      updated_at: "2025-12-01 11:00:00",
-      remind: true,
-      article: 0
-    },
-    {
-      id: 3,
-      title: "图书馆借书",
-      note: "借《金瓶梅》",
-      start_time: "2025-12-10 15:00:00",
-      end_time: "2025-12-10 16:00:00",
-      status: 1,
-      created_at: "2025-11-30 09:00:00",
-      updated_at: "2025-12-10 10:00:00",
-      remind: true,
-      article: 0
-    },
-    {
-      id: 4,
-      title: "体育打卡",
-      note: "校园跑3公里",
-      start_time: "2025-12-15 08:00:00",
-      end_time: "2025-12-15 09:00:00",
-      status: 0,
-      created_at: "2025-12-05 08:00:00",
-      updated_at: "2025-12-05 08:00:00",
-      remind: true,
-      article: 0
-    }
-  ];
-  
-  // 获取指定日期的待办
-  exports.mockGetTodos = (date) => {
-    console.log('Mock - 获取待办，日期：', date);
-    let filteredTodos = [...mockTodos];
-    
-    // 有date参数时：筛选「目标日期在待办时间范围内」的项（适配跨天）
-    if (date) {
-      filteredTodos = mockTodos.filter(todo => {
-        if (!todo.start_time || !todo.end_time) return false;
-        
-        // 解析时间并标准化
-        const startDate = new Date(todo.start_time);
-        const endDate = new Date(todo.end_time);
-        const targetDate = new Date(date);
-        targetDate.setHours(0, 0, 0, 0); // 目标日期 00:00:00
-        const targetEnd = new Date(targetDate);
-        targetEnd.setHours(23, 59, 59, 999); // 目标日期 23:59:59
-        
-        // 核心逻辑：待办开始时间 ≤ 目标日期结束 且 待办结束时间 ≥ 目标日期开始
-        return startDate <= targetEnd && endDate >= targetDate;
-      });
-    }
-    
-    // 按开始时间倒序排列
-    filteredTodos.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
-    
-    // 移除空的创建/更新时间（非必须字段）
-    const resultTodos = filteredTodos.map(todo => {
-      const { created_at, updated_at, ...rest } = todo;
-      const result = { ...rest };
-      // 仅保留有值的创建/更新时间
-      if (created_at) result.created_at = created_at;
-      if (updated_at) result.updated_at = updated_at;
-      return result;
+let mockTodos = [{
+    id: 1,
+    title: "完成日历",
+    note: "软工日历", // 对应前端content
+    start_time: "2025-12-12 09:00:00", // 前端需要的startTime源字段
+    end_time: "2025-12-13 10:00:00", // 前端需要的endTime源字段
+    status: 0,
+    created_at: "2025-12-01 10:00:00",
+    updated_at: "2025-12-01 10:00:00",
+    remind: true,
+    article: 0
+  },
+  {
+    id: 2,
+    title: "完成桌宠",
+    note: "小程序桌宠",
+    start_time: "2025-12-12 14:00:00",
+    end_time: "2025-12-12 16:00:00",
+    status: 0,
+    created_at: "2025-12-01 11:00:00",
+    updated_at: "2025-12-01 11:00:00",
+    remind: true,
+    article: 0
+  },
+  {
+    id: 3,
+    title: "图书馆借书",
+    note: "借《金瓶梅》",
+    start_time: "2025-12-10 15:00:00",
+    end_time: "2025-12-10 16:00:00",
+    status: 1,
+    created_at: "2025-11-30 09:00:00",
+    updated_at: "2025-12-10 10:00:00",
+    remind: true,
+    article: 0
+  },
+  {
+    id: 4,
+    title: "体育打卡",
+    note: "校园跑3公里",
+    start_time: "2025-12-15 08:00:00",
+    end_time: "2025-12-15 09:00:00",
+    status: 0,
+    created_at: "2025-12-05 08:00:00",
+    updated_at: "2025-12-05 08:00:00",
+    remind: true,
+    article: 0
+  }
+];
+
+// 获取指定日期的待办
+exports.mockGetTodos = (date) => {
+  console.log('Mock - 获取待办，日期：', date);
+  let filteredTodos = [...mockTodos];
+
+  // 有date参数时：筛选「目标日期在待办时间范围内」的项（适配跨天）
+  if (date) {
+    filteredTodos = mockTodos.filter(todo => {
+      if (!todo.start_time || !todo.end_time) return false;
+
+      // 解析时间并标准化
+      const startDate = new Date(todo.start_time);
+      const endDate = new Date(todo.end_time);
+      const targetDate = new Date(date);
+      targetDate.setHours(0, 0, 0, 0); // 目标日期 00:00:00
+      const targetEnd = new Date(targetDate);
+      targetEnd.setHours(23, 59, 59, 999); // 目标日期 23:59:59
+
+      // 核心逻辑：待办开始时间 ≤ 目标日期结束 且 待办结束时间 ≥ 目标日期开始
+      return startDate <= targetEnd && endDate >= targetDate;
     });
-    
-    return {
-      code: 200,
-      msg: "success",
-      data: {
-        list: resultTodos,
-        total: resultTodos.length
-      }
+  }
+
+  // 按开始时间倒序排列
+  filteredTodos.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+  // 移除空的创建/更新时间（非必须字段）
+  const resultTodos = filteredTodos.map(todo => {
+    const {
+      created_at,
+      updated_at,
+      ...rest
+    } = todo;
+    const result = {
+      ...rest
     };
+    // 仅保留有值的创建/更新时间
+    if (created_at) result.created_at = created_at;
+    if (updated_at) result.updated_at = updated_at;
+    return result;
+  });
+
+  return {
+    code: 200,
+    msg: "success",
+    data: {
+      list: resultTodos,
+      total: resultTodos.length
+    }
   };
-  
-  // 添加待办
-  exports.mockAddTodo = (data) => {
-    
-    
-    // 1. 校验核心字段：标题、开始/结束时间
-    if (!data.title?.trim()) {
-        return { code: 400, msg: "待办标题不能为空" };
-      }
-      if (!data.start_time || !data.end_time) {
-        return { code: 400, msg: "待办开始/结束时间不能为空" };
-      }
-      // 2. 校验时间格式（YYYY-MM-DD HH:MM:SS）
-      const timeReg = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-      if (!timeReg.test(data.start_time) || !timeReg.test(data.end_time)) {
-        return { code: 400, msg: "时间格式错误，请使用YYYY-MM-DD HH:MM:SS" };
-      }
-      // 3. 校验结束时间晚于开始时间
-      const startTime = new Date(data.start_time.replace(' ', 'T'));
-      const endTime = new Date(data.end_time.replace(' ', 'T'));
-      if (endTime <= startTime) {
-        return { code: 400, msg: "结束时间需晚于开始时间" };
-      }
-      // 4. 模拟成功返回（生成唯一ID）
-      const newTodo = {
-        id: Date.now(), // 模拟后端生成的ID
-        ...data,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      return { code: 200, msg: "添加成功", data: newTodo };
-  };
-  
-  // 修改待办
-  exports.mockUpdateTodo = (todoId, data) => {
-    console.log('Mock - 修改待办：', { todoId, data });
-    const id = Number(todoId);
-    
-    // 查找待办
-    const todoIndex = mockTodos.findIndex(todo => todo.id === id);
-    if (todoIndex === -1) return { code: 400, msg: '待办不存在' };
-    
-    // 匹配前端传入的字段（note/start_time/end_time等）
-    if (data.title) mockTodos[todoIndex].title = data.title;
-    if (data.note) mockTodos[todoIndex].note = data.note; // 前端传note，对应后端字段
-    if (data.status !== undefined) mockTodos[todoIndex].status = data.status;
-    if (data.start_time) mockTodos[todoIndex].start_time = data.start_time;
-    if (data.end_time) mockTodos[todoIndex].end_time = data.end_time;
-    mockTodos[todoIndex].updated_at = new Date().toISOString().replace('T', ' ').substring(0, 19);
-    
-    const updatedTodo = mockTodos[todoIndex];
-    console.log('Mock - 待办修改成功：', updatedTodo);
-    
+};
+
+// 添加待办
+exports.mockAddTodo = (data) => {
+
+
+  // 1. 校验核心字段：标题、开始/结束时间
+  if (!data.title?.trim()) {
     return {
-      code: 200,
-      msg: '待办修改成功',
-      data: updatedTodo
+      code: 400,
+      msg: "待办标题不能为空"
     };
-  };
-  
-  // 删除待办
-  exports.mockDeleteTodo = (todoId) => {
-    console.log('Mock - 删除待办：', todoId);
-    const id = Number(todoId);
-    
-    // 查找待办
-    const todoIndex = mockTodos.findIndex(todo => todo.id === id);
-    if (todoIndex === -1) return { code: 400, msg: '待办不存在' };
-    
-    // 删除
-    mockTodos.splice(todoIndex, 1);
-    console.log('Mock - 待办删除成功，剩余列表：', mockTodos);
-    
+  }
+  if (!data.start_time || !data.end_time) {
     return {
-      code: 200,
-      msg: '待办删除成功',
-      data: { id }
+      code: 400,
+      msg: "待办开始/结束时间不能为空"
     };
+  }
+  // 2. 校验时间格式（YYYY-MM-DD HH:MM:SS）
+  const timeReg = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+  if (!timeReg.test(data.start_time) || !timeReg.test(data.end_time)) {
+    return {
+      code: 400,
+      msg: "时间格式错误，请使用YYYY-MM-DD HH:MM:SS"
+    };
+  }
+  // 3. 校验结束时间晚于开始时间
+  const startTime = new Date(data.start_time.replace(' ', 'T'));
+  const endTime = new Date(data.end_time.replace(' ', 'T'));
+  if (endTime <= startTime) {
+    return {
+      code: 400,
+      msg: "结束时间需晚于开始时间"
+    };
+  }
+  // 4. 模拟成功返回（生成唯一ID）
+  const newTodo = {
+    id: Date.now(), // 模拟后端生成的ID
+    ...data,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
+  return {
+    code: 200,
+    msg: "添加成功",
+    data: newTodo
+  };
+};
+
+// 修改待办
+exports.mockUpdateTodo = (todoId, data) => {
+  console.log('Mock - 修改待办：', {
+    todoId,
+    data
+  });
+  const id = Number(todoId);
+
+  // 查找待办
+  const todoIndex = mockTodos.findIndex(todo => todo.id === id);
+  if (todoIndex === -1) return {
+    code: 400,
+    msg: '待办不存在'
+  };
+
+  // 匹配前端传入的字段（note/start_time/end_time等）
+  if (data.title) mockTodos[todoIndex].title = data.title;
+  if (data.note) mockTodos[todoIndex].note = data.note; // 前端传note，对应后端字段
+  if (data.status !== undefined) mockTodos[todoIndex].status = data.status;
+  if (data.start_time) mockTodos[todoIndex].start_time = data.start_time;
+  if (data.end_time) mockTodos[todoIndex].end_time = data.end_time;
+  mockTodos[todoIndex].updated_at = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+  const updatedTodo = mockTodos[todoIndex];
+  console.log('Mock - 待办修改成功：', updatedTodo);
+
+  return {
+    code: 200,
+    msg: '待办修改成功',
+    data: updatedTodo
+  };
+};
+
+// 删除待办
+exports.mockDeleteTodo = (todoId) => {
+  console.log('Mock - 删除待办：', todoId);
+  const id = Number(todoId);
+
+  // 查找待办
+  const todoIndex = mockTodos.findIndex(todo => todo.id === id);
+  if (todoIndex === -1) return {
+    code: 400,
+    msg: '待办不存在'
+  };
+
+  // 删除
+  mockTodos.splice(todoIndex, 1);
+  console.log('Mock - 待办删除成功，剩余列表：', mockTodos);
+
+  return {
+    code: 200,
+    msg: '待办删除成功',
+    data: {
+      id
+    }
+  };
+};
 
 // ========== 同步文章收藏状态函数 ==========
 const updateArticleFavoriteStatus = (articleId, isFavorited, favoriteId = 0) => {
@@ -536,9 +572,12 @@ const updateCollectionCount = () => {
 };
 
 // ========== 移动收藏 Mock 函数 ==========
-exports.mockMoveFavourite = function(favoriteId, targetCollectionId) {
-  console.log('Mock - 移动收藏：', { favoriteId, targetCollectionId });
-  
+exports.mockMoveFavourite = function (favoriteId, targetCollectionId) {
+  console.log('Mock - 移动收藏：', {
+    favoriteId,
+    targetCollectionId
+  });
+
   // 统一转为数字ID（核心修复）
   const favId = Number(favoriteId);
   const targetId = Number(targetCollectionId);
@@ -546,13 +585,19 @@ exports.mockMoveFavourite = function(favoriteId, targetCollectionId) {
   // 校验收藏ID是否存在
   const favIndex = mockFavorites.findIndex(item => item.id === favId);
   if (favIndex === -1) {
-    return { code: 400, msg: '收藏记录不存在' };
+    return {
+      code: 400,
+      msg: '收藏记录不存在'
+    };
   }
 
   // 校验目标收藏夹是否存在
   const collectionExist = mockCollectionList.some(item => item.id === targetId);
   if (!collectionExist) {
-    return { code: 400, msg: '目标收藏夹不存在' };
+    return {
+      code: 400,
+      msg: '目标收藏夹不存在'
+    };
   }
 
   // 获取收藏关联的文章ID
@@ -576,20 +621,27 @@ exports.mockMoveFavourite = function(favoriteId, targetCollectionId) {
   // 更新收藏夹数量
   updateCollectionCount();
 
-  return { code: 200, msg: '移动成功', data: { id: favId, target_collection_id: targetId } };
+  return {
+    code: 200,
+    msg: '移动成功',
+    data: {
+      id: favId,
+      target_collection_id: targetId
+    }
+  };
 };
 
 // ========== 获取收藏夹文章 ==========
-exports.mockGetCollectionArticles = function(collectionId, startRank = 0) {
+exports.mockGetCollectionArticles = function (collectionId, startRank = 0) {
   const colId = Number(collectionId);
   const articleIds = collectionArticleMap[colId] || [];
   let allArticles = articleIds.map(articleId => {
     let article = mockArticles.find(item => item.id === articleId);
     if (!article) {
-      article = mockLatestArticles.find(item => item.id === articleId) || 
-                mockCustomizedLatestArticles.find(item => item.id === articleId) ||
-                mockCampusLatestArticles.find(item => item.id === articleId) ||
-                mockRecommendedArticles.find(item => item.id === articleId);
+      article = mockLatestArticles.find(item => item.id === articleId) ||
+        mockCustomizedLatestArticles.find(item => item.id === articleId) ||
+        mockCampusLatestArticles.find(item => item.id === articleId) ||
+        mockRecommendedArticles.find(item => item.id === articleId);
     }
     if (article) {
       return {
@@ -634,9 +686,12 @@ exports.mockAddFavourite = (data) => {
   console.log('Mock - 新增收藏：', data);
   // 优先接收card组件传递的article_id
   const articleId = data.article_id || data.id || data.article?.id;
-  
+
   if (!articleId) {
-    return { code: 400, msg: '文章ID不能为空' };
+    return {
+      code: 400,
+      msg: '文章ID不能为空'
+    };
   }
 
   const idType = typeof articleId === 'string' ? articleId : Number(articleId);
@@ -647,18 +702,27 @@ exports.mockAddFavourite = (data) => {
     const existingItem = mockFavorites.splice(existingIndex, 1)[0];
     mockFavorites.unshift(existingItem);
     console.log('Mock - 收藏已存在，更新位置：', mockFavorites);
-    return { code: 200, msg: '收藏已存在', data: { id: existingItem.id } };
+    return {
+      code: 200,
+      msg: '收藏已存在',
+      data: {
+        id: existingItem.id
+      }
+    };
   }
 
   // 查找文章
   let articleInfo = mockLatestArticles.find(item => item.id === idType) ||
-                    mockRecommendedArticles.find(item => item.id === idType) ||
-                    mockCustomizedLatestArticles.find(item => item.id === idType) ||
-                    mockCampusLatestArticles.find(item => item.id === idType) ||
-                    mockArticles.find(item => item.id === idType);
+    mockRecommendedArticles.find(item => item.id === idType) ||
+    mockCustomizedLatestArticles.find(item => item.id === idType) ||
+    mockCampusLatestArticles.find(item => item.id === idType) ||
+    mockArticles.find(item => item.id === idType);
 
   if (!articleInfo) {
-    return { code: 400, msg: `未找到ID为${articleId}的文章` };
+    return {
+      code: 400,
+      msg: `未找到ID为${articleId}的文章`
+    };
   }
 
   // 生成数字类型的收藏ID
@@ -687,7 +751,7 @@ exports.mockAddFavourite = (data) => {
 
   // 新增收藏
   mockFavorites.unshift(newFavorite);
-  
+
   // 同步到默认收藏夹的文章映射
   if (!collectionArticleMap[defaultCollectionId]) {
     collectionArticleMap[defaultCollectionId] = [];
@@ -702,23 +766,35 @@ exports.mockAddFavourite = (data) => {
 
   console.log('Mock - 收藏成功，当前收藏列表：', mockFavorites);
   console.log('Mock - 默认收藏夹文章映射：', collectionArticleMap[defaultCollectionId]);
-  return { code: 200, msg: '收藏成功', data: { id: favoriteId } };
+  return {
+    code: 200,
+    msg: '收藏成功',
+    data: {
+      id: favoriteId
+    }
+  };
 };
 
 // ========== 取消收藏 Mock 函数 ==========
 exports.mockDeleteFavourite = (favId) => {
   console.log('Mock - 取消收藏：', favId);
   const favIdNum = Number(favId);
-  
+
   // 查找对应收藏记录
   const favIndex = mockFavorites.findIndex(item => item.id === favIdNum);
-  if (favIndex === -1) return { code: 400, msg: '该收藏不存在' };
-  
-  const { articleId, collectionId } = mockFavorites[favIndex];
-  
+  if (favIndex === -1) return {
+    code: 400,
+    msg: '该收藏不存在'
+  };
+
+  const {
+    articleId,
+    collectionId
+  } = mockFavorites[favIndex];
+
   // 从收藏列表删除
   mockFavorites.splice(favIndex, 1);
-  
+
   // 从收藏夹映射中移除文章
   if (collectionArticleMap[collectionId]) {
     collectionArticleMap[collectionId] = collectionArticleMap[collectionId].filter(id => id !== articleId);
@@ -726,12 +802,15 @@ exports.mockDeleteFavourite = (favId) => {
 
   // 更新收藏夹数量
   updateCollectionCount();
-  
+
   // 同步收藏状态
   updateArticleFavoriteStatus(articleId, false);
-  
+
   console.log('Mock - 取消收藏后列表：', mockFavorites);
-  return { code: 200, msg: '取消收藏成功' };
+  return {
+    code: 200,
+    msg: '取消收藏成功'
+  };
 };
 
 // ========== 获取收藏列表 ==========
@@ -748,8 +827,7 @@ exports.mockGetFavouriteList = () => {
 
 // ========== 其他 Mock 函数 ==========
 let mockHistories = [];
-let mockSubscriptions = [
-  {
+let mockSubscriptions = [{
     id: "tsinghua_official",
     public_account: {
       id: "tsinghua_official",
@@ -941,8 +1019,7 @@ let mockSubscriptions = [
   },
 ];
 
-let mockAccountArticles = [
-  {
+let mockAccountArticles = [{
     id: 1,
     accountId: 1,
     title: '清华大学 2025 年冬季学期选课通知',
@@ -964,8 +1041,7 @@ let mockAccountArticles = [
   }
 ];
 
-let mockCampusAccounts = [
-  {
+let mockCampusAccounts = [{
     id: "tsinghua_official",
     accountid: 10,
     icon: "assets/icons/add",
@@ -1025,7 +1101,9 @@ let mockCampusAccounts = [
 // 筛选文章
 exports.mockGetFilteredArticles = (data) => {
   console.log('Mock - 接收筛选参数：', data);
-  const { tags = [], date_from, date_to } = data;
+  const {
+    tags = [], date_from, date_to
+  } = data;
   let filtered = [...mockArticles];
   if (tags.length > 0) {
     filtered = filtered.filter(article => tags.some(tag => article.tags.includes(tag)));
@@ -1033,94 +1111,155 @@ exports.mockGetFilteredArticles = (data) => {
   if (date_from) filtered = filtered.filter(article => new Date(article.publish_time) >= new Date(date_from));
   if (date_to) filtered = filtered.filter(article => new Date(article.publish_time) <= new Date(date_to));
   filtered.sort((a, b) => new Date(b.publish_time) - new Date(a.publish_time));
-  return { code: 200, data: { list: filtered, total: filtered.length } };
+  return {
+    code: 200,
+    data: {
+      list: filtered,
+      total: filtered.length
+    }
+  };
 };
 
 // 推荐文章
 exports.mockGetRecommendedArticles = () => {
   console.log('Mock - 推荐文章列表：', mockRecommendedArticles);
-  return { code: 200, data: { articles: mockRecommendedArticles, total: mockRecommendedArticles.length } };
+  return {
+    code: 200,
+    data: {
+      articles: mockRecommendedArticles,
+      total: mockRecommendedArticles.length
+    }
+  };
 };
 
 // 首页最新文章
 exports.mockGetLatestArticles = (startRank = 0, pageSize = 8) => {
-  console.log('startrank(mock)(before)',startRank);
+  console.log('startrank(mock)(before)', startRank);
   const paginatedArticles = mockLatestArticles.slice(startRank, startRank + 10);
   startRank = startRank + mockLatestArticles.length;
-  console.log('startrank(mock)(later)',startRank);
+  console.log('startrank(mock)(later)', startRank);
   const reach_end = startRank + pageSize >= mockLatestArticles.length;
-  return { code: 200, data: { articles: paginatedArticles, total: mockLatestArticles.length, reach_end } };
+  return {
+    code: 200,
+    data: {
+      articles: paginatedArticles,
+      total: mockLatestArticles.length,
+      reach_end
+    }
+  };
 };
 
 // 自选/校园文章
 exports.mockGetCustomizedLatestArticles = () => {
   const sortedArticles = [...mockCustomizedLatestArticles].sort((a, b) => new Date(b.publish_time) - new Date(a.publish_time));
-  return { code: 200, data: { articles: sortedArticles, total: sortedArticles.length } };
+  return {
+    code: 200,
+    data: {
+      articles: sortedArticles,
+      total: sortedArticles.length
+    }
+  };
 };
 
 exports.mockGetCampusLatestArticles = () => {
   const sortedArticles = [...mockCampusLatestArticles].sort((a, b) => new Date(b.publish_time) - new Date(a.publish_time));
-  return { code: 200, data: { articles: sortedArticles, total: sortedArticles.length } };
+  return {
+    code: 200,
+    data: {
+      articles: sortedArticles,
+      total: sortedArticles.length
+    }
+  };
 };
 
 // 获取指定公众号文章
 exports.mockGetArticlesByAccount = (accountId) => {
   const articles = mockArticles.filter(item => item.accountid === accountId);
   articles.sort((a, b) => new Date(b.publish_time) - new Date(a.publish_time));
-  return { code: 200, data: { list: articles, total: articles.length } };
+  return {
+    code: 200,
+    data: {
+      list: articles,
+      total: articles.length
+    }
+  };
 };
 
 // 订阅相关
 exports.mockGetSubscriptions = () => {
   console.log('Mock - 获取订阅列表：', mockSubscriptions);
-  return { code: 200, data: { list: mockSubscriptions, total: mockSubscriptions.length } };
+  return {
+    code: 200,
+    data: {
+      list: mockSubscriptions,
+      total: mockSubscriptions.length
+    }
+  };
 };
 
 exports.mockAddSubscription = (data) => {
   console.log('Mock - 添加新订阅：', data);
   mockSubscriptions.unshift(data);
-  return { code: 200, msg: '订阅成功' };
+  return {
+    code: 200,
+    msg: '订阅成功'
+  };
 };
 
 exports.mockDeleteSubscription = (id) => {
   console.log('Mock - 删除单条订阅：', id);
   mockSubscriptions = mockSubscriptions.filter(item => item.id !== id);
-  return { code: 200, msg: '删除订阅成功' };
+  return {
+    code: 200,
+    msg: '删除订阅成功'
+  };
 };
 
 exports.mockDeleteAllSubscriptions = () => {
   mockSubscriptions = [];
-  return { code: 200, msg: '所有订阅删除成功' };
+  return {
+    code: 200,
+    msg: '所有订阅删除成功'
+  };
 };
 
 // 历史记录
 exports.mockDeleteAllHistory = () => {
   mockHistories = [];
-  return { code: 200, msg: '所有历史记录删除成功' };
+  return {
+    code: 200,
+    msg: '所有历史记录删除成功'
+  };
 };
 
 exports.mockAddHistory = (data) => {
   console.log('Mock - 新增历史记录：', data);
   const articleId = data.article_id || data.id || data.article?.id;
-  
+
   if (!articleId) {
-    return { code: 400, msg: '文章ID不能为空' };
+    return {
+      code: 400,
+      msg: '文章ID不能为空'
+    };
   }
 
   const idType = typeof articleId === 'string' ? articleId : Number(articleId);
-  
+
   let articleInfo = mockLatestArticles.find(item => item.id === idType) ||
-                    mockRecommendedArticles.find(item => item.id === idType) ||
-                    mockCustomizedLatestArticles.find(item => item.id === idType) ||
-                    mockCampusLatestArticles.find(item => item.id === idType) ||
-                    mockArticles.find(item => item.id === idType);
+    mockRecommendedArticles.find(item => item.id === idType) ||
+    mockCustomizedLatestArticles.find(item => item.id === idType) ||
+    mockCampusLatestArticles.find(item => item.id === idType) ||
+    mockArticles.find(item => item.id === idType);
 
   if (!articleInfo) {
-    return { code: 400, msg: `未找到ID为${articleId}的文章` };
+    return {
+      code: 400,
+      msg: `未找到ID为${articleId}的文章`
+    };
   }
 
   const existingIndex = mockHistories.findIndex(item => item.id == articleId);
-  
+
   if (existingIndex !== -1) {
     const existingItem = mockHistories.splice(existingIndex, 1)[0];
     mockHistories.unshift(existingItem);
@@ -1147,7 +1286,13 @@ exports.mockAddHistory = (data) => {
   }
 
   console.log('Mock - 新增历史后列表：', mockHistories);
-  return { code: 200, msg: '历史记录添加成功', data: { id: articleId } };
+  return {
+    code: 200,
+    msg: '历史记录添加成功',
+    data: {
+      id: articleId
+    }
+  };
 };
 
 exports.mockGetHistoryList = () => {
@@ -1165,24 +1310,36 @@ exports.mockDeleteHistory = (articleId) => {
   console.log('Mock - 删除历史记录：', articleId);
 
   if (!articleId) {
-    return { code: 400, msg: '文章ID不能为空' };
+    return {
+      code: 400,
+      msg: '文章ID不能为空'
+    };
   }
 
   const isExisted = mockHistories.some(item => item.id == articleId);
   if (!isExisted) {
-    return { code: 400, msg: '该历史记录不存在' };
+    return {
+      code: 400,
+      msg: '该历史记录不存在'
+    };
   }
 
   mockHistories = mockHistories.filter(item => item.id != articleId);
   console.log('Mock - 删除历史后列表：', mockHistories);
-  return { code: 200, msg: '历史记录删除成功' };
+  return {
+    code: 200,
+    msg: '历史记录删除成功'
+  };
 };
 
 // 收藏夹管理
-exports.mockUpdateCollection = function(collectionId, data) {
+exports.mockUpdateCollection = function (collectionId, data) {
   const collectionIndex = mockCollectionList.findIndex(item => item.id == collectionId);
   if (collectionIndex === -1) {
-    return { code: 400, msg: '收藏夹不存在' };
+    return {
+      code: 400,
+      msg: '收藏夹不存在'
+    };
   }
 
   if (data.name) mockCollectionList[collectionIndex].name = data.name;
@@ -1197,18 +1354,24 @@ exports.mockUpdateCollection = function(collectionId, data) {
   };
 };
 
-exports.mockDeleteCollection = function(collectionId) {
+exports.mockDeleteCollection = function (collectionId) {
   console.log('Mock - 删除收藏夹：', collectionId);
   const colId = Number(collectionId);
-  
+
   const collectionIndex = mockCollectionList.findIndex(item => item.id === colId);
   if (collectionIndex === -1) {
-    return { code: 400, msg: '收藏夹不存在' };
+    return {
+      code: 400,
+      msg: '收藏夹不存在'
+    };
   }
 
   const targetCollection = mockCollectionList[collectionIndex];
   if (targetCollection.is_default) {
-    return { code: 403, msg: '默认收藏夹不可删除' };
+    return {
+      code: 403,
+      msg: '默认收藏夹不可删除'
+    };
   }
 
   mockCollectionList.splice(collectionIndex, 1);
@@ -1216,23 +1379,26 @@ exports.mockDeleteCollection = function(collectionId) {
   delete collectionArticleMap[colId];
 
   console.log('Mock - 删除收藏夹成功，剩余收藏夹：', mockCollectionList);
-  return { code: 200, msg: '删除成功' };
+  return {
+    code: 200,
+    msg: '删除成功'
+  };
 };
 
-exports.mockGetCollections = function() {
+exports.mockGetCollections = function () {
   // 返回前更新收藏夹数量
   updateCollectionCount();
   return {
     code: 200,
     msg: "success",
-    data: mockCollectionList 
+    data: mockCollectionList
   };
 };
 
-exports.mockAddCollection = function(data) {
-  const maxId = mockCollectionList.length > 0 
-    ? Math.max(...mockCollectionList.map(item => item.id)) 
-    : 0;
+exports.mockAddCollection = function (data) {
+  const maxId = mockCollectionList.length > 0 ?
+    Math.max(...mockCollectionList.map(item => item.id)) :
+    0;
   const newCollection = {
     id: maxId + 1,
     name: data.name,
@@ -1254,38 +1420,69 @@ exports.mockAddCollection = function(data) {
 exports.mockDeleteAllFavourite = () => {
   console.log('Mock - 删除所有收藏');
   const articleIds = mockFavorites.map(item => item.articleId);
-  
+
   articleIds.forEach(articleId => updateArticleFavoriteStatus(articleId, false));
-  
+
   // 清空收藏夹文章映射
   Object.keys(collectionArticleMap).forEach(key => {
     collectionArticleMap[key] = [];
   });
   // 更新收藏夹数量
   updateCollectionCount();
-  
+
   mockFavorites = [];
-  return { code: 200, msg: '所有收藏删除成功' };
+  return {
+    code: 200,
+    msg: '所有收藏删除成功'
+  };
 };
 
 // 登录/注册/用户信息
 exports.mockRegister = (data) => {
-  const { username, password } = data;
+  const {
+    username,
+    password
+  } = data;
   const existUser = mockUsers.find(u => u.username === username);
-  if (existUser) return { code: 400, msg: '用户名已存在' };
+  if (existUser) return {
+    code: 400,
+    msg: '用户名已存在'
+  };
   const newUserId = mockUsers.length + 1;
-  mockUsers.push({ id: newUserId, username, password });
+  mockUsers.push({
+    id: newUserId,
+    username,
+    password
+  });
   mockUserInfo.nickName = username;
   mockUserInfo.studentId = '2025' + Mock.Random.integer(1000, 9999);
-  return { code: 200, msg: '注册成功', data: { token: `mock_token_${newUserId}` } };
+  return {
+    code: 200,
+    msg: '注册成功',
+    data: {
+      token: `mock_token_${newUserId}`
+    }
+  };
 };
 
 exports.mockLogin = (data) => {
-  const { username, password } = data;
+  const {
+    username,
+    password
+  } = data;
   const user = mockUsers.find(u => u.username === username && u.password === password);
-  if (!user) return { code: 400, msg: '用户名或密码错误' };
+  if (!user) return {
+    code: 400,
+    msg: '用户名或密码错误'
+  };
   mockUserInfo.nickName = username;
-  return { code: 200, msg: '登录成功', data: { token: `mock_token_${user.id}` } };
+  return {
+    code: 200,
+    msg: '登录成功',
+    data: {
+      token: `mock_token_${user.id}`
+    }
+  };
 };
 
 exports.getMockUserInfo = () => {
@@ -1299,41 +1496,65 @@ exports.mockUpdateUsername = (data) => {
     const currentUser = mockUsers.find(u => u.username === mockUserInfo.nickName);
     if (currentUser) currentUser.username = data.username;
   }
-  return { code: 200, msg: '用户名修改成功' };
+  return {
+    code: 200,
+    msg: '用户名修改成功'
+  };
 };
 
 exports.mockUpdateEmail = (data) => {
   if (data.email) mockUserInfo.email = data.email;
-  return { code: 200, msg: '邮箱修改成功' };
+  return {
+    code: 200,
+    msg: '邮箱修改成功'
+  };
 };
 
 exports.mockUpdatePhone = (data) => {
   if (data.phone) mockUserInfo.phone = data.phone;
-  return { code: 200, msg: '手机号修改成功' };
+  return {
+    code: 200,
+    msg: '手机号修改成功'
+  };
 };
 
 exports.mockUpdatePassword = (data) => {
-  if (!data.old_password) return { code: 400, msg: '原密码不能为空' };
-  if (data.new_password.length < 6) return { code: 400, msg: '新密码需6-16位' };
+  if (!data.old_password) return {
+    code: 400,
+    msg: '原密码不能为空'
+  };
+  if (data.new_password.length < 6) return {
+    code: 400,
+    msg: '新密码需6-16位'
+  };
   const currentUser = mockUsers.find(u => u.username === mockUserInfo.nickName);
   if (currentUser) currentUser.password = data.new_password;
-  return { code: 200, msg: '密码修改成功' };
+  return {
+    code: 200,
+    msg: '密码修改成功'
+  };
 };
 
 exports.mockUpdateAvatar = (filePath) => {
   const newAvatarUrl = '/assets/icons/custom-avatar.png';
   mockUserInfo.avatarUrl = newAvatarUrl;
-  return { code: 200, msg: '头像修改成功', data: { avatarUrl: newAvatarUrl } };
+  return {
+    code: 200,
+    msg: '头像修改成功',
+    data: {
+      avatarUrl: newAvatarUrl
+    }
+  };
 };
 
 exports.mockGetCampusAccounts = () => {
-    console.log('Mock - 校内公众号列表：', mockCampusAccounts);
-    return {
-      code: 200,
-      msg: "success",
-      data: {
-        list: mockCampusAccounts, 
-        total: mockCampusAccounts.length
-      }
-    };
+  console.log('Mock - 校内公众号列表：', mockCampusAccounts);
+  return {
+    code: 200,
+    msg: "success",
+    data: {
+      list: mockCampusAccounts,
+      total: mockCampusAccounts.length
+    }
   };
+};

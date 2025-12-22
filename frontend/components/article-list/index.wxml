@@ -1,31 +1,16 @@
 <!-- article-list.wxml -->
 <view class="card-area">
   <!-- 卡片独立滚动容器 -->
-  <scroll-view 
-    class="card-scroll" 
-    scroll-y="true" 
-    scroll-top="{{scrollTop}}"
-    style="height: {{article_list_scrollHeight}};"
-  >
+  <scroll-view class="card-scroll" scroll-y="true" scroll-top="{{scrollTop}}" style="height: {{article_list_scrollHeight}};">
     <view class="card-list">
-      <block wx:for="{{list}}" wx:key="id"> 
-        <card-component
-          id_="{{item.id}}"
-          title="{{item.title}}"
-          time="{{item.publish_time}}"
-          tags="{{item.tags}}"
-          desc="{{item.summary}}"
-          url="{{item.article_url}}"
-          key_info="{{item.key_info}}"
-          name="{{item.account_name}}"
-          is_favorited="{{item.is_favorited}}"
-        />
+      <block wx:for="{{list}}" wx:key="id">
+        <card-component id_="{{item.id}}" title="{{item.title}}" time="{{item.publish_time}}" tags="{{item.tags}}" desc="{{item.summary}}" url="{{item.article_url}}" key_info="{{item.key_info}}" name="{{item.account_name}}" is_favorited="{{item.is_favorited}}" />
       </block>
     </view>
-    
+
     <!-- 空数据提示 -->
     <view wx:if="{{list.length === 0}}" class="empty-tip">{{emptyText}}</view>
-    
+
     <!-- 新增：加载更多按钮区域 -->
     <view wx:if="{{list.length > 0}}" class="load-more-area">
       <!-- 加载中状态 -->

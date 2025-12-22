@@ -23,7 +23,7 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
-  
+
   <view class="menu-item" bindtap="goToFavorites_">
     <view class="menu-left">
       <image class="menu-icon" src="/assets/icons/star.svg" mode="widthFix"></image>
@@ -39,7 +39,7 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
-  
+
   <view class="menu-item" bindtap="goToHistory">
     <view class="menu-left">
       <image class="menu-icon" src="/assets/icons/time.svg" mode="widthFix"></image>
@@ -47,7 +47,15 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
-  
+
+  <view class="menu-item" bindtap="goToCalendar">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/calendar.svg" mode="widthFix"></image>
+      <text class="menu-text">我的待办</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
   <view class="menu-item" bindtap="goToHelp">
     <view class="menu-left">
       <image class="menu-icon" src="/assets/icons/question-circle.svg" mode="widthFix"></image>
@@ -55,7 +63,7 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
-  
+
   <view class="menu-item" bindtap="goToSuggestion">
     <view class="menu-left">
       <image class="menu-icon" src="/assets/icons/comment.svg" mode="widthFix"></image>
@@ -63,14 +71,11 @@
     </view>
     <view class="menu-arrow">></view>
   </view>
+</view>
 
-  <view class="menu-item" bindtap="goToCalendar">
-    <view class="menu-left">
-      <image class="menu-icon" src="/assets/icons/comment.svg" mode="widthFix"></image>
-      <text class="menu-text">我的待办</text>
-    </view>
-    <view class="menu-arrow">></view>
-  </view>
+<!-- 退出登录按钮 -->
+<view class="logout-btn" bindtap="handleLogout">
+  <text class="logout-btn-text">退出登录</text>
 </view>
 
 <!-- 底部导航栏 -->

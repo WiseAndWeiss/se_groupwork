@@ -1,858 +1,1030 @@
 /* ================= 全局样式配置 ================= */
 page {
-    /* 主题变量：统一管理，方便换肤/维护 */
-    --primary-color: #591bb7;
-    --primary-light: #6a27c5;
-    --primary-dark: #401488;
-    --danger-color: #ff4444;
-    --text-main: #333;
-    --text-secondary: #666;
-    --text-light: #999;
-    --bg-main: #f8f8f8;
-    --bg-white: #ffffff;
-    --border-color: #eee;
-    --border-light: #f5f5f5;
-    --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4rpx 30rpx rgba(0, 0, 0, 0.15);
-    
-    /* 通用尺寸变量 */
-    --navbar-height: 170rpx;
-    --tabbar-height: 88rpx;
-    --hour-cell-height: 70rpx;
-    --date-header-height: 60rpx;
-    
-    margin: 0;
-    padding: 0;
-    font-size: 28rpx;
-    color: var(--text-main);
-    background-color: var(--bg-main);
-    line-height: 1.5;
+  /* 主题变量：统一管理，方便换肤/维护 */
+  --primary-color: #591bb7;
+  --primary-light: #6a27c5;
+  --primary-dark: #401488;
+  --danger-color: #ff4444;
+  --text-main: #333;
+  --text-secondary: #666;
+  --text-light: #999;
+  --bg-main: #f8f8f8;
+  --bg-white: #ffffff;
+  --border-color: #eee;
+  --border-light: #f5f5f5;
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4rpx 30rpx rgba(0, 0, 0, 0.15);
+
+  /* 通用尺寸变量 */
+  --navbar-height: 170rpx;
+  --tabbar-height: 88rpx;
+  --hour-cell-height: 70rpx;
+  --date-header-height: 60rpx;
+
+  margin: 0;
+  padding: 0;
+  font-size: 28rpx;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  line-height: 1.5;
+}
+
+/* 基础重置 */
+button,
+input,
+textarea,
+scroll-view {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+button {
+  background: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+button::after {
+  border: none;
+}
+
+/* 核心布局  */
+.todo-calendar-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--tabbar-height);
+  box-sizing: border-box;
+  background-color: var(--bg-main);
+  /* 移除overflow: hidden，避免影响fixed定位 */
+  overflow: visible;
+}
+
+.calendar-container {
+  flex: 1;
+  padding: 20rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* 优化iOS滚动体验 */
+}
+
+/* 视图切换动画 */
+.view-animate {
+  animation: viewFade 0.4s ease-out forwards;
+  width: 100%;
+}
+
+@keyframes viewFade {
+  0% {
+    opacity: 0;
   }
-  
-  /* 基础重置 */
-  button, input, textarea, scroll-view {
-    margin: 0;
-    padding: 0;
-    border: none;
-    outline: none;
-    box-sizing: border-box;
+
+  100% {
+    opacity: 1;
   }
-  
-  button {
-    background: none;
-    font-size: inherit;
-    color: inherit;
-  }
-  
-  button::after {
-    border: none;
-  }
-  
-  /* 核心布局  */
-  .todo-calendar-page {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: var(--tabbar-height);
-    box-sizing: border-box;
-    background-color: var(--bg-main);
-    /* 移除overflow: hidden，避免影响fixed定位 */
-    overflow: visible;
-  }
-  
-  .calendar-container {
-    flex: 1;
-    padding: 20rpx;
-    box-sizing: border-box;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* 优化iOS滚动体验 */
-  }
-  
-  /* 视图切换动画 */
-  .view-animate {
-    animation: viewFade 0.4s ease-out forwards;
-    width: 100%;
-  }
-  
-  @keyframes viewFade {
-    0% {
-      opacity: 0;
-      transform: scale(0.98) translateY(10rpx);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-  
-  /* 自定义导航栏  */
-  .custom-navbar {
-    position: relative;
-    height: var(--navbar-height);
-    background-color: var(--bg-white);
-    display: flex;
-    align-items: flex-end;
-    padding: 0 30rpx 20rpx 30rpx;
-    box-sizing: border-box;
-    z-index: 1000;
-    color: var(--primary-color);
-    font-weight: 600;
-  }
-  
-  .navbar-title {
-    font-size: 35rpx;
-    margin: 0 auto;
-  }
-  
-  .return-icon {
-    width: 50rpx;
-    height: 50rpx;
-    position: absolute;
-    left: 30rpx;
-    bottom: 17rpx;
-    transition: transform 0.2s ease;
-  }
-  
-  .return-icon:active {
-    transform: scale(0.9);
-  }
-  
-  /* 年视图样式  */
-  .year-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10rpx 0;
-    margin-bottom: 20rpx;
-    font-size: 30rpx;
-  }
-  
-  .year-nav-btn {
-    color: var(--primary-color);
-    font-size: 26rpx;
-    padding: 5rpx 10rpx;
-    transition: color 0.2s ease;
-  }
-  
-  .year-nav-btn:active {
-    color: var(--primary-dark);
-  }
-  
-  .year-nav-title {
-    font-weight: 600;
-    color: var(--text-main);
-  }
-  
-  .year-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15rpx;
-  }
-  
-  .year-month-item {
-    width: calc(33.333% - 15rpx);
-    box-sizing: border-box;
-    background-color: var(--bg-white);
-    border-radius: 8rpx;
-    padding: 5rpx;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .year-month-item:active {
-    transform: scale(0.98);
-  }
-  
-  .year-month-title {
-    font-size: 28rpx;
-    font-weight: 600;
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 10rpx;
-  }
-  
-  .year-week-header {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    font-size: 20rpx;
-    color: var(--text-light);
-    margin-bottom: 5rpx;
-  }
-  
-  .year-week-header > view {
-    width: calc(100% / 7);
-    text-align: center;
-    box-sizing: border-box;
-  }
-  
-  .year-date-list {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-  
-  .year-date-item {
-    width: calc(100% / 7);
-    text-align: center;
-    padding: 5rpx 0;
-    font-size: 22rpx;
-    border-radius: 4rpx;
-    transition: background-color 0.2s ease;
-    box-sizing: border-box;
-  }
-  
-  .year-date-item.current-date {
-    color: var(--danger-color);
-    font-weight: 600;
-  }
-  
-  .year-date-item.selected-date {
+}
+
+/* 自定义导航栏  */
+.custom-navbar {
+  position: relative;
+  height: var(--navbar-height);
+  background-color: var(--bg-white);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 30rpx 20rpx 30rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.navbar-title {
+  font-size: 35rpx;
+  margin: 0 auto;
+}
+
+.return-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+  transition: transform 0.2s ease;
+}
+
+.return-icon:active {
+  transform: scale(0.9);
+}
+
+/* 年视图样式  */
+.year-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 0;
+  margin-bottom: 20rpx;
+  font-size: 30rpx;
+}
+
+.year-nav-btn {
+  color: var(--primary-color);
+  font-size: 26rpx;
+  padding: 5rpx 10rpx;
+  transition: color 0.2s ease;
+}
+
+.year-nav-btn:active {
+  color: var(--primary-dark);
+}
+
+.year-nav-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.year-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.year-month-item {
+  width: calc(33.333% - 10rpx);
+  /* 调整宽度计算 */
+  box-sizing: border-box;
+  background-color: var(--bg-white);
+  border-radius: 24rpx;
+  padding: 6rpx;
+  padding-right: 2;
+  /* 移除右侧padding */
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.year-month-item:active {
+  transform: scale(0.98);
+}
+
+.year-month-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 10rpx;
+}
+
+.year-week-header {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  font-size: 20rpx;
+  color: var(--text-light);
+  margin-bottom: 5rpx;
+  margin-left: 5rpx;
+  padding-bottom: 5rpx;
+}
+
+.year-week-header .week-header-text {
+  text-align: center;
+  box-sizing: border-box;
+  padding: 1rpx;
+  /* 左右各6rpx，形成间隔 */
+}
+
+.year-week-header .week-header-text:not(:last-child) {
+  margin-right: 9rpx;
+  /* 除了最后一个，右边都有间隔 */
+}
+
+.year-date-list {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.year-date-item {
+  width: calc(100% / 7);
+  aspect-ratio: 1 / 1;
+  /* 设置为正方形 */
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  border-radius: 4rpx;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  padding: 3rpx 0 2rpx 0;
+}
+
+/* 空的日期项：透明度为0，保持布局 */
+.year-date-item.empty-date {
+  opacity: 0;
+  pointer-events: none;
+  /* 禁用点击事件 */
+}
+
+.year-date-item.current-date {
+  color: #fff;
+  font-weight: 600;
+  background-color: var(--primary-color);
+}
+
+/* .year-date-item.selected-date {
     background-color: var(--primary-color);
     color: var(--bg-white);
     border-radius: 50%;
+  } */
+
+/*  月视图样式  */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 0;
+  margin-bottom: 10rpx;
+  font-size: 30rpx;
+}
+
+.month-nav-btn {
+  color: var(--primary-color);
+  font-size: 26rpx;
+  padding: 5rpx 10rpx;
+  transition: color 0.2s ease;
+}
+
+.month-nav-btn:active {
+  color: var(--primary-dark);
+}
+
+.month-nav-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.week-header {
+  display: flex;
+  margin-bottom: 10rpx;
+  width: 100%;
+}
+
+.week-header-item {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.date-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rpx;
+  width: 100%;
+  margin-bottom: 20rpx;
+}
+
+.date-item {
+  width: calc(14.28% - 5rpx);
+  height: 120rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  background-color: var(--bg-white);
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  box-sizing: border-box;
+  padding: 5rpx;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* 空的日期项：透明度为0，保持布局 */
+.date-item.empty-date {
+  opacity: 0;
+  pointer-events: none;
+  /* 禁用点击事件 */
+}
+
+.date-item:active {
+  transform: scale(0.95);
+}
+
+.date-day {
+  font-size: 28rpx;
+  margin-bottom: 5rpx;
+}
+
+.date-week {
+  font-size: 20rpx;
+  color: var(--text-light);
+  margin-bottom: 5rpx;
+}
+
+.date-item.current-date {
+  background-color: var(--primary-color);
+  color: var(--bg-white) !important;
+}
+
+.date-item.current-date .date-week {
+  color: var(--bg-white) !important;
+}
+
+.date-item.selected-date {
+  border: 2rpx solid var(--primary-color);
+  color: var(--text-secondary);
+}
+
+/* 同时是本日和选中时，优先显示本日的紫色填充 */
+.date-item.current-date.selected-date {
+  background-color: var(--primary-color);
+  border: 2rpx solid var(--primary-color);
+  color: var(--bg-white) !important;
+}
+
+.date-item.current-date.selected-date .date-week {
+  color: var(--bg-white) !important;
+}
+
+/*  周视图 */
+.week-container {
+  display: flex;
+  height: 100%;
+  background-color: var(--bg-white);
+  border-radius: 8rpx;
+  overflow: hidden;
+  min-height: calc(24 * var(--hour-cell-height));
+  /* 24小时高度，保证对齐 */
+  width: 100%;
+  position: relative;
+}
+
+/* 左侧时间轴 */
+.time-axis {
+  width: 100rpx;
+  border-right: 1rpx solid var(--border-color);
+  background-color: var(--bg-main);
+  flex-shrink: 0;
+  padding-top: 110rpx;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+}
+
+.time-axis-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  border-bottom: 1rpx solid var(--border-light);
+  box-sizing: border-box;
+  height: var(--hour-cell-height);
+  position: relative;
+}
+
+.time-text {
+  display: block;
+  text-align: center;
+  padding-bottom: 60rpx;
+}
+
+/* 右侧日期包裹层 */
+.week-date-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: calc(100% - 100rpx);
+}
+
+/* 日期栏*/
+.week-date-header {
+  display: flex;
+  height: 110rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  background-color: #fafafa;
+  flex-shrink: 0;
+  padding-right: 0rpx;
+}
+
+.week-date-header .date-header {
+  flex: 1;
+  height: 110rpx;
+  border-right: 2rpx solid var(--border-color);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  margin-right: 4rpx;
+}
+
+.week-date-header .date-header:last-child {
+  margin-right: 0;
+}
+
+.week-date-header .date-header .date-week {
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.week-date-header .date-header .date-day {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.date-header.current-date {
+  background-color: var(--primary-color);
+  color: var(--bg-white) !important;
+  font-weight: 600;
+}
+
+.date-header.current-date .date-week,
+.date-header.current-date .date-day {
+  color: var(--bg-white) !important;
+}
+
+.date-header.selected-date {
+  border: 2rpx solid var(--primary-color);
+  color: var(--text-secondary);
+}
+
+/* 同时是当天和选中时，优先显示当天的紫色填充 */
+.date-header.current-date.selected-date {
+  background-color: var(--primary-color);
+  border: 2rpx solid var(--primary-color);
+  color: var(--bg-white) !important;
+}
+
+.date-header.current-date.selected-date .date-week,
+.date-header.current-date.selected-date .date-day {
+  color: var(--bg-white) !important;
+}
+
+/* 日期时间内容 */
+.week-date-content {
+  flex: 1;
+  display: flex;
+  height: calc(100% - 110rpx);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 日期列 */
+.date-column {
+  flex: 1;
+  width: calc(100% / 7);
+  border-right: 1rpx solid var(--border-color);
+  box-sizing: border-box;
+  min-width: 0;
+  height: 100%;
+}
+
+.date-column:last-child {
+  border-right: none;
+}
+
+/* 日期时间表格 */
+.date-body {
+  height: 100%;
+  width: 100%;
+}
+
+/* 时间单元格 */
+.time-cell {
+  border-bottom: 1rpx solid var(--border-color);
+  position: relative;
+  box-sizing: border-box;
+  height: var(--hour-cell-height);
+  background-color: var(--bg-white);
+  width: 100%;
+}
+
+/* 周视图待办条 */
+.week-schedule-bar {
+  position: absolute;
+  left: 2rpx;
+  width: calc(100% - 4rpx);
+  background-color: var(--primary-color);
+  border-radius: 6rpx;
+  opacity: 0.85;
+  transition: all 0.2s ease;
+  padding: 6rpx 6rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.week-schedule-bar:active {
+  opacity: 1;
+  transform: scale(0.98);
+  background-color: var(--primary-dark);
+}
+
+.schedule-title {
+  color: var(--bg-white);
+  font-size: 20rpx;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.4;
+  font-weight: 500;
+  margin-bottom: 4rpx;
+}
+
+.schedule-time {
+  color: #f0f0f0;
+  font-size: 18rpx;
+  line-height: 1.2;
+}
+
+/*  全部日程样式  */
+.all-todo-container {
+  background-color: var(--bg-white);
+  border-radius: 8rpx;
+  padding: 20rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.all-todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding: 0 20rpx 20rpx 20rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.all-todo-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.inline-add-btn {
+  padding: 8rpx 20rpx 10rpx;
+  font-size: 24rpx;
+  /* 继承 add-todo-btn 的样式 */
+}
+
+.all-todo-list {
+  margin-top: 10rpx;
+}
+
+/*  待办列表样式 */
+.todo-list-wrap {
+  margin: 30rpx;
+}
+
+.add-todo-btn-wrap {
+  margin: 20rpx 10rpx;
+  text-align: center;
+  width: 100%;
+  /* 添加以下代码 */
+  display: flex;
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
+}
+
+.add-todo-btn {
+  color: #fff;
+  font-size: 28rpx;
+  padding: 10rpx 28rpx 14rpx;
+  border-radius: 100rpx;
+  background: linear-gradient(135deg, #7b2ff7 0%, #6a27d8 100%);
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.2);
+  transition: all 0.25s ease;
+  border: none;
+  will-change: transform, box-shadow;
+  height: 45rpx;
+  width: 160rpx;
+  /* 确保按钮内文字居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.add-todo-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 2rpx 8rpx rgba(123, 47, 247, 0.3);
+  /* 紫色系阴影加深 */
+  background: linear-gradient(135deg, #6a27d8 0%, #591bb7 100%);
+  /* 紫色加深 */
+}
+
+.empty-tip {
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--text-light);
+  padding: 40rpx 0;
+  background: var(--bg-white);
+  border-radius: 24rpx;
+  margin: 10rpx 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/*  底部切换栏  */
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  background-color: var(--bg-white);
+  border-top: 1rpx solid var(--border-color);
+}
+
+.view-switch-bar {
+  display: flex;
+  background-color: var(--bg-white);
+}
+
+.switch-btn {
+  flex: 1;
+  height: var(--tabbar-height);
+  line-height: var(--tabbar-height);
+  padding: 0;
+  margin: 0;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.switch-btn.active {
+  color: var(--primary-color);
+  font-weight: 600;
+  position: relative;
+}
+
+.switch-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background-color: var(--primary-color);
+  border-radius: 2rpx;
+  animation: tabActive 0.3s ease-out forwards;
+}
+
+@keyframes tabActive {
+  0% {
+    width: 0;
   }
-  
-  /*  月视图样式  */
-  .month-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10rpx 0;
-    margin-bottom: 10rpx;
-    font-size: 30rpx;
+
+  100% {
+    width: 40rpx;
   }
-  
-  .month-nav-btn {
-    color: var(--primary-color);
-    font-size: 26rpx;
-    padding: 5rpx 10rpx;
-    transition: color 0.2s ease;
+}
+
+/* ========== 待办弹窗样式（优化卡顿+确定按钮改为紫色，与card组件一致） ========== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2002;
+  animation: fadeIn 0.25s ease-out;
+  /* 缩短动画时长，更流畅 */
+  will-change: opacity;
+  /* 提示浏览器优化 */
+  /* 避免mask重绘卡顿 */
+  pointer-events: auto;
+  backface-visibility: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .month-nav-btn:active {
-    color: var(--primary-dark);
-  }
-  
-  .month-nav-title {
-    font-weight: 600;
-    color: var(--text-main);
-  }
-  
-  .week-header {
-    display: flex;
-    margin-bottom: 10rpx;
-    width: 100%;
-  }
-  
-  .week-header-item {
-    flex: 1;
-    text-align: center;
-    font-size: 24rpx;
-    color: var(--text-secondary);
-  }
-  
-  .date-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5rpx;
-    width: 100%;
-    margin-bottom: 20rpx;
-  }
-  
-  .date-item {
-    width: calc(14.28% - 5rpx);
-    height: 120rpx;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8rpx;
-    background-color: var(--bg-white);
-    font-size: 24rpx;
-    color: var(--text-secondary);
-    box-sizing: border-box;
-    padding: 5rpx;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    flex-shrink: 0;
-  }
-  
-  .date-item:active {
-    transform: scale(0.95);
-  }
-  
-  .date-day {
-    font-size: 28rpx;
-    margin-bottom: 5rpx;
-  }
-  
-  .date-week {
-    font-size: 20rpx;
-    color: var(--text-light);
-    margin-bottom: 5rpx;
-  }
-  
-  .date-item.current-date {
-    border: 2rpx solid var(--danger-color);
-    color: var(--text-secondary);
-  }
-  
-  .date-item.selected-date {
-    background-color: var(--primary-color);
-    color: var(--bg-white) !important;
-  }
-  
-  .date-item.selected-date .date-week {
-    color: var(--bg-white) !important;
-  }
-  
-  /*  周视图 */
-  .week-container {
-    display: flex;
-    height: 100%;
-    background-color: var(--bg-white);
-    border-radius: 8rpx;
-    overflow: hidden;
-    min-height: calc(24 * var(--hour-cell-height)); /* 24小时高度，保证对齐 */
-    width: 100%;
-    position: relative;
-  }
-  
-  /* 左侧时间轴 */
-  .time-axis {
-    width: 100rpx;
-    border-right: 1rpx solid var(--border-color);
-    background-color: var(--bg-main);
-    flex-shrink: 0;
-    padding-top: var(--date-header-height);
-    box-sizing: border-box;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  .time-axis-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22rpx;
-    color: var(--text-secondary);
-    border-bottom: 1rpx solid var(--border-light);
-    box-sizing: border-box;
-    height: var(--hour-cell-height);
-    position: relative;
-  }
-  
-  .time-text {
-    display: block;
-    text-align: center;
-  }
-  
-  /* 右侧日期包裹层 */
-  .week-date-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: calc(100% - 100rpx);
-  }
-  
-  /* 日期栏*/
-  .week-date-header {
-    display: flex;
-    height: var(--date-header-height);
-    border-bottom: 1rpx solid var(--border-color);
-    background-color: #fafafa;
-    flex-shrink: 0;
-  }
-  
-  .week-date-header .date-header {
-    flex: 1;
-    height: 100%;
-    border-right: 1rpx solid var(--border-color);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 24rpx;
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-  }
-  
-  .week-date-header .date-header:last-child {
-    border-right: none;
-  }
-  
-  .date-header.current-date {
-    border: 1rpx solid var(--danger-color);
-    color: var(--danger-color);
-    font-weight: 600;
-  }
-  
-  .date-header.selected-date {
-    background-color: var(--primary-color);
-    color: var(--bg-white) !important;
-  }
-  
-  /* 日期时间内容 */
-  .week-date-content {
-    flex: 1;
-    display: flex;
-    height: calc(100% - var(--date-header-height));
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* 日期列 */
-  .date-column {
-    flex: 1;
-    width: calc(100% / 7);
-    border-right: 1rpx solid var(--border-color);
-    box-sizing: border-box;
-    min-width: 0;
-    height: 100%;
-  }
-  
-  .date-column:last-child {
-    border-right: none;
-  }
-  
-  /* 日期时间表格 */
-  .date-body {
-    height: 100%;
-    width: 100%;
-  }
-  
-  /* 时间单元格 */
-  .time-cell {
-    border-bottom: 1rpx solid var(--border-color);
-    position: relative;
-    box-sizing: border-box;
-    height: var(--hour-cell-height);
-    background-color: var(--bg-white);
-    width: 100%;
-  }
-  
-  /* 周视图待办条 */
-  .week-schedule-bar {
-    position: absolute;
-    left: 2rpx;          
-    width: calc(100% - 4rpx); 
-    background-color: var(--primary-color);
-    border-radius: 6rpx;
-    opacity: 0.85;
-    transition: all 0.2s ease;
-    padding: 6rpx 6rpx;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow: hidden;
-    z-index: 10;
-  }
-  
-  .week-schedule-bar:active {
+
+  to {
     opacity: 1;
-    transform: scale(0.98);
-    background-color: var(--primary-dark);
   }
-  
-  .schedule-title {
-    color: var(--bg-white);
-    font-size: 20rpx;
-    white-space: normal;
-    word-wrap: break-word;
-    line-height: 1.4;
-    font-weight: 500;
-    margin-bottom: 4rpx;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  max-width: 600rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  z-index: 2003;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+  /* 核心优化：解决卡顿 */
+  animation: slideUpModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* 更顺滑的缓动函数 */
+  will-change: transform, opacity;
+  /* 预告知浏览器动画属性 */
+  backface-visibility: hidden;
+  /* 开启GPU加速 */
+  transform: translate(-50%, -50%) translate3d(0, 0, 0);
+  /* 强制GPU渲染 */
+  /* 防止超出视口 */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 优化弹窗动画：改用translate3d，缓动函数更顺滑 */
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 30rpx, 0);
   }
-  
-  .schedule-time {
-    color: #f0f0f0;
-    font-size: 18rpx;
-    line-height: 1.2;
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0);
   }
-  
-  /*  全部日程样式  */
-  .all-todo-container {
-    background-color: var(--bg-white);
-    border-radius: 8rpx;
-    padding: 20rpx;
-    box-shadow: var(--shadow-sm);
+}
+
+.modal-content {
+  padding: 30rpx;
+}
+
+.modal-item {
+  margin-bottom: 24rpx;
+}
+
+.modal-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  font-weight: 600;
+}
+
+/* 标题输入栏加高 */
+.modal-input {
+  width: 100%;
+  padding: 22rpx 20rpx;
+  min-height: 88rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  line-height: 1.5;
+  /* 优化输入框渲染 */
+  backface-visibility: hidden;
+}
+
+/* 内容输入框单独调整 */
+.desc-input {
+  min-height: 120rpx;
+  padding: 18rpx 20rpx;
+  line-height: 1.3;
+  resize: none;
+  vertical-align: top;
+  /* 确保文本从顶部对齐 */
+}
+
+/* 内容输入框的placeholder样式 */
+.content-placeholder-style {
+  color: #999;
+  line-height: 1.6;
+  /* 与输入框的line-height保持一致 */
+  vertical-align: top;
+  /* 确保placeholder从顶部对齐 */
+}
+
+/* 聚焦色改为紫色，统一视觉 */
+.modal-input:focus {
+  border-color: #7b2ff7;
+  outline: none;
+}
+
+.modal-btn-group {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.add-todo-btn-group {
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx;
+  border-radius: 30rpx;
+  font-size: 28rpx;
+  font-weight: 550;
+  transition: all 0.25s ease;
+  will-change: transform, background;
+  /* 优化点击动画 */
+}
+
+.cancel-btn {
+  background: #f8f8f8;
+  color: #666;
+  border: 2rpx solid #e8e8e8;
+}
+
+.cancel-btn:active {
+  background: #f0f0f0;
+  transform: scale(0.97);
+}
+
+/* ========== 确定按钮：改为紫色系，与添加待办完全一致 ========== */
+.confirm-btn {
+  background: linear-gradient(135deg, #7b2ff7 0%, #6a27d8 100%);
+  /* 紫色渐变 */
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.2);
+  /* 紫色系阴影 */
+  color: #fff;
+  border: none;
+}
+
+.confirm-btn:active {
+  background: linear-gradient(135deg, #6a27d8 0%, #591bb7 100%);
+  /* 紫色加深 */
+  box-shadow: 0 2rpx 8rpx rgba(123, 47, 247, 0.3);
+  /* 阴影加深 */
+  transform: scale(0.97);
+}
+
+.placeholder-style {
+  color: #999;
+  line-height: 1.5;
+  /* 与input的line-height保持一致 */
+}
+
+/* 内容输入框的placeholder样式 */
+.content-placeholder-style {
+  color: #999;
+  line-height: 1.6;
+  /* 与textarea的line-height保持一致 */
+}
+
+/*  待办详情弹窗样式 */
+.todo-popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  animation: maskFade 0.2s ease-out forwards;
+}
+
+.todo-popup {
+  position: fixed;
+  /* 核心：基于视口50%定位，再偏移自身50% */
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 600rpx;
+  min-width: 400rpx;
+  background: var(--bg-white);
+  border-radius: 24rpx;
+  box-shadow: var(--shadow-md);
+  z-index: 9999;
+  animation: popupFade 0.2s ease-out forwards;
+  /* 防止超出视口 */
+  max-height: 90vh;
+  /* 小程序兼容：强制脱离文档流 */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@keyframes popupFade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.95);
   }
-  
-  .all-todo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20rpx;
-    padding-bottom: 10rpx;
-    border-bottom: 1rpx solid var(--border-color);
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
-  
-  .all-todo-title {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: var(--text-main);
-  }
-  
-  .inline-add-btn {
-    padding: 8rpx 16rpx;
-    font-size: 24rpx;
-  }
-  
-  .all-todo-list {
-    margin-top: 10rpx;
-  }
-  
-  /*  待办列表样式 */
-  .todo-list-wrap {
-    margin-top: 30rpx;
-    padding: 0 10rpx;
-    width: 100%;
-  }
-  
-  .add-todo-btn-wrap {
-    margin: 20rpx 10rpx;
-    text-align: right;
-    width: 100%;
-  }
-  
-  .add-todo-btn {
-    background-color: var(--primary-color);
-    color: var(--bg-white);
-    border-radius: 8rpx;
-    padding: 10rpx 20rpx;
-    font-size: 28rpx;
-    transition: all 0.2s ease;
-  }
-  
-  .add-todo-btn:active {
-    background-color: var(--primary-dark);
-    transform: scale(0.98);
-  }
-  
-  .empty-tip {
-    text-align: center;
-    font-size: 28rpx;
-    color: var(--text-light);
-    padding: 40rpx 0;
-    background: var(--bg-white);
-    border-radius: 8rpx;
-    margin: 10rpx 0;
-    box-shadow: var(--shadow-sm);
-  }
-  
-  /*  底部切换栏  */
-  .fixed-bottom {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-    background-color: var(--bg-white);
-    border-top: 1rpx solid var(--border-color);
-  }
-  
-  .view-switch-bar {
-    display: flex;
-    background-color: var(--bg-white);
-  }
-  
-  .switch-btn {
-    flex: 1;
-    height: var(--tabbar-height);
-    line-height: var(--tabbar-height);
-    padding: 0;
-    margin: 0;
-    font-size: 28rpx;
-    color: var(--text-secondary);
-    transition: color 0.2s ease;
-  }
-  
-  .switch-btn.active {
-    color: var(--primary-color);
-    font-weight: 600;
-    position: relative;
-  }
-  
-  .switch-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40rpx;
-    height: 4rpx;
-    background-color: var(--primary-color);
-    border-radius: 2rpx;
-    animation: tabActive 0.3s ease-out forwards;
-  }
-  
-  @keyframes tabActive {
-    0% { width: 0; }
-    100% { width: 40rpx; }
-  }
-  
-  /*  弹窗通用样式 */
-  .modal-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999; /* 提升层级，确保覆盖所有内容 */
-    animation: maskFade 0.3s ease-out forwards;
-  }
-  
-  .modal-container {
-    position: fixed;
-    /* 核心：基于视口50%定位，再偏移自身50% */
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 600rpx;
-    background: var(--bg-white);
-    border-radius: 12rpx;
-    z-index: 10000;
-    padding: 30rpx;
-    box-sizing: border-box;
-    box-shadow: var(--shadow-md);
-    animation: modalPop 0.3s ease-out forwards;
-    /* 防止超出视口 */
-    max-height: 90vh;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-  
-  @keyframes modalPop {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -45%) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-  
-  .modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20rpx;
-  }
-  
-  .modal-item {
-    display: flex;
-    flex-direction: column;
-    gap: 10rpx;
-  }
-  
-  .modal-label {
-    font-size: 28rpx;
-    color: var(--text-main);
-    font-weight: 500;
-  }
-  
-  .modal-input {
-    padding: 15rpx;
-    border: 1rpx solid var(--border-color);
-    border-radius: 8rpx;
-    font-size: 26rpx;
-    transition: border-color 0.2s ease;
-  }
-  
-  .modal-input:focus {
-    border-color: var(--primary-color);
-  }
-  
-  .desc-input {
-    min-height: 120rpx;
-    resize: none;
-  }
-  
-  .modal-btn-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20rpx;
-  }
-  
-  .add-todo-btn-group {
-    justify-content: flex-end;
-    gap: 20rpx;
-  }
-  
-  .modal-btn {
-    padding: 15rpx 30rpx;
-    border-radius: 8rpx;
-    font-size: 28rpx;
-    transition: all 0.2s ease;
-  }
-  
-  .modal-btn:active {
-    transform: scale(0.98);
-  }
-  
-  .cancel-btn {
-    background-color: var(--border-color);
-    color: var(--text-secondary);
-  }
-  
-  .cancel-btn:active {
-    background-color: #e0e0e0;
-  }
-  
-  .confirm-btn {
-    background-color: var(--primary-color);
-    color: var(--bg-white);
-  }
-  
-  .confirm-btn:active {
-    background-color: var(--primary-dark);
-  }
-  
-  .placeholder-style {
-    color: var(--text-light);
-  }
-  
-  /*  待办详情弹窗样式 */
-  .todo-popup-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9998; 
-    animation: maskFade 0.2s ease-out forwards;
-  }
-  
+}
+
+.popup-header {
+  padding: 10rpx 16rpx;
+  border-bottom: 1rpx solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(239, 239, 239, 0.6);
+  border-radius: 24rpx 24rpx 0 0;
+}
+
+.popup-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  padding: 10rpx;
+}
+
+.popup-close {
+  font-size: 32rpx;
+  color: var(--text-light);
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+.popup-close:active {
+  color: var(--primary-color);
+}
+
+.popup-content {
+  padding: 0 30rpx;
+  max-height: 70vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: rgba(239, 239, 239, 0.6);
+  border-radius: 0 0 24rpx 24rpx;
+}
+
+/* ================= 滚动条优化 ================= */
+::-webkit-scrollbar {
+  width: 4rpx;
+  height: 4rpx;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-light);
+  border-radius: 2rpx;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2rpx;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+/* ================= 响应式适配 ================= */
+@media (max-width: 750rpx) {
   .todo-popup {
-    position: fixed;
-    /* 核心：基于视口50%定位，再偏移自身50% */
-    top: 50vh;
-    left: 50vw;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 600rpx;
-    min-width: 400rpx;
-    background: var(--bg-white);
-    border-radius: 12rpx;
-    box-shadow: var(--shadow-md);
-    z-index: 9999;
-    padding: 10rpx 0;
-    animation: popupFade 0.2s ease-out forwards;
-    /* 防止超出视口 */
-    max-height: 90vh;
-    /* 小程序兼容：强制脱离文档流 */
-    box-sizing: border-box;
+    width: 90%;
+    min-width: unset;
   }
-  
-  @keyframes popupFade {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -45%) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
+
+  .modal-container {
+    width: 90%;
   }
-  
-  .popup-header {
-    padding: 10rpx 16rpx;
-    border-bottom: 1rpx solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  .year-month-item {
+    width: calc(50% - 7.5rpx);
   }
-  
-  .popup-title {
-    font-size: 28rpx;
-    font-weight: 600;
-    color: var(--text-main);
+
+  .date-item {
+    height: 100rpx;
   }
-  
-  .popup-close {
-    font-size: 32rpx;
-    color: var(--text-light);
-    width: 40rpx;
-    height: 40rpx;
-    line-height: 40rpx;
-    text-align: center;
-    transition: color 0.2s ease;
+
+  .switch-btn {
+    font-size: 26rpx;
   }
-  
-  .popup-close:active {
-    color: var(--primary-color);
+}
+
+/* 适配小屏手机 */
+@media (max-height: 667px) {
+  .week-container {
+    min-height: calc(20 * var(--hour-cell-height));
   }
-  
+
   .popup-content {
-    padding: 12rpx 16rpx;
-    max-height: 70vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    max-height: 50vh;
   }
-  
-  /* ================= 滚动条优化 ================= */
-  ::-webkit-scrollbar {
-    width: 4rpx;
-    height: 4rpx;
+
+  .modal-container {
+    max-height: 85vh;
   }
-  
-  ::-webkit-scrollbar-track {
-    background: var(--border-light);
-    border-radius: 2rpx;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 2rpx;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--text-light);
-  }
-  
-  /* ================= 响应式适配 ================= */
-  @media (max-width: 750rpx) {
-    .todo-popup {
-      width: 90%;
-      min-width: unset;
-    }
-    
-    .modal-container {
-      width: 90%;
-    }
-    
-    .year-month-item {
-      width: calc(50% - 7.5rpx);
-    }
-    
-    .date-item {
-      height: 100rpx;
-    }
-    
-    .switch-btn {
-      font-size: 26rpx;
-    }
-  }
-  
-  /* 适配小屏手机 */
-  @media (max-height: 667px) {
-    .week-container {
-      min-height: calc(20 * var(--hour-cell-height));
-    }
-    
-    .popup-content {
-      max-height: 50vh;
-    }
-    
-    .modal-container {
-      max-height: 85vh;
-    }
-  }
+}
