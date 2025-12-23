@@ -318,10 +318,21 @@ Page({
 
   handleStreamError(error, aiIndex, startTime) {
     console.error('AI对话失败：', error);
-    wx.showToast({
-      title: error || '发送失败，请重试',
-      icon: 'none'
-    });
+
+    // 检查是否为503状态码
+    if (error.statusCode === 503) {
+      wx.showModal({
+        title: '提示',
+        content: '接口繁忙，请稍后再试',
+        showCancel: false,
+        confirmText: '确定'
+      });
+    } else {
+      wx.showToast({
+        title: error.message || error || '发送失败，请重试',
+        icon: 'none'
+      });
+    }
 
     // 清除思考时间定时器
     this.clearThinkingTimer();
