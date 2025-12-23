@@ -976,9 +976,16 @@ const chatWithAIStream = ({
       'Accept': 'text/event-stream,application/json;q=0.9,*/*;q=0.8',
       'Authorization': access_token ? `Bearer ${access_token}` : ''
     },
-    success: () => finish(),
+    success: (res) => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        finish();
+      } else {
+        if (onError) onError({ statusCode: res.statusCode, message: res.data || '请求失败' });
+        finish();
+      }
+    },
     fail: (err) => {
-      if (onError) onError(err.errMsg || '网络失败');
+      if (onError) onError({ statusCode: 0, message: err.errMsg || '网络失败' });
       finish();
     }
   });
