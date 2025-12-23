@@ -192,14 +192,14 @@ class CollectionCreateSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ['name', 'description']
     
-    """
-    不做检查，否则会报错
     def validate_name(self, value):
         user = self.context['request'].user
-        if Collection.objects.filter(user=user, name=value).exists():
+        queryset = Collection.objects.filter(user=user, name=value)
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise serializers.ValidationError("收藏夹名称已存在")
         return value
-    """
 
 class FavoriteMoveSerializer(serializers.Serializer):
     """收藏移动序列化器"""
