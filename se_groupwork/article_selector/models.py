@@ -10,39 +10,24 @@ from remoteAI.remoteAI.tags import TAGS
 
 # Create your models here.
 class PreferenceManager(models.Manager):
-    def output(self, outputfile=None, user=None):
+    def output(self, outputfile):
         """
         输出数据到文件
         """
         table = []
-        if user:
-            preferences = self.get_user_preferences(user)
+        for preference in self.all():
             table.append({
                 'user': {
-                    'id': preferences.user.id,
-                    'username': preferences.user.username,
+                    'id': preference.user.id,
+                    'username': preference.user.username,
                 },
-                'account_preference': preferences.account_preference,
-                'tag_preference': preferences.tag_preference,
-                'keyword_preference': preferences.keyword_preference,
+                'account_preference': preference.account_preference,
+                'tag_preference': preference.tag_preference,
+                'keyword_preference': preference.keyword_preference,
+                # 'updated_at': preference.updated_at
             })
-        else:
-            for preference in self.all():
-                table.append({
-                    'user': {
-                        'id': preference.user.id,
-                        'username': preference.user.username,
-                    },
-                    'account_preference': preference.account_preference,
-                    'tag_preference': preference.tag_preference,
-                    'keyword_preference': preference.keyword_preference,
-                    # 'updated_at': preference.updated_at
-                })
-        if outputfile:
-            with open(outputfile, 'w', encoding='utf-8') as f:
-                json.dump(table, f, ensure_ascii=False, indent=4)
-        else:
-            print(json.dumps(table, ensure_ascii=False, indent=4))
+        with open(outputfile, 'w', encoding='utf-8') as f:
+            f.write(json.dumps(table, ensure_ascii=False, indent=4))
         return True
             
     
@@ -55,20 +40,14 @@ class PreferenceManager(models.Manager):
         try:
             preferences = self.get(user=user)
         except Preference.DoesNotExist:
-            preferences = self.add_user(user)
-        return preferences
-
-
-    def add_user(self, user, account_preference={}, tag_preference=[1/len(TAGS)]*len(TAGS), keyword_preference=[0.01]*100):
-        """
-        在偏好表中添加用户
-        :param user: 用户
-        :return: 用户偏好
-        """
-        try:
-            preferences = self.get(user=user)
-        except Preference.DoesNotExist:
-            preferences = self.create(user=user, account_preference=account_preference, tag_preference=tag_preference, keyword_preference=keyword_preference)
+            from article_selector.article_selector import get_campus_accounts
+            account_preference = {}
+            campus_accounts = get_campus_accounts()
+            for account in campus_accounts:
+                account_preference[account.id] = 1/(len(campus_accounts))
+            tag_preference = [0.0625]*16
+            keyword_preference = [0.01]*100
+            preferences = Preference.objects.create(user=user, account_preference=account_preference, tag_preference=tag_preference, keyword_preference=keyword_preference)
         return preferences
 
 

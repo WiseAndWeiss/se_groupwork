@@ -21,17 +21,16 @@ class UsernameUpdateTests(TestCase):
 
     def test_update_username_success(self):
         """测试成功修改用户名"""
-        data = {'new_username': 'newtestuser'}
+        data = {'new_username': 'newuser'}
         response = self.client.patch(self.url, data)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], '用户名修改成功')
-        self.assertEqual(response.data['user']['username'], 'newtestuser')
+        self.assertEqual(response.data['user']['username'], 'newuser')
         
         # 验证数据库更新
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, 'newtestuser')
-
+        self.assertEqual(self.user.username, 'newuser')
     def test_update_username_empty(self):
         """测试用户名为空"""
         data = {'new_username': ''}

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import Collection, User, Subscription, Favorite, History, Todo
 from webspider.models import PublicAccount, Article
-from .param_validate import validate_credentials, validate_credentials_new, check_password_strength, check_phone_number
+from .param_validate import validate_credentials_new, check_password_new, check_phone_number
 from article_selector.serializers import ArticleSerializer
 from django.conf import settings
 from drf_spectacular.utils import extend_schema_field
@@ -194,7 +194,10 @@ class CollectionCreateSerializer(serializers.ModelSerializer):
     
     def validate_name(self, value):
         user = self.context['request'].user
-        if Collection.objects.filter(user=user, name=value).exists():
+        queryset = Collection.objects.filter(user=user, name=value)
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise serializers.ValidationError("收藏夹名称已存在")
         return value
 
@@ -260,9 +263,9 @@ class UserPasswordChangeSerializer(serializers.Serializer):
     
     def validate_new_password(self, value):
         """验证新密码强度"""
-        result = check_password_strength(value)
-        if result['strength'] == 'weak':
-            raise serializers.ValidationError(result['suggestion'])
+        result = check_password_new(value)
+        if result[0] is False:
+            raise serializers.ValidationError(result[1])
         return value
     
 class UserEmailChangeSerializer(serializers.Serializer):

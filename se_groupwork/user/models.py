@@ -328,7 +328,7 @@ class FavoriteManager(models.Manager):
         return self.filter(user=user, article=article).exists()
     
     # 创建收藏并更新用户的收藏计数
-    def create_favorite(self, user, article, collection):
+    def create_favorite(self, user, article, collection = None):
         # 如果没有指定收藏夹，则使用默认收藏夹（如果没有，则会自动创建）
         if not collection:
            collection, created = Collection.objects.get_or_create(
@@ -435,10 +435,14 @@ class HistoryManager(models.Manager):
     def is_viewed(self, user, article): 
         return self.filter(user=user, article=article).exists()
 
-    # 创建一条浏览历史记录
+    # 创建一条浏览历史记录（唯一性约束：同一用户同一文章只保留一条，若已存在则更新时间）
     def create_history(self, user, article):
-        history = self.create(user=user, article=article)
-        return history
+        obj, created = self.get_or_create(user=user, article=article)
+        if not created:
+            # 已存在则更新时间
+            obj.viewed_at = timezone.now()
+            obj.save(update_fields=["viewed_at"])
+        return obj
 
     # 删除某个用户的所有浏览历史记录
     def clear_user_history(self, user):
@@ -470,11 +474,12 @@ class History(models.Model):
     objects = HistoryManager()
 
     class Meta:
-        unique_together = [('user', 'article')]  # 重复历史记录只能更新原有的时间，而非创建新的历史记录
+        constraints = [
+            models.UniqueConstraint(fields=["user", "article"], name="unique_user_article_history")
+        ]
         ordering = ['-viewed_at']  # 按照浏览时间排列，最新浏览的在前面
         indexes = [
             models.Index(fields=['user', '-viewed_at']),
-            # models.Index(fields=['user', 'article']),  # unique_together已自动创建
         ]
     def __str__(self):
         return f"{self.user} viewed {self.article}"

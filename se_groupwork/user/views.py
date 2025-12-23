@@ -16,7 +16,7 @@ from user.models import Collection, Collection, User, Subscription, Favorite, Hi
 from webspider.models import PublicAccount, Article
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from user.param_validate import check_username
+from user.param_validate import check_username_new
 
 # 认证相关API
 @extend_schema(
@@ -471,7 +471,7 @@ class CollectionDetailView(APIView):
         if collection.is_default:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            collection.delete()
+            Collection.objects.delete_collection(collection)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -957,7 +957,7 @@ class UsernameUpdateView(APIView):
             return Response({'error': '该用户名已被占用'}, status=status.HTTP_400_BAD_REQUEST)
         
         # 检查用户名是否符合规则
-        validated, error = check_username(new_username)
+        validated, error = check_username_new(new_username)
         if not validated:
             return Response({'error':error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1008,9 +1008,9 @@ class AvatarUpdateView(APIView):
         if new_avatar.content_type not in allowed_types:
             return Response({'error': '只支持JPEG、JPG、PNG和GIF格式的图片'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # 检查文件大小（限制为10MB）
-        if new_avatar.size > 10 * 1024 * 1024:
-            return Response({'error': '头像文件大小不能超过10MB'}, status=status.HTTP_400_BAD_REQUEST)
+        # 检查文件大小（限制为1MB）
+        if new_avatar.size > 1 * 1024 * 1024:
+            return Response({'error': '头像文件大小不能超过1MB'}, status=status.HTTP_400_BAD_REQUEST)
         
         # 保存旧头像路径用于后续删除
         old_avatar_path = None

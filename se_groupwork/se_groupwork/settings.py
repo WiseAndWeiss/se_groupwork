@@ -20,14 +20,6 @@ try:
     pymysql.install_as_MySQLdb()
 except Exception:
     pass
-from datetime import timedelta
-
-# Optional PyMySQL compatibility (use PyMySQL instead of mysqlclient)
-try:
-    import pymysql
-    pymysql.install_as_MySQLdb()
-except Exception:
-    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -103,11 +103,13 @@ class UserRegistrationAPITests(APITestCase):
         }
         response = self.client.post(self.register_url, short_password_data, format='json')
         
-        # 这个测试取决于你的密码验证规则
+        # 这个测试取决于密码验证规则
         # 如果设置了最小密码长度，应该返回400
         # 如果没有设置，可能会成功
         if response.status_code == status.HTTP_400_BAD_REQUEST:
-            self.assertIn('password', response.data)
+            self.assertIn('non_field_errors', response.data)
+            error_str = str(response.data['non_field_errors'][0])
+            self.assertIn('密码', error_str)
     
     def test_jwt_tokens_are_valid_after_registration(self):
         """测试注册后返回的JWT token是否有效"""
@@ -179,8 +181,8 @@ class UserRegistrationEdgeCaseTests(APITestCase):
     
     def test_registration_with_max_length_username(self):
         """测试使用最大长度的用户名"""
-        # 根据你的User模型，用户名最大长度是20
-        long_username = 'a' * 20  # 20个字符的用户名
+        # 根据User模型，用户名最大长度是10个字符
+        long_username = 'a' * 10  # 10个字符的用户名
         
         data = {
             'username': long_username,

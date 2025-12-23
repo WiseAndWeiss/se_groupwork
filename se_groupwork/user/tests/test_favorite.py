@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from user.models import Favorite, User
+from user.models import Favorite, User, Collection
 from webspider.models import Article, PublicAccount
 
 User = get_user_model()
@@ -17,12 +17,16 @@ class FavoriteTestCase(TestCase):
             email='favorite@example.com',
             password='testpass123'
         )
-        
+
+        self.collection = Collection.objects.create(
+            name='测试收藏夹',
+            user=self.user
+        )
         # 创建公众号和文章
         self.public_account = PublicAccount.objects.create(
             name='测试公众号',
             fakeid='test_fakeid',
-            icon_url='http://example.com/icon.jpg'
+            icon='http://example.com/icon.jpg'
         )
         
         self.article1 = Article.objects.create(
@@ -46,6 +50,7 @@ class FavoriteTestCase(TestCase):
         favorite = Favorite.objects.create(
             user=self.user,
             article=self.article1,
+            collection=self.collection
         )
         
         self.assertEqual(favorite.user, self.user)
@@ -54,11 +59,11 @@ class FavoriteTestCase(TestCase):
     
     def test_duplicate_favorite_prevention(self):
         """测试防止重复收藏"""
-        Favorite.objects.create(user=self.user, article=self.article1)
+        Favorite.objects.create(user=self.user, article=self.article1, collection=self.collection)
         
         # 验证唯一约束
         with self.assertRaises(Exception):
-            Favorite.objects.create(user=self.user, article=self.article1)
+            Favorite.objects.create(user=self.user, article=self.article1, collection=self.collection)
     
     # ... 其他测试方法保持不变 ...
 
@@ -71,6 +76,10 @@ class FavoriteManagerTestCase(TestCase):
             username='manageruser',
             email='manager@example.com',
             password='testpass123'
+        )
+        self.Collection = Collection.objects.create(
+            name='管理收藏夹', 
+            user=self.user
         )
         
         self.public_account = PublicAccount.objects.create(name='测试号', fakeid='test')
@@ -111,7 +120,7 @@ class FavoriteIntegrationTestCase(TestCase):
         
         # 用户收藏多篇文章
         for article in articles:
-            Favorite.objects.create(user=user, article=article)
+            Favorite.objects.create(user=user, article=article, collection=None)
         
         # 验证收藏数量
         self.assertEqual(user.favorite_set.count(), 3)

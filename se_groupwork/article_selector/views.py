@@ -244,11 +244,19 @@ class ArticleViewSet(viewsets.ViewSet):
 
         # 如果有搜索内容，添加搜索条件（多字段模糊搜索）
         if search_content:
-            base_query = base_query.filter(
-                Q(summary__icontains=search_content) |
-                Q(title__icontains=search_content) |
-                Q(content__icontains=search_content)
-            )
+            try:
+                meilitools = global_meili_tool_load()
+                search_result_ids = meilitools.search_articles(search_content)
+                if len(search_result_ids) == 0:
+                    raise Article.DoesNotExist
+                base_query = base_query.filter(id__in=search_result_ids)
+            except Article.DoesNotExist:
+                print("[Info at views.py::search_customized_latest] Meilisearch搜索失败，降级为数据库搜索")
+                base_query = base_query.filter(
+                    Q(summary__icontains=search_content) |
+                    Q(title__icontains=search_content) |
+                    Q(content__icontains=search_content)
+                )
 
         base_query = base_query.order_by('-publish_time', '-id')
 
@@ -421,8 +429,11 @@ class ArticleViewSet(viewsets.ViewSet):
             try:
                 meilitools = global_meili_tool_load()
                 search_result_ids = meilitools.search_articles(search_content)
+                if len(search_result_ids) == 0:
+                    raise Article.DoesNotExist
                 queryset = queryset.filter(id__in=search_result_ids)
             except Exception:
+                print("[Info at views.py::filter] Meilisearch搜索失败，降级为数据库搜索")
                 search_query = Q()
                 for field in ['title', 'summary', 'content']:
                     search_query |= Q(**{f'{field}__icontains': search_content})

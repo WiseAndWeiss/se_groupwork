@@ -84,10 +84,8 @@ def entry(article_msg):
 		success_flag &= ("key_info" in ai_resp)
 		success_flag &= ("tags" in ai_resp)
 		if not success_flag:
-			print(f"[Retry {retry}] For {article_msg['title']}")
 			continue
-		if "relevant_time" not in ai_resp:
-			ai_resp["relevant_time"] = []
+		ai_resp["relevant_time"] = [] if "relevant_time" not in ai_resp else ai_resp["relevant_time"]
 		print(ai_resp)
 		ai_resp["semantic_vector"] = keywords_vectorize(ai_resp["key_info"])
 		ai_resp["tags_vector"] = tags_vectorize(ai_resp["tags"])

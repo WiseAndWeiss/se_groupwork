@@ -4,10 +4,9 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from webspider.models import Article, PublicAccount
 from django.utils import timezone
-from user.models import History, User
+from user.models import History
 
 User = get_user_model()
-
 
 class HistoryModelTest(TestCase):
     """History模型基础测试"""
@@ -71,13 +70,12 @@ class HistoryModelTest(TestCase):
         self.assertEqual(histories[1], history1)
 
     def test_unique_constraint(self):
-        """测试同一用户对同一文章可以创建多条记录（无唯一约束）"""
+        """测试同一用户对同一文章只能有一条记录（唯一性约束）"""
         history1 = History.objects.create_history(self.user, self.article)
         history2 = History.objects.create_history(self.user, self.article)
-        
-        # 应该能创建两条记录
-        self.assertEqual(History.objects.filter(user=self.user, article=self.article).count(), 2)
-        self.assertNotEqual(history1.id, history2.id)
+        # 应该只能有一条记录，且id相同
+        self.assertEqual(History.objects.filter(user=self.user, article=self.article).count(), 1)
+        self.assertEqual(history1.id, history2.id)
 
 
 class HistoryManagerTest(TestCase):
@@ -261,16 +259,16 @@ class HistoryEdgeCasesTest(TestCase):
         )
 
     def test_multiple_views_same_article(self):
-        """测试同一用户多次浏览同一文章"""
+        """测试同一用户多次浏览同一文章只保留一条记录，且viewed_at会被刷新"""
+        times = []
         for i in range(5):
-            History.objects.create_history(self.user, self.article)
-        
+            h = History.objects.create_history(self.user, self.article)
+            times.append(h.viewed_at)
+            time.sleep(0.01)
         histories = History.objects.filter(user=self.user, article=self.article)
-        self.assertEqual(histories.count(), 5)
-        
-        # 验证时间顺序（最新的在前面）
-        viewed_times = [h.viewed_at for h in histories]
-        self.assertEqual(viewed_times, sorted(viewed_times, reverse=True))
+        self.assertEqual(histories.count(), 1)
+        # viewed_at应该是最后一次的时间
+        self.assertEqual(histories[0].viewed_at, times[-1])
 
     def test_empty_user_history(self):
         """测试空用户历史记录"""

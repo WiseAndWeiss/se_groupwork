@@ -13,8 +13,9 @@ class RemoteAITestCase(TestCase):
         for account in data['account']:
             PublicAccount.objects.create(**account)
         for article in data['article']:
+            account = PublicAccount.objects.get(name=article['public_account'])
             Article.objects.create(
-                public_account_id=article['public_account'],
+                public_account = account,
                 title=article['title'],
                 content=article['content'],
                 article_url=article['article_url'],

@@ -112,10 +112,7 @@ class UserAdmin(DjangoUserAdmin):
     # 自定义方法
     def get_avatar_preview(self, obj):
         if obj.avatar:
-            return format_html(
-                '',
-                obj.avatar.url
-            )
+            return format_html('', obj.avatar.url)
         return "无头像"
     get_avatar_preview.short_description = _('头像预览')
     

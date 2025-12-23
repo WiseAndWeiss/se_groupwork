@@ -1,0 +1,77 @@
+{
+  "timestamp": 1766431174,
+  "fail_ratio": 0.0,
+  "total_rps": 28.48978862904528,
+  "requests": [
+    {
+      "name": "GET articles customized_latest",
+      "method": "GET",
+      "num_requests": 1445,
+      "num_failures": 0,
+      "avg_response_time_ms": 124.35051958475398,
+      "p95_ms": 300.0,
+      "p99_ms": 540.0,
+      "rps": 4.804825463231842
+    },
+    {
+      "name": "GET articles customized_search",
+      "method": "GET",
+      "num_requests": 741,
+      "num_failures": 0,
+      "avg_response_time_ms": 101.91209770575453,
+      "p95_ms": 330.0,
+      "p99_ms": 490.0,
+      "rps": 2.463927798100204
+    },
+    {
+      "name": "GET articles latest",
+      "method": "GET",
+      "num_requests": 2178,
+      "num_failures": 0,
+      "avg_response_time_ms": 275.5580206611181,
+      "p95_ms": 920.0,
+      "p99_ms": 2000.0,
+      "rps": 7.242152151501005
+    },
+    {
+      "name": "GET articles recommended",
+      "method": "GET",
+      "num_requests": 1337,
+      "num_failures": 0,
+      "avg_response_time_ms": 458.31325848911365,
+      "p95_ms": 980.0,
+      "p99_ms": 1300.0,
+      "rps": 4.445710480512784
+    },
+    {
+      "name": "GET articles by_account",
+      "method": "GET",
+      "num_requests": 685,
+      "num_failures": 0,
+      "avg_response_time_ms": 256.43747810224016,
+      "p95_ms": 820.0,
+      "p99_ms": 2000.0,
+      "rps": 2.2777200292829147
+    },
+    {
+      "name": "POST articles filter",
+      "method": "POST",
+      "num_requests": 736,
+      "num_failures": 0,
+      "avg_response_time_ms": 353.4088851901802,
+      "p95_ms": 960.0,
+      "p99_ms": 2000.0,
+      "rps": 2.4473021044558037
+    },
+    {
+      "name": "GET articles campus_latest",
+      "method": "GET",
+      "num_requests": 1446,
+      "num_failures": 0,
+      "avg_response_time_ms": 267.74492351319856,
+      "p95_ms": 940.0,
+      "p99_ms": 1900.0,
+      "rps": 4.8081506019607225
+    }
+  ]
+}

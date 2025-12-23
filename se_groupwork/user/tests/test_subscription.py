@@ -28,17 +28,17 @@ class SubscriptionTestCase(TestCase):
         self.account1 = PublicAccount.objects.create(
             name='测试公众号1',
             fakeid='fakeid123',
-            icon_url='http://example.com/icon1.jpg'
+            icon='http://example.com/icon1.jpg'
         )
         self.account2 = PublicAccount.objects.create(
             name='测试公众号2',
             fakeid='fakeid456',
-            icon_url='http://example.com/icon2.jpg'
+            icon='http://example.com/icon2.jpg'
         )
         self.account3 = PublicAccount.objects.create(
             name='测试公众号3',
             fakeid='fakeid789',
-            icon_url='http://example.com/icon3.jpg'
+            icon='http://example.com/icon3.jpg'
         )
 
     def test_create_subscription(self):
@@ -53,7 +53,7 @@ class SubscriptionTestCase(TestCase):
         self.assertEqual(subscription.user, self.user1)
         self.assertEqual(subscription.public_account, self.account1)
         self.assertTrue(subscription.is_active)
-        self.assertIsNotNone(subscription.subscribe_at)
+        self.assertIsNotNone(subscription.subscribed_at)
 
         # 验证唯一约束
         with self.assertRaises(Exception):  # 具体异常类型取决于数据库
@@ -135,7 +135,7 @@ class SubscriptionTestCase(TestCase):
         subscription1 = Subscription.objects.create(user=self.user1, public_account=self.account1)
 
         # 模拟时间间隔
-        subscription1.subscribe_at = timezone.now() - timezone.timedelta(hours=1)
+        subscription1.subscribed_at = timezone.now() - timezone.timedelta(hours=1)
         subscription1.save()
 
         subscription2 = Subscription.objects.create(user=self.user1, public_account=self.account2)
