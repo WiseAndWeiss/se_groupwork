@@ -15,6 +15,7 @@ Page({
     currentCategory: 'time', // 当前选中的类目（默认时间）
     showLoadingAnimation: false,
     isSelected: false,
+    isLoaded: false, // 是否已首次加载数据
     timeFilter: {
       start: '',
       end: ''
@@ -54,16 +55,18 @@ Page({
   // 页面生命周期 
   onShow() {
     console.log('校内页面加载完成');
-    this.setData({
-      scrollTop: 0
-    });
-    this.loadCampusArticles(true); // 加载文章数据
+    if (!this.data.isLoaded) {
+      this.setData({ isLoaded: true });
+      this.loadCampusArticles(true); // 加载校园最新文章
+    } else {
+      // 返回时不重新加载文章列表，保持之前的状态
+    }
   },
 
   // 页面卸载时清理（比如跳转到其他Tab页面、关闭页面）
   onHide() {
     console.log('页面卸载，彻底清理数据');
-    this.clearPageData();
+    // this.clearPageData();
   },
 
   clearPageData() {
@@ -75,6 +78,7 @@ Page({
       lastOuterSearchContent: '',
       innerSearchContent: '',
       isLoading: false, // 加载状态
+      isLoaded: false, // 是否已首次加载数据
       start_rank: 0, // 分页偏移量
       reach_end: false, // 是否已加载完所有数据
       currentCategory: 'time',
@@ -711,7 +715,7 @@ Page({
 
   // 其他方法
   goToAlllist() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/campus-all/campus-all'
     });

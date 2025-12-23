@@ -51,7 +51,7 @@ Component({
         const dataList = list?.public_accounts || list || [];
 
         this.setData({
-          campusAccountList: dataList,
+          campusAccountList: dataList.reverse(),
           showNoResults: dataList.length === 0
         });
 
@@ -98,7 +98,7 @@ Component({
         const dataList = list?.public_accounts || [];
 
         this.setData({
-          campusAccountList: dataList,
+          campusAccountList: dataList.reverse(),
           showNoResults: dataList.length === 0
         });
 
