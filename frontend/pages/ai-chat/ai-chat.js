@@ -319,31 +319,32 @@ Page({
   handleStreamError(error, aiIndex, startTime) {
     console.error('AI对话失败：', error);
 
+    // 清除思考时间定时器
+    this.clearThinkingTimer();
+
     // 检查是否为503状态码
     if (error.statusCode === 503) {
-      wx.showModal({
-        title: '提示',
-        content: '接口繁忙，请稍后再试',
-        showCancel: false,
-        confirmText: '确定'
+      // 直接让AI回复“接口繁忙，请稍后再试”
+      this.setData({
+        [`messages[${aiIndex}].content`]: '接口繁忙，请稍后再试',
+        [`messages[${aiIndex}].nodes`]: this.formatContentToNodes('接口繁忙，请稍后再试'),
+        [`messages[${aiIndex}].isLoading`]: false,
+        [`messages[${aiIndex}].thinkingTime`]: ''
       });
     } else {
       wx.showToast({
         title: error.message || error || '发送失败，请重试',
         icon: 'none'
       });
-    }
 
-    // 清除思考时间定时器
-    this.clearThinkingTimer();
-
-    if (this.data.messages[aiIndex]) {
-      this.setData({
-        [`messages[${aiIndex}].content`]: '抱歉，发送消息时出现了错误，请稍后再试。',
-        [`messages[${aiIndex}].nodes`]: this.formatContentToNodes('抱歉，发送消息时出现了错误，请稍后再试。'),
-        [`messages[${aiIndex}].isLoading`]: false, // 移除 loading 状态
-        [`messages[${aiIndex}].thinkingTime`]: '' // 隐藏思考时间
-      });
+      if (this.data.messages[aiIndex]) {
+        this.setData({
+          [`messages[${aiIndex}].content`]: '抱歉，发送消息时出现了错误，请稍后再试。',
+          [`messages[${aiIndex}].nodes`]: this.formatContentToNodes('抱歉，发送消息时出现了错误，请稍后再试。'),
+          [`messages[${aiIndex}].isLoading`]: false,
+          [`messages[${aiIndex}].thinkingTime`]: ''
+        });
+      }
     }
 
     this.setData({
