@@ -59,10 +59,19 @@ Component({
           console.log('no results')
         }
       } catch (err) {
-        wx.showToast({
-          title: '获取订阅列表失败',
-          icon: 'none'
-        });
+        if (err.statusCode === 503) {
+          wx.showModal({
+            title: '提示',
+            content: '接口繁忙，请稍后再试',
+            showCancel: false,
+            confirmText: '确定'
+          });
+        } else {
+          wx.showToast({
+            title: '获取订阅列表失败',
+            icon: 'none'
+          });
+        }
         console.error('获取订阅失败：', err);
         this.setData({
           showNoResults: true
