@@ -8,6 +8,7 @@ Page({
     searchContent: '',
     selectionList: [],
     isLoading: false,
+    isLoaded: false, // 是否已首次加载数据
     reach_end: false,
     start_rank: 0,
     currentSort: 'time',
@@ -654,6 +655,16 @@ Page({
         order: index + 1
       }));
 
+      // 如果没有订阅，直接显示成功
+      if (orders.length === 0) {
+        wx.showToast({
+          title: '排序已更新',
+          icon: 'success',
+          duration: 1000
+        });
+        return;
+      }
+
       const requestData = {
         orders: orders
       };
@@ -696,9 +707,11 @@ Page({
 
   clearPageData() {
     this.stopAutoScroll();
+    this.cancelEditMode();
     this.setData({
       searchContent: '',
       lastSearchContent: '',
+      isLoaded: false,
       selectionList: [],
       officialList: [],
       isLoading: false,
@@ -709,17 +722,22 @@ Page({
       // scrollTop: 0, // 已禁用 scrollTop 维护
       maxScrollTop: 0, // 重置最大滚动距离
       enableScroll: true, // 确保非编辑模式下滚动可用
-      currentSort: 'time',
+      // currentSort: 'time',
     });
   },
 
   onShow() {
     console.log('自选页面加载完成');
-    if (this.data.currentSort === 'time') {
-      this.loadCustomizedArticles(true);
-    } else {
-      this.getSubscriptionList(true);
-    }
+      if (!this.data.isLoaded) {
+        this.setData({ isLoaded: true });
+        if (this.data.currentSort === 'time') {
+          this.loadCustomizedArticles(true);
+        } else if(this.data.currentSort === 'official') {
+          this.getSubscriptionList();
+        }
+      } else {
+        console.log('页面已加载过，跳过重复加载');
+      }
   },
 
 
@@ -844,13 +862,13 @@ Page({
       officialList: [],
       selectionList: [],
       // scrollTop: 0, // 已禁用 scrollTop 维护
-      enableScroll: true // 切换排序时确保滚动可用
+      // enableScroll: true // 切换排序时确保滚动可用
     });
 
     if (sortType === 'time') {
       this.loadCustomizedArticles(true);
-    } else {
-      this.getSubscriptionList(true);
+    } else if (sortType === 'official') {
+      this.getSubscriptionList();
     }
   },
 
@@ -882,6 +900,15 @@ Page({
   },
 
   async loadFilteredCustomizedArticles(reset = false) {
+    if (this.data.isEditing) {
+      wx.showModal({
+        title: '提示',
+        content: '在编辑模式下无法搜索，请退出编辑模式后重试',
+        showCancel: false,
+        confirmText: '确定'
+      });
+      return;
+    }
     if (this.data.isLoading) return;
     this.setData({
       isLoading: true,
@@ -937,13 +964,31 @@ Page({
     }
   },
   async getFilteredSubscriptionList() {
-    const response = await request.searchSubscriptions(this.data.searchContent);
-    if (response) {
+    if (this.data.isEditing) {
+      wx.showModal({
+        title: '提示',
+        content: '在编辑模式下无法搜索，请退出编辑模式后重试',
+        showCancel: false,
+        confirmText: '确定'
+      });
+      return;
+    }
+    this.setData({
+      showLoadingAnimation: true
+    });
+    try {
+      const response = await request.searchSubscriptions(this.data.searchContent);
+      if (response) {
+        this.setData({
+          subscriptionList: response
+        })
+      } else {
+        console.log("未搜索到订阅信息");
+      }
+    } finally {
       this.setData({
-        subscriptionList: response
-      })
-    } else {
-      console.log("未搜索到订阅信息");
+        showLoadingAnimation: false
+      });
     }
   },
 
@@ -982,7 +1027,7 @@ Page({
   },
 
   goToAdd() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.navigateTo({
       url: '/packageA/add/add'
     });
