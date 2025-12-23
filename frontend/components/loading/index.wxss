@@ -1,0 +1,47 @@
+/* 加载遮罩层 - 全屏覆盖 */
+.loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  /* 阻止点击穿透 */
+}
+
+/* 模糊背景层 */
+.blur-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+  /* 如果浏览器不支持 backdrop-filter，使用半透明遮罩 */
+}
+
+/* 加载动画容器 */
+.loading {
+  position: relative;
+  z-index: 10000;
+  /* 缩小容器尺寸 */
+  width: 50%;
+  height: 20%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+}
+
+.loading-gif {
+  width: 100%;
+  height: 100%;
+}

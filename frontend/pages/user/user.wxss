@@ -1,0 +1,194 @@
+/* 页面整体布局 */
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 自定义导航栏 */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+/* 导航标题 */
+.navbar-title {
+  font-size: 35rpx;
+}
+
+/* 用户信息区域 */
+.user-info-section {
+  padding: 180rpx 30rpx 0rpx;
+}
+
+/* 新增：用户信息卡片容器 */
+.user-info-card {
+  background: linear-gradient(90deg, #7b2ff7 0%, #9c4dff 100%);
+  border-radius: 24rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20rpx;
+  color: #fff;
+}
+
+.user-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background-color: #fff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+/* 菜单列表 */
+.menu-list {
+  background-color: #fff;
+  margin: 30rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 35rpx 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background-color: #f7f7f7;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+  filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+}
+
+.menu-text {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 1rpx;
+}
+
+.menu-arrow {
+  font-size: 36rpx;
+  color: #ccc;
+}
+
+/* 底部导航栏 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1rpx solid #eee;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  font-size: 26rpx;
+}
+
+/* 底部导航图标样式 */
+.tab-item .menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 6rpx;
+  margin-left: 18rpx;
+  filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+  /* 默认灰色 */
+}
+
+/* 选中态图标改为紫色 */
+.tab-item.active {
+  color: #7b2ff7;
+  font-weight: bold;
+}
+
+.tab-item.active .menu-icon {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+}
+
+/* 退出登录按钮 */
+.logout-btn {
+  position: fixed;
+  bottom: 160rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250rpx;
+  height: 80rpx;
+  background: #ff4a4a;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(247, 47, 47, 0.3);
+  z-index: 1001;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.logout-btn:active {
+  transform: translateX(-50%) scale(0.98);
+  background: #ff2a2a;
+}
+
+.logout-btn-text {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+}

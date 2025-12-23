@@ -1,0 +1,58 @@
+<!-- 收藏夹卡片容器 -->
+<view class="collection-item">
+  <!-- 卡片主体（点击跳转） -->
+  <view class="collection-content" bindtap="navigateToCollectionDetail">
+    <view class="collection-header">
+      <text class="collection-name">{{item.name}}</text>
+      <text class="default-tag" wx:if="{{item.is_default}}">默认</text>
+    </view>
+    <view class="collection-footer">
+      <text class="collection-desc">{{item.description || '无描述'}}</text>
+      <text class="count-text">收藏数：{{item.favorite_count ||item.count || item.article_count || item.num || 0}}</text>
+    </view>
+  </view>
+
+  <!-- 右侧操作区域 -->
+  <view class="collection-actions">
+    <image class="action-icon" catchtap="openEditPopup" src="../../assets/icons/edit.svg" mode="widthFix"></image>
+  </view>
+</view>
+
+<!-- 编辑浮窗遮罩 -->
+<view class="popup-mask" wx:if="{{showEditPopup}}" catchtap="closeEditPopup"></view>
+<!-- 编辑浮窗主体 -->
+<view class="edit-popup" wx:if="{{showEditPopup}}">
+  <!-- 浮窗头部 -->
+  <view class="popup-header">
+    <image class="return-icon" catchtap="closeEditPopup" src="../../assets/icons/return.svg" mode="widthFix"></image>
+    <text class="complete-btn" catchtap="saveCollectionEdit">完成</text>
+  </view>
+
+  <!-- 浮窗内容 -->
+  <view class="popup-content">
+    <!-- 名称输入框 -->
+    <view class="form-item">
+      <text class="form-label">收藏夹名称</text>
+      <view class="input-wrapper">
+        <input class="form-input" value="{{tempName}}" bindinput="onNameInput" placeholder="请输入收藏夹名称" maxlength="10" />
+        <!-- 剩余字数 -->
+        <text class="remain-count">{{remainNameCount}}</text>
+      </view>
+    </view>
+
+    <!-- 描述输入框 -->
+    <view class="form-item">
+      <text class="form-label">收藏夹描述</text>
+      <view class="input-wrapper">
+        <textarea class="form-textarea" value="{{tempDesc}}" bindinput="onDescInput" placeholder="请输入收藏夹描述（选填）" maxlength="30" auto-height />
+        <!-- 剩余字数 -->
+        <text class="remain-count">{{remainDescCount}}</text>
+      </view>
+    </view>
+
+    <!-- 删除 -->
+    <view class="delete-section">
+      <text class="delete-btn {{item.is_default ? 'disabled' : 'enabled'}}" catchtap="deleteCollection">{{item.is_default ? '默认收藏夹不可删除' : '删除收藏夹'}}</text>
+    </view>
+  </view>
+</view>

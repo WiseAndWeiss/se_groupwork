@@ -1,0 +1,102 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <view class="navbar-title">我的</view>
+</view>
+
+<!-- 用户信息区域 -->
+<view class="user-info-section">
+  <view class="user-info-card">
+    <view class="user-avatar">
+      <!-- 用户头像，根据用户上传选取 -->
+      <image class="avatar-img" src="https://{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+    </view>
+    <view class="user-name">{{userInfo.nickName || '用户名'}}</view>
+  </view>
+</view>
+
+<!-- 菜单列表 -->
+<view class="menu-list">
+  <view class="menu-item" bindtap="goToProfile">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/user.svg" mode="widthFix"></image>
+      <text class="menu-text">个人资料</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToFavorites_">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/star.svg" mode="widthFix"></image>
+      <text class="menu-text">我的收藏</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToSubscriptions">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/heart2.svg" mode="widthFix"></image>
+      <text class="menu-text">我的订阅</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToHistory">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/time.svg" mode="widthFix"></image>
+      <text class="menu-text">浏览历史</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToCalendar">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/calendar.svg" mode="widthFix"></image>
+      <text class="menu-text">我的待办</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToHelp">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/question-circle.svg" mode="widthFix"></image>
+      <text class="menu-text">帮助中心</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+
+  <view class="menu-item" bindtap="goToSuggestion">
+    <view class="menu-left">
+      <image class="menu-icon" src="/assets/icons/comment.svg" mode="widthFix"></image>
+      <text class="menu-text">反馈建议</text>
+    </view>
+    <view class="menu-arrow">></view>
+  </view>
+</view>
+
+<!-- 退出登录按钮 -->
+<view class="logout-btn" bindtap="handleLogout">
+  <text class="logout-btn-text">退出登录</text>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">订阅</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>
+
+<!-- 桌宠组件 -->
+<floating-pet />

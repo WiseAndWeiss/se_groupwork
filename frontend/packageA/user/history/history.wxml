@@ -1,0 +1,26 @@
+<loading showLoading="{{showLoadingAnimation}}" />
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">浏览历史</view>
+</view>
+
+<!-- 历史记录容器 -->
+<view class="history-container">
+  <!-- 空状态：无浏览历史时显示 -->
+  <view wx:if="{{historyList.length === 0}}" class="empty-history">
+    <image src="/assets/icons/history-empty.svg" class="empty-icon" mode="widthFix"></image>
+    <text class="empty-text">暂无浏览历史</text>
+    <text class="empty-tip">展开文章后会在这里显示</text>
+  </view>
+
+  <!-- 历史记录列表：复用 article-list 组件，支持分页加载 -->
+  <view wx:else class="history-list">
+    <article-list list="{{historyList}}" emptyText="暂无浏览历史" article_list_scrollHeight="calc(100vh - 340rpx)" bind:loadmore="onReachBottom" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
+  </view>
+  <!-- 删除全部按钮 -->
+  <view class="delete-all-btn {{isCollectionOperating ? 'hidden' : ''}}" bindtap="deleteAllHistory">
+    <text class="delete-btn-text">删除全部</text>
+  </view>
+</view>

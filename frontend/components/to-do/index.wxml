@@ -1,0 +1,88 @@
+<!-- 待办卡片（点击弹详情） -->
+<view class="todo-card" bindtap="showModal">
+  <!-- 标题 + 完成状态 -->
+  <view class="todo-header">
+    <text class="todo-title {{todoData.status === 1 ? 'todo-completed' : ''}}">{{todoData.title || '无标题'}}</text>
+  </view>
+
+  <!-- 开始时间（完整年月日时分） -->
+  <view class="todo-row">
+    <text class="todo-label">开始时间：</text>
+    <text class="todo-value">{{todoData.startTime || '未设置'}}</text>
+  </view>
+
+  <!-- 结束时间（完整年月日时分） -->
+  <view class="todo-row">
+    <text class="todo-label">结束时间：</text>
+    <text class="todo-value">{{todoData.endTime || '未设置'}}</text>
+  </view>
+
+  <!-- 待办内容 -->
+  <view class="todo-row">
+    <text class="todo-label">待办内容：</text>
+    <text class="todo-value todo-content-text">{{todoData.content || '无内容'}}</text>
+  </view>
+
+  <!--关联文章展示区域 -->
+  <view class="todo-row" wx:if="{{todoData.articleid}}">
+    <text class="todo-label">关联文章：</text>
+    <view class="todo-value article-value">
+      <text wx:if="{{articleLoading}}">加载中...</text>
+      <text wx:elif="{{articleInfo && articleInfo.title}}" class="article-link" catchtap="openArticleUrl">{{articleInfo.title}}</text>
+      <!-- 加载失败（有error） -->
+      <text wx:elif="{{articleInfo && articleInfo.error}}" class="article-error">{{articleInfo.error}}</text>
+      <!-- 无标题/其他情况 -->
+      <text wx:else class="article-error">无文章标题</text>
+    </view>
+  </view>
+</view>
+
+<!-- 弹窗遮罩（关键：fixed定位覆盖全屏） -->
+<view class="modal-mask" wx:if="{{showModal}}" bindtap="hideModal"></view>
+<!-- 弹窗内容（关键：基于可视窗口居中） -->
+<view class="modal-container" wx:if="{{showModal}}" catchtap="stopPropagation">
+  <view class="modal-content">
+    <!-- 标题编辑 -->
+    <view class="modal-item">
+      <text class="modal-label">标题：</text>
+      <input wx:if="{{isEdit}}" class="modal-input" value="{{tempData.title}}" bindinput="handleTitleInput" placeholder="请输入待办标题" />
+      <text wx:else class="modal-text">{{tempData.title || '无标题'}}</text>
+    </view>
+
+    <!-- 内容编辑 -->
+    <view class="modal-item">
+      <text class="modal-label">内容：</text>
+      <textarea wx:if="{{isEdit}}" class="modal-input desc-input" value="{{tempData.content}}" bindinput="handleContentInput" placeholder="请输入待办内容（选填）" auto-height />
+      <text wx:else class="modal-text">{{tempData.content || '无内容'}}</text>
+    </view>
+
+    <!-- 开始时间：多列选择器（年月日时分） -->
+    <view class="modal-item">
+      <text class="modal-label">开始时间：</text>
+      <picker wx:if="{{isEdit}}" mode="multiSelector" range="{{timeRange}}" value="{{startTimeIndex}}" bindcolumnchange="handleStartTimeColumnChange" bindchange="handleStartTimeConfirm">
+        <view class="modal-input {{!tempData.startTime ? 'placeholder-style' : ''}}">
+          {{tempData.startTime || '请选择开始时间'}}
+        </view>
+      </picker>
+      <text wx:else class="modal-text">{{tempData.startTime || '未设置'}}</text>
+    </view>
+
+    <!-- 结束时间：多列选择器（年月日时分） -->
+    <view class="modal-item">
+      <text class="modal-label">结束时间：</text>
+      <picker wx:if="{{isEdit}}" mode="multiSelector" range="{{timeRange}}" value="{{endTimeIndex}}" bindcolumnchange="handleEndTimeColumnChange" bindchange="handleEndTimeConfirm">
+        <view class="modal-input {{!tempData.endTime ? 'placeholder-style' : ''}}">
+          {{tempData.endTime || '请选择结束时间'}}
+        </view>
+      </picker>
+      <text wx:else class="modal-text">{{tempData.endTime || '未设置'}}</text>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="modal-btn-group">
+      <text class="modal-btn edit-btn" bindtap="handleEdit" wx:if="{{!isEdit}}">修改</text>
+      <text class="modal-btn save-btn" bindtap="handleSave" wx:if="{{isEdit}}">保存</text>
+      <text class="modal-btn delete-btn" bindtap="handleDelete">删除</text>
+    </view>
+  </view>
+</view>

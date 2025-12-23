@@ -1,0 +1,393 @@
+/* 页面基础样式 */
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 导航栏样式 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+.navbar-title {
+  font-size: 35rpx;
+}
+
+/* 轮播图区域：降低高度（从420rpx→320rpx） */
+.banner-section {
+  width: 100%;
+  height: 420rpx;
+  /* 降低轮播图高度，避免过高 */
+  position: relative;
+  overflow: hidden;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+  margin-top: 200rpx;
+  /* 紧贴导航栏 */
+}
+
+.swiper-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 20rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.native-swiper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.swiper-item {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20rpx;
+}
+
+.swiper-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 保持图片比例，填满容器 */
+  display: block;
+}
+
+/* 文字容器：适配轮播图高度降低，保持两行布局 */
+.swiper-desc {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx 42rpx 30rpx;
+  /* 减少内边距，适配降低的高度 */
+  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3));
+  color: #fff;
+  z-index: 10;
+  height: 140rpx;
+  /* 同步降低文字区域高度，避免拥挤 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: visible;
+  /* 允许文字滚动超出容器（但被父容器裁剪） */
+}
+
+
+.title-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.title-container .title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 收藏按钮点击反馈 */
+.collect-icon:active {
+  opacity: 0.7;
+}
+
+/* 卡片区域样式 */
+.card-area {
+  width: 100%;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+  margin-top: 30rpx;
+  margin-bottom: 150rpx;
+}
+
+.latest-news-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin: 30rpx;
+  padding-left: 10rpx;
+  border-left: 4rpx solid #7b2ff7;
+}
+
+/* 适配轮播图高度降低，调整卡片滚动区域高度 */
+.card-scroll {
+  height: calc(100vh - 870rpx);
+}
+
+.loading-tip,
+.empty-tip {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 底部导航栏样式 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1rpx solid #eee;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  font-size: 26rpx;
+}
+
+.tab-item .menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-bottom: 6rpx;
+  filter: brightness(0) saturate(100%) invert(62%) sepia(0%) saturate(0%) hue-rotate(201deg) brightness(88%) contrast(85%);
+}
+
+.tab-item.active {
+  color: #7b2ff7;
+  font-weight: bold;
+}
+
+.tab-item.active .menu-icon {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(74%) saturate(6221%) hue-rotate(253deg) brightness(96%) contrast(101%);
+}
+
+/* ===================== 滚动文字核心样式 ===================== */
+/* 滚动容器：确保溢出隐藏，设置固定高度和行高 */
+.unique-scroll {
+  width: 100%;
+  height: 38rpx;
+  /* 与文字行高一致，避免垂直偏移 */
+  line-height: 38rpx;
+  /* 垂直居中 */
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  /* 动画：匀速滚动，无限循环，优先级最高 */
+  animation: scroll 12s linear infinite !important;
+  animation-delay: 0.8s !important;
+  /* 延迟滚动，提升体验 */
+  animation-fill-mode: both !important;
+  /* 保持动画初始/结束状态 */
+}
+
+/* 滚动文字,必须inline-block才能实现平移滚动 */
+.summary-text {
+  display: inline-block !important;
+  padding-right: 200% !important;
+  color: #f0f0f0 !important;
+  font-size: 24rpx !important;
+  vertical-align: middle !important;
+  /* 确保垂直居中 */
+}
+
+/* 定义滚动关键帧：从右侧完全可见到左侧完全消失 */
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+    /* 初始位置：文字右侧对齐容器右侧，完全不可见 */
+  }
+
+  100% {
+    transform: translateX(-100%);
+    /* 结束位置：文字左侧对齐容器左侧，完全不可见 */
+  }
+}
+
+/* 轮播图切换时的动画控制 */
+/* 激活的轮播项：动画运行 */
+.native-swiper .wx-swiper-item-active .unique-scroll {
+  animation-play-state: running !important;
+}
+
+/* 非激活的轮播项：动画暂停并重置位置 */
+.native-swiper .wx-swiper-item:not(.wx-swiper-item-active) .unique-scroll {
+  animation-play-state: paused !important;
+  transform: translateX(100%) !important;
+  /* 重置到初始位置 */
+}
+
+/* ===================== 滚动文字核心样式（修改后）===================== */
+/* 外层容器：固定显示宽度（卡片宽度），隐藏溢出 → 作为滚动窗口 */
+.summary-container {
+  z-index: 11 !important;
+  position: relative;
+  width: 100%;
+  /* 窗口宽度=卡片宽度 */
+  height: 38rpx;
+  /* 与文字行高一致 */
+  line-height: 38rpx;
+  overflow: hidden;
+  /* 隐藏窗口外的文字 */
+  white-space: nowrap;
+  /* 禁止文字换行 */
+}
+
+/* 内层滚动容器：跟随文字长度自适应，不限制宽度 → 承载完整文字 */
+.unique-scroll.scroll-wrapper {
+  display: inline-block;
+  /* 宽度=文字实际长度 */
+  padding-right: var(--item-padding, 1000rpx);
+  /* 文字末尾留少量间距，避免滚动衔接生硬 */
+  /* 动画：基于文字长度滚动，无限循环 */
+  animation: scroll 20s linear infinite !important;
+  animation-delay: 0.8s !important;
+  animation-fill-mode: both !important;
+}
+
+/* 滚动文字：保持原有样式，去掉不必要的超大内边距 */
+.summary-text {
+  display: inline-block !important;
+  color: #f0f0f0 !important;
+  font-size: 24rpx !important;
+  vertical-align: middle !important;
+}
+
+/* 关键帧修正：从窗口右侧（完全不可见）滚动到窗口左侧（完全不可见） */
+@keyframes scroll {
+  0% {
+    transform: translateX(5%);
+    /* 初始：文字右侧对齐窗口右侧 → 完全不可见 */
+  }
+
+  100% {
+    transform: translateX(-100%);
+    /* 结束：文字左侧对齐窗口左侧 → 完全不可见 */
+  }
+}
+
+/* 轮播图切换动画控制（选择器适配内层容器） */
+.native-swiper .wx-swiper-item-active .unique-scroll.scroll-wrapper {
+  animation-play-state: running !important;
+}
+
+.native-swiper .wx-swiper-item:not(.wx-swiper-item-active) .unique-scroll.scroll-wrapper {
+  animation-play-state: paused !important;
+  transform: translateX(100%) !important;
+  /* 重置初始位置 */
+}
+
+/* 适配不同屏幕的滚动速度（保持不变） */
+@media (min-width: 375px) {
+  .unique-scroll.scroll-wrapper {
+    animation-duration: 20s !important;
+  }
+}
+
+@media (min-width: 414px) {
+  .unique-scroll.scroll-wrapper {
+    animation-duration: 16s !important;
+  }
+}
+
+/* 确保GIF加载动画层级最高，覆盖所有内容 */
+.loading-animation-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999 !important;
+  /* 强制最高层级 */
+}
+
+/* 加载GIF样式 */
+.loading-gif {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+/* 隐藏原有加载文字提示 */
+.loading-tip {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #999;
+  font-size: 28rpx;
+  display: none;
+}
+
+/* 加载动画容器 - 全屏居中覆盖 */
+.loading-animation-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 自定义dot容器：定位到轮播图底部，居中 */
+.custom-dot-container {
+  position: absolute;
+  bottom: 15rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  z-index: 10;
+}
+
+/* 普通dot样式：更小的圆形 */
+.custom-dot {
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background-color: #ccc;
+  transition: all 0.3s ease;
+}
+
+/* 激活态dot：两端半圆的小横条 */
+.custom-dot-active {
+  width: 20rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background-color: #7b2ff7;
+}

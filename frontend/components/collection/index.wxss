@@ -1,0 +1,347 @@
+/* 收藏夹卡片容器 */
+.collection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  margin-bottom: 30rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.05);
+  position: relative;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.collection-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 卡片主体 */
+.collection-content {
+  flex: 1;
+}
+
+.collection-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.collection-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+  margin-right: 12rpx;
+}
+
+.default-tag {
+  font-size: 22rpx;
+  color: #7b2ff7;
+  background: rgba(123, 47, 247, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: 30rpx;
+}
+
+.collection-footer {
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 8rpx;
+}
+
+.count-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.action-icon {
+  width: 50rpx;
+  height: 50rpx;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.action-icon:active {
+  transform: scale(0.9);
+}
+
+/* 浮窗遮罩 */
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* 编辑浮窗主体 */
+.edit-popup {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  max-height: 85vh;
+  background: #fff;
+  border-top-left-radius: 30rpx;
+  border-top-right-radius: 30rpx;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* 浮窗头部 */
+.popup-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  position: relative;
+  min-height: 45rpx;
+}
+
+/* 头部拖拽指示条 */
+.popup-header::before {
+  content: '';
+  position: absolute;
+  top: 16rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 6rpx;
+  background: #e0e0e0;
+  border-radius: 3rpx;
+}
+
+/* 返回图标 - 固定在左上角 */
+.return-icon {
+  position: absolute;
+  top: 25rpx;
+  left: 30rpx;
+  width: 50rpx;
+  height: 50rpx;
+  transition: transform 0.2s;
+}
+
+.return-icon:active {
+  transform: scale(0.9);
+}
+
+/* 完成按钮 - 固定在右上角 */
+.complete-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 30rpx;
+  font-size: 30rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #7b2ff7 0%, #9d4edd 100%);
+  font-weight: 500;
+  padding: 12rpx 32rpx;
+  border-radius: 30rpx;
+  transition: all 0.2s;
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.3);
+}
+
+.complete-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 8rpx rgba(123, 47, 247, 0.25);
+}
+
+/* 浮窗内容区（自适应高度，可滚动） */
+.popup-content {
+  flex: 1;
+  padding: 20rpx 30rpx 40rpx 30rpx;
+  overflow-y: auto;
+}
+
+/* 表单项样式 */
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+  padding-left: 4rpx;
+  font-weight: 600;
+}
+
+/* 输入框容器 */
+.input-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background: #fff;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+  min-height: 80rpx;
+}
+
+.input-wrapper:focus-within {
+  border-color: #7b2ff7;
+  box-shadow: 0 0 0 4rpx rgba(123, 47, 247, 0.1);
+}
+
+/* 文本域容器使用顶部对齐 */
+.form-textarea {
+  align-self: flex-start;
+}
+
+/* 名称输入框 */
+.form-input {
+  flex: 1;
+  padding: 0 20rpx;
+  padding-right: 80rpx;
+  background: transparent;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  color: #222;
+  box-sizing: border-box;
+  line-height: 1.5;
+  height: 100%;
+}
+
+.form-input::placeholder {
+  color: #bbb;
+}
+
+/* 描述输入框 */
+.form-textarea {
+  flex: 1;
+  padding: 18rpx 20rpx;
+  padding-right: 80rpx;
+  background: transparent;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  color: #222;
+  min-height: 160rpx;
+  box-sizing: border-box;
+  line-height: 1.3;
+  vertical-align: top;
+}
+
+/* 包含文本域的容器使用顶部对齐 - 通过父元素选择 */
+.form-item .input-wrapper {
+  align-items: center;
+}
+
+/* 通过相邻选择器调整包含 textarea 的容器 */
+.form-item:nth-of-type(2) .input-wrapper {
+  align-items: flex-start;
+  min-height: auto;
+}
+
+.form-textarea::placeholder {
+  color: #bbb;
+  line-height: 1.6;
+}
+
+/* 剩余字数样式 */
+.remain-count {
+  position: absolute;
+  right: 20rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24rpx;
+  color: #999;
+  pointer-events: none;
+  font-weight: 400;
+}
+
+/* 文本域的剩余字数位置 */
+.form-textarea+.remain-count {
+  top: 24rpx;
+  transform: none;
+}
+
+/* 底部升起动画 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+    /* 修正动画：从底部完全滑入，原20%会留空隙 */
+  }
+}
+
+/* 删除区域样式 */
+.delete-section {
+  padding-top: 40rpx;
+  border-top: 1rpx solid #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 删除按钮基础样式 */
+.delete-btn {
+  height: 80rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+/* 可删除状态 - 红色按钮 */
+.delete-btn.enabled {
+  width: 320rpx;
+  background: #ff4a4a;
+  box-shadow: 0 8rpx 20rpx rgba(255, 74, 74, 0.3);
+  color: #fff;
+}
+
+.delete-btn.enabled:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(255, 74, 74, 0.25);
+}
+
+/* 不可删除状态 - 灰色禁用样式 */
+.delete-btn.disabled {
+  width: 400rpx;
+  background: #f5f5f5;
+  box-shadow: none;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.delete-btn.disabled:active {
+  transform: none;
+}

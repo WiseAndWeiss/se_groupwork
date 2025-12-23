@@ -1,0 +1,49 @@
+<!-- article-list.wxml -->
+<view class="card-area">
+  <!-- 卡片独立滚动容器 -->
+  <scroll-view class="card-scroll" scroll-y="true" scroll-top="{{scrollTop}}" style="height: {{article_list_scrollHeight}};">
+    <view class="card-list">
+      <block wx:for="{{list}}" wx:key="id">
+        <card-component id_="{{item.id}}" title="{{item.title}}" time="{{item.publish_time}}" tags="{{item.tags}}" desc="{{item.summary}}" url="{{item.article_url}}" key_info="{{item.key_info}}" name="{{item.account_name}}" is_favorited="{{item.is_favorited}}" bind:showCollectionSelect="onShowCollectionSelect" bind:hideCollectionSelect="onHideCollectionSelect" bind:moveFavouriteToCollection="onMoveFavouriteToCollection" />
+      </block>
+    </view>
+
+    <!-- 空数据提示 -->
+    <view wx:if="{{list.length === 0}}" class="empty-tip">{{emptyText}}</view>
+
+    <!-- 新增：加载更多按钮区域 -->
+    <view wx:if="{{list.length > 0}}" class="load-more-area">
+      <!-- 加载中状态 -->
+      <view wx:if="{{isLoading}}" class="loading-tip">
+        加载中...
+      </view>
+      <!-- 已加载完所有数据 -->
+      <view wx:elif="{{reachEnd}}" class="no-more-tip">
+        暂无更多文章
+      </view>
+      <!-- 可点击加载更多 -->
+      <view wx:else class="load-more-btn" bindtap="onLoadMoreTap">
+        点击加载更多文章
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 收藏夹选择弹窗（页面级别，避免被scroll-view裁剪） -->
+<view class="collection-select-popup" wx:if="{{showCollectionSelect}}">
+  <view class="select-mask" bindtap="onHideCollectionSelect"></view>
+  <view class="select-content">
+    <view class="select-title">选择收藏夹</view>
+    <scroll-view class="collection-scroll" scroll-y="true" style="height: 600rpx;">
+      <view class="collection-list">
+        <block wx:for="{{collectionList}}" wx:key="id" wx:for-item="item" wx:for-index="index">
+          <view class="collection-item {{defaultCollection && item.id === defaultCollection.id ? 'active' : ''}}" bindtap="onMoveFavouriteToCollection" data-collectionid="{{item.id}}">
+            <text>{{item.name || '未命名'}}</text>
+            <text wx:if="{{item.is_default}}" class="default-tag">默认</text>
+          </view>
+        </block>
+        <view wx:if="{{collectionList.length === 0}}" class="empty-collection-tip">暂无收藏夹</view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

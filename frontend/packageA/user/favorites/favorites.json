@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "collection": "/components/collection/index",
+    "loading": "/components/loading/index"
+  },
+  "navigationStyle": "custom",
+  "renderer": "webview"
+}
