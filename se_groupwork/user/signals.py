@@ -135,6 +135,22 @@ def enforce_history_cap(sender, instance, **kwargs):
         # 批量删除旧记录，这会自动触发post_delete信号
         History.objects.filter(id__in=stale_ids).delete()
 
+
+@receiver(post_save, sender=History)
+def enforce_history_cap(sender, instance, **kwargs):
+    """Ensure per-user history does not exceed HISTORY_MAX_RECORDS (keep latest)."""
+    if not HISTORY_MAX_RECORDS or HISTORY_MAX_RECORDS <= 0:
+        return
+
+    qs = (
+        History.objects
+        .filter(user=instance.user)
+        .order_by('-viewed_at', '-id')
+    )
+    stale_ids = list(qs.values_list('id', flat=True)[HISTORY_MAX_RECORDS:])
+    if stale_ids:
+        History.objects.filter(id__in=stale_ids).delete()
+
 @receiver(post_delete, sender=History)
 def update_history_count_on_delete(sender, instance, **kwargs):
     """
