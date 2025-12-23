@@ -15,6 +15,7 @@ Page({
     start_rank: 0, // 分页起始位置
     pageSize: 10, // 每页固定加载10条
     reach_end: false, // 是否已加载完所有数据
+    isLoaded: false, // 是否已首次加载数据
   },
 
   onReady() {
@@ -29,8 +30,14 @@ Page({
   // 页面生命周期
   onShow() {
     console.log('首页页面加载完成');
-    this.loadRecommendedArticles(); // 加载推荐文章数据（轮播图）
-    this.loadLatestArticles(true); // 加载首页文章数据（卡片）
+    if (!this.data.isLoaded) {
+      this.setData({ isLoaded: true });
+      this.loadRecommendedArticles(); // 加载推荐文章数据（轮播图）
+      this.loadLatestArticles(true); // 加载首页文章数据（卡片）
+    } else {
+      // 返回时不重新加载文章列表，保持之前的状态
+      // this.loadRecommendedArticles(); // 轮播图可以每次刷新
+    }
   },
 
   /*
@@ -69,6 +76,7 @@ Page({
       // 重置加载状态
       isLoading: false,
       isSwiperLoading: false,
+      isLoaded: false,
       // 重置轮播图当前索引
       current: 0
     });
@@ -187,7 +195,8 @@ Page({
     if (this.data.isLoading || this.data.reach_end) return; // 新增：已到末尾则不加载
     console.log('开始加载首页文章...');
     this.setData({
-      isLoading: true
+      isLoading: true,
+      showLoadingAnimation: true // 显示加载动画
     });
 
     try {
@@ -237,7 +246,8 @@ Page({
       });
     } finally {
       this.setData({
-        isLoading: false
+        isLoading: false,
+        showLoadingAnimation: false // 隐藏加载动画
       });
     }
   },
