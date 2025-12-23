@@ -471,7 +471,7 @@ class CollectionDetailView(APIView):
         if collection.is_default:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            collection.delete()
+            Collection.objects.delete_collection(collection)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
