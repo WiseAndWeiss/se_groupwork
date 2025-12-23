@@ -42,7 +42,7 @@
   <view class="select-mask" bindtap="closeAllPopups"></view>
   <view class="select-content">
     <view class="select-title">选择收藏夹</view>
-    <scroll-view class="collection-scroll" scroll-y="true">
+    <scroll-view class="collection-scroll" scroll-y="true" enable-back-to-top="{{false}}">
       <view class="collection-list">
         <text class="collection-item {{defaultCollection && item.id === defaultCollection.id ? 'active' : ''}}" wx:for="{{collectionList}}" wx:key="id" bindtap="moveFavouriteToCollection" data-collectionid="{{item.id}}">{{item.name}}<text wx:if="{{item.is_default}}" class="default-tag">默认</text>
         </text>

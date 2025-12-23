@@ -7,7 +7,7 @@
 
 <!-- 用户信息展示区域 -->
 <view class="profile-container">
-  <!-- 头像+昵称 -->
+  <!-- 头像+用户名 -->
   <view class="avatar-section">
     <image class="avatar-img" src="https://{{userInfo.avatar}}" mode="aspectFill"></image>
     <view class="nickname">{{userInfo.username || '未设置'}}</view>
@@ -26,5 +26,5 @@
   </view>
 
   <!-- 修改按钮 -->
-  <button class="edit-btn" bindtap="goToUpdateUserInfo">修改信息</button>
+  <button class="edit-btn" bindtap="goToUpdateUserInfo">修改资料</button>
 </view>

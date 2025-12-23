@@ -71,11 +71,19 @@ page {
   display: flex;
   align-items: center;
   gap: 15rpx;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 .info-content text {
   font-size: 28rpx;
   color: #666;
+  word-wrap: break-word;
+  word-break: break-all;
+  text-align: right;
+  line-height: 1.5;
+  max-width: 60vw;
 }
 
 .avatar-img {
@@ -89,6 +97,7 @@ page {
   width: 30rpx;
   height: 30rpx;
   color: #ccc;
+  flex-shrink: 0;
 }
 
 /* 悬浮窗遮罩层 */

@@ -199,9 +199,19 @@ Page({
       });
     } catch (err) {
       console.error('登录失败：', err);
-      wx.showToast({
-        title: err || '登录失败',
-        icon: 'none'
+      // 从错误对象中提取错误信息（服务器相关错误）
+      let errorMessage = '登录失败';
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        errorMessage = err.message || err.error || err.detail || '用户名或密码错误';
+      }
+      // 服务器错误使用 showModal
+      wx.showModal({
+        title: '登录失败',
+        content: errorMessage,
+        showCancel: false,
+        confirmText: '知道了'
       });
     }
   },
@@ -233,11 +243,10 @@ Page({
     // 检测是否包含非法特殊字符
     const hasIllegalChars = this.hasIllegalSpecialChars(password);
     if (hasIllegalChars) {
-      wx.showModal({
+      wx.showToast({
         title: '密码包含非法字符',
-        content: `密码仅允许包含字母、数字和特殊字符：!@#$%^&*（共8种），请移除其他特殊字符（如？、！、￥等）`,
-        showCancel: false,
-        confirmText: '知道了'
+        icon: 'none',
+        duration: 2000
       });
       return;
     }
@@ -248,11 +257,10 @@ Page({
     const optionalPassedCount = optionalRules.filter(rule => rule.test(password)).length;
 
     if (!requiredRule.test(password) || optionalPassedCount < 2) {
-      wx.showModal({
-        title: '密码要求',
-        content: '密码长度应不小于8位，且包含数字、大小写字母、特殊字符"!@#$%^&*"中至少2种',
-        showCancel: false,
-        confirmText: '知道了'
+      wx.showToast({
+        title: '密码长度应不小于8位，且包含数字、大小写字母、特殊字符"!@#$%^&*"中至少2种',
+        icon: 'none',
+        duration: 2000
       });
       return;
     }
@@ -267,18 +275,45 @@ Page({
         icon: 'success'
       });
       // 注册成功后自动登录
-      await request.login({
-        username,
-        password
-      });
-      wx.reLaunch({
-        url: '/pages/home/home'
-      });
+      try {
+        await request.login({
+          username,
+          password
+        });
+        wx.reLaunch({
+          url: '/pages/home/home'
+        });
+      } catch (loginErr) {
+        console.error('自动登录失败：', loginErr);
+        // 自动登录失败（服务器错误）使用 showModal
+        let loginErrorMessage = '自动登录失败';
+        if (typeof loginErr === 'string') {
+          loginErrorMessage = loginErr;
+        } else if (loginErr && typeof loginErr === 'object') {
+          loginErrorMessage = loginErr.message || loginErr.error || loginErr.detail || '自动登录失败，请手动登录';
+        }
+        wx.showModal({
+          title: '自动登录失败',
+          content: loginErrorMessage,
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      }
     } catch (err) {
       console.error('注册失败：', err);
-      wx.showToast({
-        title: err || '注册失败',
-        icon: 'none'
+      // 从错误对象中提取错误信息（服务器相关错误）
+      let errorMessage = '注册失败';
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        errorMessage = err.message || err.error || err.detail || '注册失败，请稍后重试';
+      }
+      // 服务器错误使用 showModal
+      wx.showModal({
+        title: '注册失败',
+        content: errorMessage,
+        showCancel: false,
+        confirmText: '知道了'
       });
     }
   },

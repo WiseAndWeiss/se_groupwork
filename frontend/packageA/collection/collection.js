@@ -4,10 +4,8 @@ Page({
   data: {
     collectionid: '',
     collectionName: '',
-    articles: [],
+    articles: [], // 文章列表（格式：{id, title, publish_time, tags, summary, article_url, key_info, account_name, is_favorited}）
     isLoading: false,
-    startRank: 0,
-    reachEnd: false, // 是否已加载完所有数据
   },
 
   // 返回上一页
@@ -34,7 +32,8 @@ Page({
 
     this.setData({
       collectionid,
-      collectionName
+      collectionName,
+      articles: []
     });
     this.loadCollectionArticles(); // 加载对应收藏夹文章
   },
@@ -47,14 +46,28 @@ Page({
     });
     try {
       console.log('正在加载收藏夹文章，collectionid:', this.data.collectionid);
-      // 调用 getCollectionArticles 接口
+      // 调用 getCollectionArticles 接口，不传 startRank 或传 0，一次性加载所有
       const response = await request.getCollectionArticles(
         this.data.collectionid,
-        this.data.startRank
+        0
       );
       console.log('收藏夹文章 API 响应:', response);
+      
+      // 转换数据格式为 article-list 需要的格式
+      const formattedArticles = (response || []).map(item => ({
+        id: item.article.id,
+        title: item.article.title,
+        publish_time: item.article.publish_time,
+        tags: item.article.tags || [],
+        summary: item.article.summary || '',
+        article_url: item.article.article_url || '',
+        key_info: item.article.key_info || '',
+        account_name: item.article.account_name || '',
+        is_favorited: item.id || 0 // 收藏ID
+      }));
+
       this.setData({
-        articles: response || [],
+        articles: formattedArticles
       });
       console.log('收藏夹文章列表:', this.data.articles);
     } catch (err) {
@@ -82,8 +95,6 @@ Page({
       collectionName: '',
       articles: [],
       isLoading: false,
-      startRank: 0,
-      reachEnd: false,
     });
   }
 });

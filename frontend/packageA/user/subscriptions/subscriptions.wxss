@@ -53,6 +53,11 @@ page {
   z-index: 1001;
 }
 
+.delete-all-btn:active {
+  transform: translateX(-50%) scale(0.98);
+  background: #ff2a2a;
+}
+
 .delete-btn-text {
   color: #fff;
   font-size: 32rpx;

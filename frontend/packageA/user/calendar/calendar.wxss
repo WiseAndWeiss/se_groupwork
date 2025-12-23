@@ -961,13 +961,21 @@ button::after {
   color: var(--primary-color);
 }
 
+.popup-content-wrapper {
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .popup-content {
   padding: 0 30rpx;
-  max-height: 70vh;
+  height: 60vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background-color: rgba(239, 239, 239, 0.6);
   border-radius: 0 0 24rpx 24rpx;
+  /* 内容不足时不滚动 */
+  overscroll-behavior: contain;
 }
 
 /* ================= 滚动条优化 ================= */

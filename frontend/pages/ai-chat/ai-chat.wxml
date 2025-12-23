@@ -50,7 +50,7 @@
 <!-- 输入区域 -->
 <view class="input-area">
   <input class="input-box" type="text" placeholder="输入消息..." value="{{inputText}}" bindinput="onInputChange" confirm-type="send" bindconfirm="sendMessage" disabled="{{isLoading}}" />
-  <view class="send-button {{inputText ? 'active' : ''}}" bindtap="sendMessage" disabled="{{isLoading || !inputText}}">
+  <view class="send-button {{inputText && !isLoading ? 'active' : ''}} {{isLoading ? 'disabled' : ''}}" bindtap="sendMessage">
     发送
   </view>
 </view>

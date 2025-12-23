@@ -26,21 +26,48 @@ Page({
 
   onLoad() {
     const eventChannel = this.getOpenerEventChannel();
-    eventChannel.on('passUserInfo', (data) => {
-      console.log('修改页面接收的数据：', data.userInfo);
-
-      const userInfo = data.userInfo;
-      if (userInfo.avatar) {
-        userInfo.avatar = this.processAvatarUrl(userInfo.avatar);
-      }
-      this.setData({
-        form: data.userInfo,
-        // 初始化临时数据为当前值
-        tempUsername: data.userInfo.username || '',
-        tempEmail: data.userInfo.email || '',
-        tempPhone: data.userInfo.phone_number || ''
+    if (eventChannel && typeof eventChannel.on === 'function') {
+      eventChannel.on('passUserInfo', (data) => {
+        console.log('修改页面接收的数据：', data.userInfo);
+        this.loadUserInfo(data.userInfo);
       });
+    } else {
+      // 如果没有eventChannel，直接从接口获取用户信息
+      this.loadUserInfoFromApi();
+    }
+  },
+
+  // 加载用户信息（从eventChannel或接口）
+  loadUserInfo(userInfo) {
+    if (userInfo.avatar) {
+      userInfo.avatar = this.processAvatarUrl(userInfo.avatar);
+    }
+    this.setData({
+      form: userInfo,
+      // 初始化临时数据为当前值
+      tempUsername: userInfo.username || '',
+      tempEmail: userInfo.email || '',
+      tempPhone: userInfo.phone_number || ''
     });
+  },
+
+  // 从接口获取用户信息
+  async loadUserInfoFromApi() {
+    try {
+      wx.showLoading({
+        title: '加载中...'
+      });
+      const userInfo = await request.getProfile();
+      this.loadUserInfo(userInfo);
+    } catch (err) {
+      console.error('获取用户信息失败：', err);
+      wx.showToast({
+        title: '获取用户信息失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // ========== 悬浮窗显示/隐藏 ==========
@@ -57,32 +84,38 @@ Page({
   },
   showUsernameModal() {
     this.setData({
-      showUsernameModal: true
+      showUsernameModal: true,
+      tempUsername: this.data.form.username || ''
     });
   },
   hideUsernameModal() {
     this.setData({
-      showUsernameModal: false
+      showUsernameModal: false,
+      tempUsername: ''
     });
   },
   showEmailModal() {
     this.setData({
-      showEmailModal: true
+      showEmailModal: true,
+      tempEmail: this.data.form.email || ''
     });
   },
   hideEmailModal() {
     this.setData({
-      showEmailModal: false
+      showEmailModal: false,
+      tempEmail: ''
     });
   },
   showPhoneModal() {
     this.setData({
-      showPhoneModal: true
+      showPhoneModal: true,
+      tempPhone: this.data.form.phone_number || ''
     });
   },
   hidePhoneModal() {
     this.setData({
-      showPhoneModal: false
+      showPhoneModal: false,
+      tempPhone: ''
     });
   },
   showPwdModal() {
@@ -202,14 +235,14 @@ Page({
     } = this.data;
     if (!tempUsername) {
       wx.showToast({
-        title: '请输入昵称',
+        title: '请输入用户名',
         icon: 'none'
       });
       return false;
     }
     if (tempUsername.length < 2 || tempUsername.length > 10) {
       wx.showToast({
-        title: '昵称长度需2-10字',
+        title: '用户名长度需2-10字',
         icon: 'none'
       });
       return false;
@@ -226,7 +259,7 @@ Page({
         new_username: this.data.tempUsername.trim()
       });
       if (res && res.error) {
-        this.showErrorModal('昵称修改失败', res.error);
+        this.showErrorModal('用户名修改失败', res.error);
         return;
       }
       this.setData({
@@ -234,13 +267,13 @@ Page({
         showUsernameModal: false
       });
       wx.showToast({
-        title: '昵称修改成功',
+        title: '用户名修改成功',
         icon: 'success'
       });
     } catch (err) {
       const errorMsg = this.extractErrorMessage(err);
-      this.showErrorModal('昵称修改失败', errorMsg);
-      console.error('昵称修改失败：', err);
+      this.showErrorModal('用户名修改失败', errorMsg);
+      console.error('用户名修改失败：', err);
     } finally {
       wx.hideLoading();
     }
@@ -418,15 +451,15 @@ Page({
         return;
       }
       this.setData({
-        showPwdModal: false
+        showPwdModal: false,
+        tempOldPwd: '',
+        tempNewPwd: '',
+        tempConfirmPwd: ''
       });
       wx.showToast({
         title: '密码修改成功',
         icon: 'success'
       });
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1000);
     } catch (err) {
       const errorMsg = this.extractErrorMessage(err);
       this.showErrorModal('密码修改失败', errorMsg);

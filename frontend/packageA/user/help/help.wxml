@@ -99,7 +99,7 @@
         我的页面是您的个人中心，包含以下功能模块：
       </view>
       <view class="section-text">
-        <text class="text-bold">1. 个人资料：</text>查看和编辑您的个人信息，包括头像、昵称、密码等。
+        <text class="text-bold">1. 个人资料：</text>查看和编辑您的个人信息，包括头像、用户名、密码等。
       </view>
       <view class="section-text">
         <text class="text-bold">2. 我的收藏：</text>查看您的收藏夹以及收藏的所有文章。您可以在这里管理收藏夹和收藏的文章，取消不需要的收藏。

@@ -183,7 +183,8 @@ page {
 }
 
 .logout-btn:active {
-  background: #6a1dd6;
+  transform: translateX(-50%) scale(0.98);
+  background: #ff2a2a;
 }
 
 .logout-btn-text {

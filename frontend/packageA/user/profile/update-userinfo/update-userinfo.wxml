@@ -1,7 +1,7 @@
 <!-- 自定义导航栏 -->
 <view class="custom-navbar">
   <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
-  <view class="navbar-title">修改个人信息</view>
+  <view class="navbar-title">修改个人资料</view>
 </view>
 
 <!-- 个人信息列表 -->
@@ -17,9 +17,9 @@
 
   <!-- 用户名项 -->
   <view class="info-item" bindtap="showUsernameModal">
-    <view class="info-label">昵称</view>
+    <view class="info-label">用户名</view>
     <view class="info-content">
-      <text>{{form.username || '请设置昵称'}}</text>
+      <text>{{form.username || '请设置用户名'}}</text>
       <image class="arrow-icon" src="/assets/icons/arrow-right.svg"></image>
     </view>
   </view>
@@ -69,9 +69,9 @@
 <!-- 2. 用户名修改悬浮窗 -->
 <view class="modal-mask" wx:if="{{showUsernameModal}}" bindtap="hideUsernameModal"></view>
 <view class="modal-content" wx:if="{{showUsernameModal}}">
-  <view class="modal-title">修改昵称</view>
+  <view class="modal-title">修改用户名</view>
   <view class="modal-input-group">
-    <input class="modal-input" placeholder="请输入昵称（2-10字）" value="{{tempUsername}}" bindinput="handleTempUsernameInput" />
+    <input class="modal-input" placeholder="请输入用户名（2-10字）" value="{{tempUsername}}" bindinput="handleTempUsernameInput" />
   </view>
   <view class="modal-btn-group">
     <button class="modal-cancel-btn" bindtap="hideUsernameModal">取消</button>

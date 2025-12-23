@@ -189,15 +189,17 @@
       <text class="popup-title">{{popupData.type === 'single' ? '待办详情' : '当前时段待办列表'}}</text>
       <text class="popup-close" bindtap="closeTodoPopup">×</text>
     </view>
-    <scroll-view class="popup-content" scroll-y style="max-height: 70vh;">
-      <block wx:if="{{popupData.type === 'single' && popupData.todo}}">
-        <to-do todoData="{{popupData.todo}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%;"></to-do>
-      </block>
-      <block wx:if="{{popupData.type === 'group' && popupData.todos && popupData.todos.length > 0}}">
-        <block wx:for="{{popupData.todos}}" wx:key="id">
-          <to-do todoData="{{item}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%; margin-bottom: 10rpx;"></to-do>
+    <view class="popup-content-wrapper">
+      <view class="popup-content">
+        <block wx:if="{{popupData.type === 'single' && popupData.todo}}">
+          <to-do todoData="{{popupData.todo}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%;"></to-do>
         </block>
-      </block>
-    </scroll-view>
+        <block wx:if="{{popupData.type === 'group' && popupData.todos && popupData.todos.length > 0}}">
+          <block wx:for="{{popupData.todos}}" wx:key="id">
+            <to-do todoData="{{item}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%; margin-bottom: 10rpx;"></to-do>
+          </block>
+        </block>
+      </view>
+    </view>
   </view>
 </view>

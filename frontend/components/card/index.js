@@ -87,13 +87,24 @@ Component({
         const collectionList = res.list || res;
         const validList = Array.isArray(collectionList) ? collectionList : [];
         const defaultCollection = validList.find(item => item.is_default);
+        console.log('收藏夹列表处理结果：', {
+          validList,
+          validListLength: validList.length,
+          validListType: Array.isArray(validList) ? 'Array' : typeof validList,
+          firstItem: validList.length > 0 ? validList[0] : null,
+          firstItemKeys: validList.length > 0 ? Object.keys(validList[0]) : [],
+          firstItemId: validList.length > 0 ? validList[0].id : null,
+          firstItemName: validList.length > 0 ? validList[0].name : null,
+          defaultCollection
+        });
         this.setData({
           collectionList: validList,
           defaultCollection
         });
-        console.log('收藏夹列表设置完成：', {
-          validList,
-          defaultCollection
+        console.log('收藏夹列表设置完成，当前数据：', {
+          collectionList: this.data.collectionList,
+          collectionListLength: this.data.collectionList.length,
+          defaultCollection: this.data.defaultCollection
         });
         // 无默认收藏夹时提示（不清楚是否会正常创建默认收藏夹）
         if (!defaultCollection) {
@@ -201,8 +212,7 @@ Component({
     },
 
     // 打开收藏夹选择弹窗
-    openCollectionSelect() {
-      this.getCollectionList();
+    async openCollectionSelect() {
       // 清理定时器
       if (this.data.tipTimer) {
         clearTimeout(this.data.tipTimer);
@@ -210,11 +220,25 @@ Component({
           tipTimer: null
         });
       }
-      // 关闭提示弹窗，显示收藏夹选择弹窗
+      // 关闭提示弹窗
       this.setData({
-        showFavTipPopup: false,
-        showCollectionSelect: true
+        showFavTipPopup: false
       });
+      // 先获取收藏夹列表，等待数据加载完成
+      await this.getCollectionList();
+      console.log('card 组件准备触发事件，当前数据:', {
+        collectionList: this.data.collectionList,
+        collectionListLength: this.data.collectionList.length,
+        defaultCollection: this.data.defaultCollection,
+        currentFavoriteId: this.data.currentFavoriteId
+      });
+      // 通知页面显示收藏夹选择弹窗（传递数据）
+      this.triggerEvent('showCollectionSelect', {
+        collectionList: this.data.collectionList || [],
+        defaultCollection: this.data.defaultCollection || null,
+        currentFavoriteId: this.data.currentFavoriteId || ''
+      });
+      console.log('card 组件已触发 showCollectionSelect 事件');
       // 通知父组件收藏操作开始
       this.triggerEvent('collectionOperationStart');
     },
@@ -231,6 +255,8 @@ Component({
         showFavTipPopup: false,
         showCollectionSelect: false
       });
+      // 通知页面关闭收藏夹选择弹窗
+      this.triggerEvent('hideCollectionSelect');
       // 通知父组件收藏操作结束
       this.triggerEvent('collectionOperationEnd');
     },
