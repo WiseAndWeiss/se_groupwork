@@ -1,17 +1,17 @@
 {
-  "timestamp": 1766213383,
+  "timestamp": 1766430736,
   "fail_ratio": 0.0,
-  "total_rps": 5.394165924332033,
+  "total_rps": 5.05662810094305,
   "requests": [
     {
       "name": "GET static asset",
       "method": "GET",
-      "num_requests": 1571,
+      "num_requests": 1521,
       "num_failures": 0,
-      "avg_response_time_ms": 713.3283314451951,
-      "p95_ms": 3100.0,
-      "p99_ms": 6900.0,
-      "rps": 5.394165924332033
+      "avg_response_time_ms": 1579.7281737015014,
+      "p95_ms": 5100.0,
+      "p99_ms": 9900.0,
+      "rps": 5.05662810094305
     }
   ]
 }

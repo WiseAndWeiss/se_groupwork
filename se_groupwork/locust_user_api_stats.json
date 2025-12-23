@@ -1,77 +1,67 @@
 {
-  "timestamp": 1766213524,
+  "timestamp": 1766431571,
   "fail_ratio": 0.0,
-  "total_rps": 44.20539236059538,
+  "total_rps": 86.11606567127258,
   "requests": [
-    {
-      "name": "/api/user/auth/login/",
-      "method": "POST",
-      "num_requests": 50,
-      "num_failures": 0,
-      "avg_response_time_ms": 1275.3914100001566,
-      "p95_ms": 2000.0,
-      "p99_ms": 2200.0,
-      "rps": 0.42261369369594054
-    },
-    {
-      "name": "GET profile",
-      "method": "GET",
-      "num_requests": 1423,
-      "num_failures": 0,
-      "avg_response_time_ms": 69.4632984541194,
-      "p95_ms": 260.0,
-      "p99_ms": 1200.0,
-      "rps": 12.027585722586467
-    },
     {
       "name": "GET subscriptions",
       "method": "GET",
-      "num_requests": 973,
+      "num_requests": 4698,
       "num_failures": 0,
-      "avg_response_time_ms": 76.39371377193055,
-      "p95_ms": 490.0,
-      "p99_ms": 1200.0,
-      "rps": 8.224062479323003
-    },
-    {
-      "name": "GET collection favorites",
-      "method": "GET",
-      "num_requests": 930,
-      "num_failures": 0,
-      "avg_response_time_ms": 68.29274236562571,
-      "p95_ms": 260.0,
-      "p99_ms": 1100.0,
-      "rps": 7.860614702744494
-    },
-    {
-      "name": "GET collections",
-      "method": "GET",
-      "num_requests": 930,
-      "num_failures": 0,
-      "avg_response_time_ms": 73.85619129094931,
-      "p95_ms": 260.0,
-      "p99_ms": 1100.0,
-      "rps": 7.860614702744494
+      "avg_response_time_ms": 84.22913071518953,
+      "p95_ms": 27,
+      "p99_ms": 81,
+      "rps": 15.661103105471241
     },
     {
       "name": "GET history",
       "method": "GET",
-      "num_requests": 462,
+      "num_requests": 2371,
       "num_failures": 0,
-      "avg_response_time_ms": 5475.53917186086,
-      "p95_ms": 14000.0,
-      "p99_ms": 25000.0,
-      "rps": 3.9049505297504905
+      "avg_response_time_ms": 106.71313302401244,
+      "p95_ms": 29,
+      "p99_ms": 79,
+      "rps": 7.9038900517395305
+    },
+    {
+      "name": "GET profile",
+      "method": "GET",
+      "num_requests": 6961,
+      "num_failures": 0,
+      "avg_response_time_ms": 97.13504704782548,
+      "p95_ms": 27,
+      "p99_ms": 73,
+      "rps": 23.204967798464306
     },
     {
       "name": "GET todos",
       "method": "GET",
-      "num_requests": 462,
+      "num_requests": 2415,
       "num_failures": 0,
-      "avg_response_time_ms": 75.94086904701368,
-      "p95_ms": 430.0,
-      "p99_ms": 1300.0,
-      "rps": 3.9049505297504905
+      "avg_response_time_ms": 103.62912227746754,
+      "p95_ms": 26,
+      "p99_ms": 73,
+      "rps": 8.05056704974735
+    },
+    {
+      "name": "GET collection favorites",
+      "method": "GET",
+      "num_requests": 4694,
+      "num_failures": 0,
+      "avg_response_time_ms": 16.48434740092305,
+      "p95_ms": 25,
+      "p99_ms": 39,
+      "rps": 15.647768832925076
+    },
+    {
+      "name": "GET collections",
+      "method": "GET",
+      "num_requests": 4694,
+      "num_failures": 0,
+      "avg_response_time_ms": 115.48788257348083,
+      "p95_ms": 29,
+      "p99_ms": 83,
+      "rps": 15.647768832925076
     }
   ]
 }

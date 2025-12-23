@@ -1,0 +1,137 @@
+{
+  "timestamp": 1766431953,
+  "fail_ratio": 0.0,
+  "total_rps": 65.81979178494687,
+  "requests": [
+    {
+      "name": "POST favorites create",
+      "method": "POST",
+      "num_requests": 1792,
+      "num_failures": 0,
+      "avg_response_time_ms": 110.35647784598878,
+      "p95_ms": 100,
+      "p99_ms": 160.0,
+      "rps": 5.959431430811681
+    },
+    {
+      "name": "POST todos create",
+      "method": "POST",
+      "num_requests": 1778,
+      "num_failures": 0,
+      "avg_response_time_ms": 41.26739398205458,
+      "p95_ms": 61,
+      "p99_ms": 100.0,
+      "rps": 5.912873372758464
+    },
+    {
+      "name": "POST history create",
+      "method": "POST",
+      "num_requests": 1740,
+      "num_failures": 0,
+      "avg_response_time_ms": 88.83860718392236,
+      "p95_ms": 70,
+      "p99_ms": 100.0,
+      "rps": 5.7865015008997345
+    },
+    {
+      "name": "GET history list",
+      "method": "GET",
+      "num_requests": 910,
+      "num_failures": 0,
+      "avg_response_time_ms": 126.45011472528235,
+      "p95_ms": 81,
+      "p99_ms": 150.0,
+      "rps": 3.0262737734590566
+    },
+    {
+      "name": "POST subscriptions create",
+      "method": "POST",
+      "num_requests": 1729,
+      "num_failures": 0,
+      "avg_response_time_ms": 83.71839566221571,
+      "p95_ms": 79,
+      "p99_ms": 120.0,
+      "rps": 5.749920169572208
+    },
+    {
+      "name": "POST collections create",
+      "method": "POST",
+      "num_requests": 809,
+      "num_failures": 0,
+      "avg_response_time_ms": 83.97554622988379,
+      "p95_ms": 73,
+      "p99_ms": 100.0,
+      "rps": 2.690390640360854
+    },
+    {
+      "name": "GET collections list",
+      "method": "GET",
+      "num_requests": 1783,
+      "num_failures": 0,
+      "avg_response_time_ms": 60.37852288278909,
+      "p95_ms": 46,
+      "p99_ms": 88,
+      "rps": 5.929501250634614
+    },
+    {
+      "name": "PATCH todos id",
+      "method": "PATCH",
+      "num_requests": 1778,
+      "num_failures": 0,
+      "avg_response_time_ms": 29.916738245244485,
+      "p95_ms": 54,
+      "p99_ms": 83,
+      "rps": 5.912873372758464
+    },
+    {
+      "name": "DELETE favorites id",
+      "method": "DELETE",
+      "num_requests": 1750,
+      "num_failures": 0,
+      "avg_response_time_ms": 34.40079977135714,
+      "p95_ms": 63,
+      "p99_ms": 97,
+      "rps": 5.819757256652032
+    },
+    {
+      "name": "GET collection favorites",
+      "method": "GET",
+      "num_requests": 1783,
+      "num_failures": 0,
+      "avg_response_time_ms": 22.57428440834645,
+      "p95_ms": 49,
+      "p99_ms": 78,
+      "rps": 5.929501250634614
+    },
+    {
+      "name": "DELETE subscriptions id",
+      "method": "DELETE",
+      "num_requests": 1353,
+      "num_failures": 0,
+      "avg_response_time_ms": 34.355662897234595,
+      "p95_ms": 63,
+      "p99_ms": 100.0,
+      "rps": 4.499503753285828
+    },
+    {
+      "name": "DELETE collections id",
+      "method": "DELETE",
+      "num_requests": 809,
+      "num_failures": 0,
+      "avg_response_time_ms": 32.37974758961502,
+      "p95_ms": 58,
+      "p99_ms": 78,
+      "rps": 2.690390640360854
+    },
+    {
+      "name": "DELETE todos id",
+      "method": "DELETE",
+      "num_requests": 1778,
+      "num_failures": 0,
+      "avg_response_time_ms": 26.72060793021518,
+      "p95_ms": 49,
+      "p99_ms": 67,
+      "rps": 5.912873372758464
+    }
+  ]
+}
