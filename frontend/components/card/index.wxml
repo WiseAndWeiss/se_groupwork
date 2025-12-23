@@ -64,7 +64,7 @@
     <!-- 内容输入 -->
     <view class="modal-item">
       <text class="modal-label">内容：</text>
-      <textarea class="modal-input desc-input" value="{{newTodoData.content}}" bindinput="inputTodoData" data-type="content" placeholder="请输入待办内容" placeholder-class="content-placeholder-style" auto-height maxlength="-1" />
+      <textarea class="modal-input desc-input" value="{{newTodoData.content}}" bindinput="inputTodoData" data-type="content" placeholder="请输入待办内容（选填）" placeholder-class="content-placeholder-style" auto-height maxlength="-1" />
     </view>
 
     <!-- 开始时间选择 -->

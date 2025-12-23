@@ -52,7 +52,7 @@
     <!-- 内容编辑 -->
     <view class="modal-item">
       <text class="modal-label">内容：</text>
-      <textarea wx:if="{{isEdit}}" class="modal-input desc-input" value="{{tempData.content}}" bindinput="handleContentInput" placeholder="请输入待办内容" auto-height />
+      <textarea wx:if="{{isEdit}}" class="modal-input desc-input" value="{{tempData.content}}" bindinput="handleContentInput" placeholder="请输入待办内容（选填）" auto-height />
       <text wx:else class="modal-text">{{tempData.content || '无内容'}}</text>
     </view>
 
