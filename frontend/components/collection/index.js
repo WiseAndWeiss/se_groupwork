@@ -12,6 +12,10 @@ Component({
       type: Object,
       value: {},
       required: true
+    },
+    collectionList: {
+      type: Array,
+      value: []
     }
   },
 
@@ -136,17 +140,16 @@ Component({
         return;
       }
 
+      wx.showLoading({
+        title: '保存中...'
+      });
       try {
         // 调用更新接口
         const updatedData = await request.updateCollection(collectionId, {
           name: tempName.trim(),
           description: tempDesc.trim()
         });
-        // 更新成功
-        wx.showToast({
-          title: '修改成功',
-          icon: 'success'
-        });
+        // 关闭编辑弹窗
         this.setData({
           showEditPopup: false
         });
@@ -157,12 +160,42 @@ Component({
           id: collectionId,
           data: updatedData
         });
-      } catch (err) {
-        console.error('更新收藏夹失败：', err);
+        // 隐藏loading后显示成功提示
+        wx.hideLoading();
         wx.showToast({
-          title: err || '修改失败',
-          icon: 'none'
+          title: '编辑收藏夹成功',
+          icon: 'success',
+          duration: 2000
         });
+      } catch (err) {
+        wx.hideLoading();
+        // 从错误对象中提取错误信息
+        let errorMessage = '修改失败';
+        if (typeof err === 'string') {
+          errorMessage = err;
+        } else if (err && typeof err === 'object') {
+          errorMessage = err.message || err.error || err.detail || '修改失败';
+        }
+        // 检查是否是重名错误（服务器相关错误使用 showModal）
+        const isDuplicateError = errorMessage.includes('重复') || 
+                                 errorMessage.includes('已存在') || 
+                                 errorMessage.includes('duplicate') ||
+                                 errorMessage.includes('exists');
+        if (isDuplicateError) {
+          wx.showModal({
+            title: '收藏夹名称重复',
+            content: errorMessage,
+            showCancel: false,
+            confirmText: '知道了'
+          });
+        } else {
+          wx.showToast({
+            title: errorMessage,
+            icon: 'none',
+            duration: 2000
+          });
+        }
+        console.error('更新收藏夹失败：', err);
       }
     },
 
@@ -195,12 +228,6 @@ Component({
               });
               // 调用删除收藏夹接口
               await request.deleteCollection(collectionId);
-              wx.hideLoading();
-              wx.showToast({
-                title: '删除成功',
-                icon: 'success'
-              });
-
               // 关闭浮窗
               this.setData({
                 showEditPopup: false
@@ -211,11 +238,26 @@ Component({
               this.triggerEvent('collectionDeleted', {
                 id: collectionId
               });
-            } catch (err) {
+              // 隐藏loading后显示成功提示
               wx.hideLoading();
               wx.showToast({
-                title: err || '删除失败',
-                icon: 'none'
+                title: '删除收藏夹成功',
+                icon: 'success',
+                duration: 2000
+              });
+            } catch (err) {
+              wx.hideLoading();
+              // 从错误对象中提取错误信息
+              let errorMessage = '删除失败';
+              if (typeof err === 'string') {
+                errorMessage = err;
+              } else if (err && typeof err === 'object') {
+                errorMessage = err.message || err.error || err.detail || '删除失败';
+              }
+              wx.showToast({
+                title: errorMessage,
+                icon: 'none',
+                duration: 2000
               });
               console.error('删除收藏夹失败：', err);
             }

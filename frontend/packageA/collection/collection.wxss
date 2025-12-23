@@ -61,29 +61,9 @@ page {
 
 /* 文章列表容器：优化padding，适配导航栏高度，避免内容被遮挡 */
 .articles-list {
-  padding: 200rpx 30rpx 120rpx 30rpx;
-  /* 下调顶部padding，上调底部padding（避开底部tab） */
+  padding: 170rpx 0rpx 0rpx;
   flex: 1;
-  /* 新增：让列表容器占满剩余高度 */
-  box-sizing: border-box;
   overflow: hidden;
-  /* 避免内容溢出 */
-}
-
-/* 滚动容器：优化高度计算，适配小程序不同设备 */
-.collection-scroll {
-  height: 100%;
-  /* 改用100%替代calc，配合父容器flex:1 */
-  max-height: calc(100vh - 230rpx);
-  /* 调整计算值，适配新的导航栏高度 */
-  overflow-y: auto;
-  /* 明确滚动方向 */
-  -webkit-overflow-scrolling: touch;
-  /* 新增：iOS顺滑滚动 */
-}
-
-.collection-list card-component {
-  margin-bottom: 20rpx;
 }
 
 /* 加载中样式：优化间距和视觉 */

@@ -337,6 +337,10 @@ page {
   color: #fff;
 }
 
-.send-button[disabled] {
+.send-button[disabled],
+.send-button.disabled {
   opacity: 0.5;
+  pointer-events: none;
+  background-color: #e8e8e8;
+  color: #999;
 }

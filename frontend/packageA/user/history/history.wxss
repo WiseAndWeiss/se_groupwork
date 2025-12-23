@@ -54,6 +54,11 @@ page {
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.delete-all-btn:active {
+  transform: translateX(-50%) scale(0.98);
+  background: #ff2a2a;
+}
+
 .delete-all-btn.hidden {
   opacity: 0;
   visibility: hidden;
@@ -68,7 +73,7 @@ page {
 
 /* 历史记录容器 */
 .history-container {
-  padding: 200rpx 0rpx 0rpx;
+  padding: 170rpx 0rpx 0rpx;
 }
 
 .card-scroll {

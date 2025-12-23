@@ -10,7 +10,7 @@
 <!-- 收藏列表 -->
 <view class="favorites-container">
   <scroll-view class="card-scroll" scroll-y="true">
-    <collection wx:for="{{collectionList}}" wx:key="id" item="{{item}}" bind:collectionUpdated="onCollectionUpdated" bind:collectionDeleted="onCollectionDeleted" bind:favouriteMoved="onFavouriteMoved" bind:editPopupOpened="onEditPopupOpened" bind:editPopupClosed="onEditPopupClosed"></collection>
+    <collection wx:for="{{collectionList}}" wx:key="id" item="{{item}}" collection-list="{{collectionList}}" bind:collectionUpdated="onCollectionUpdated" bind:collectionDeleted="onCollectionDeleted" bind:favouriteMoved="onFavouriteMoved" bind:editPopupOpened="onEditPopupOpened" bind:editPopupClosed="onEditPopupClosed"></collection>
   </scroll-view>
 </view>
 

@@ -5,6 +5,9 @@
   padding: 28rpx 28rpx 12rpx 28rpx;
   margin-bottom: 30rpx;
   box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
 /* 头部布局 */
@@ -350,7 +353,9 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 2001;
+  z-index: 10000;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .select-mask {
@@ -362,6 +367,7 @@
   background: rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.3s ease-out;
   will-change: opacity;
+  z-index: 9999;
   /* 提示浏览器优化动画 */
 }
 
@@ -381,6 +387,7 @@
   left: 0;
   width: 100vw;
   max-height: 50vh;
+  min-height: 200rpx;
   background: #fff;
   border-top-left-radius: 30rpx;
   border-top-right-radius: 30rpx;
@@ -391,6 +398,10 @@
   display: flex;
   flex-direction: column;
   will-change: transform;
+  overflow: hidden;
+  z-index: 10001;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   /* 提示浏览器优化动画 */
 }
 
@@ -417,8 +428,11 @@
 .collection-scroll {
   flex: 1;
   height: 0;
+  min-height: 0;
   width: 100%;
   margin-bottom: 40rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .collection-list {

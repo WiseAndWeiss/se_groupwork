@@ -166,22 +166,46 @@ Page({
           Math.max(...collectionList.map(item => item.order)) + 1 :
           0
       });
-      wx.showToast({
-        title: '收藏夹创建成功',
-        icon: 'success'
-      });
       // 关闭浮窗+清空临时数据
       this.closeCreatePopup();
       // 刷新列表
       this.getCollectionList();
-    } catch (err) {
-      wx.showToast({
-        title: err || '创建失败',
-        icon: 'error'
-      });
-      console.error('添加收藏夹失败：', err);
-    } finally {
+      // 隐藏loading后显示成功提示
       wx.hideLoading();
+      wx.showToast({
+        title: '添加收藏夹成功',
+        icon: 'success',
+        duration: 2000
+      });
+    } catch (err) {
+      wx.hideLoading();
+      // 从错误对象中提取错误信息
+      let errorMessage = '创建失败';
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        errorMessage = err.message || err.error || err.detail || '创建失败';
+      }
+      // 检查是否是重名错误（服务器相关错误使用 showModal）
+      const isDuplicateError = errorMessage.includes('重复') || 
+                               errorMessage.includes('已存在') || 
+                               errorMessage.includes('duplicate') ||
+                               errorMessage.includes('exists');
+      if (isDuplicateError) {
+        wx.showModal({
+          title: '收藏夹名称重复',
+          content: errorMessage,
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      } else {
+        wx.showToast({
+          title: errorMessage,
+          icon: 'none',
+          duration: 2000
+        });
+      }
+      console.error('添加收藏夹失败：', err);
     }
   },
 
