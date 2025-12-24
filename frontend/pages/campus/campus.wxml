@@ -3,6 +3,7 @@
 <!-- 自定义导航栏 -->
 <view class="custom-navbar">
   <image class="alllist-icon" bindtap="goToAlllist" src="/assets/icons/question-circle.svg"></image>
+  <image class="refresh-icon" bindtap="onRefresh" src="/assets/icons/refresh.svg"></image>
   <view class="navbar-title">校内</view>
 </view>
 

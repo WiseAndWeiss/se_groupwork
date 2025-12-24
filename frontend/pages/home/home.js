@@ -296,7 +296,7 @@ Page({
 
   // 跳转到校内页面（Tab 切换）
   goToCampus() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/campus/campus'
     });
@@ -304,7 +304,7 @@ Page({
 
   // 跳转到自选页面（Tab 切换）
   goToSelection() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/selection/selection'
     });
@@ -312,9 +312,16 @@ Page({
 
   // 跳转到我的页面（Tab 切换）
   goToUser() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/user/user'
     });
+  },
+
+  // 刷新按钮事件
+  onRefresh() {
+    console.log('手动刷新首页数据');
+    this.clearPageData();
+    this.onShow(); // 重新加载数据
   }
 });

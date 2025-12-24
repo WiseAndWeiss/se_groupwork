@@ -26,6 +26,26 @@ page {
   font-size: 35rpx;
 }
 
+.refresh-btn {
+  width: 50rpx;
+  height: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.refresh-btn:active {
+  background: rgba(89, 27, 183, 0.2);
+}
+
+.refresh-btn image {
+  width: 50rpx;
+  height: 50rpx;
+}
+
+
 /* 轮播图区域：降低高度（从420rpx→320rpx） */
 .banner-section {
   width: 100%;
@@ -131,6 +151,9 @@ page {
   margin: 30rpx;
   padding-left: 10rpx;
   border-left: 4rpx solid #7b2ff7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* 适配轮播图高度降低，调整卡片滚动区域高度 */

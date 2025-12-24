@@ -48,6 +48,9 @@
 
   <view class="latest-news-title">
     <text>最新消息</text>
+    <view class="refresh-btn" bindtap="onRefresh">
+      <image src="/assets/icons/refresh.svg" mode="widthFix" />
+    </view>
   </view>
   <article-list list="{{selectionList}}" emptyText="暂无最新动态" bind:loadmore="handleLoadMore" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
 </view>

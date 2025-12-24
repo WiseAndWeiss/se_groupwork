@@ -1034,23 +1034,30 @@ Page({
   },
 
   goToHome() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/home/home'
     });
   },
 
   goToCampus() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/campus/campus'
     });
   },
 
   goToUser() {
-    this.clearPageData();
+    // this.clearPageData();
     wx.switchTab({
       url: '/pages/user/user'
     });
+  },
+
+  // 刷新按钮事件
+  onRefresh() {
+    console.log('手动刷新首页数据');
+    this.clearPageData();
+    this.onShow(); // 重新加载数据
   }
 });

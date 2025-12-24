@@ -38,6 +38,15 @@ page {
   bottom: 17rpx;
 }
 
+.refresh-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 100rpx;
+  bottom: 17rpx;
+}
+
+
 /* 搜索栏整体：关键修改——去掉92%宽度和auto margin，改为100%宽度+内边距 */
 .search-bar {
   display: flex;

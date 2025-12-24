@@ -37,6 +37,14 @@ page {
   bottom: 17rpx;
 }
 
+.refresh-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 100rpx;
+  bottom: 17rpx;
+}
+
 /* 排序按钮区域 */
 .sort-bar {
   display: flex;
