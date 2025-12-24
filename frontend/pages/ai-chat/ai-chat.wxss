@@ -155,6 +155,22 @@ page {
   color: #fff;
 }
 
+/* Rich-text 样式 */
+.user-message-text, .ai-message-text {
+  font-size: 28rpx;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.user-message-text {
+  color: #fff;
+}
+
+.ai-message-text {
+  color: #333;
+}
+
+
 .message-time-wrapper {
   display: flex;
   align-items: center;

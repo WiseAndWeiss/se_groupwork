@@ -25,7 +25,7 @@
         <!-- 正常消息内容 -->
         <view wx:else>
           <view class="message-bubble" wx:if="{{item.content}}">
-            <text class="message-text">{{item.content}}</text>
+            <rich-text class="{{item.type === 'user' ? 'user-message-text' : 'ai-message-text'}}" nodes="{{item.nodes}}"></rich-text>
           </view>
           <!-- 参考文章列表 -->
           <view class="references-articles" wx:if="{{item.type === 'ai' && item.referencesArticles && item.referencesArticles.length > 0}}">

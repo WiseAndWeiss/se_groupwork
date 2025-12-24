@@ -164,7 +164,7 @@ Page({
     const userMessage = {
       type: 'user',
       content: inputText,
-      nodes: this.formatContentToNodes(inputText),
+      nodes: inputText, // 用户消息不解析 Markdown，直接显示纯文本
       time: this.getCurrentTime()
     };
 
@@ -354,42 +354,66 @@ Page({
   },
 
   formatContentToNodes(content = '') {
-    // 关键修改：将字面的 \n 字符串转换为实际的换行符
-    let processedContent = String(content || '');
+    // 将 markdown 转换为 HTML 字符串
+    return this.markdownToHtml(content);
+  },
 
-    // 将字面的 \n 转换为实际的换行符
-    processedContent = processedContent.replace(/\\n/g, '\n');
+  // Markdown 转换为 HTML 的简单实现
+  markdownToHtml(markdown) {
+    if (!markdown) return '';
 
-    const paragraphs = processedContent.split(/\n\s*\n/); // 按空行切段
-    const nodes = [];
-    paragraphs.forEach((para, pIdx) => {
-      const lines = para.split('\n');
-      const children = [];
-      lines.forEach((line, lIdx) => {
-        children.push({
-          type: 'text',
-          text: line
-        });
-        if (lIdx !== lines.length - 1) {
-          children.push({
-            name: 'br'
-          });
-        }
-      });
-      nodes.push({
-        name: 'p',
-        attrs: {
-          style: 'margin: 0 0 12rpx 0;'
-        },
-        children
-      });
-      if (pIdx !== paragraphs.length - 1) {
-        nodes.push({
-          name: 'br'
-        });
-      }
+    let html = String(markdown);
+
+    // 转义 HTML 特殊字符
+    html = html.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;')
+               .replace(/"/g, '&quot;')
+               .replace(/'/g, '&#39;');
+
+    // 处理代码块 (```code```)
+    html = html.replace(/```([\s\S]*?)```/g, (match, code) => {
+      return `<pre><code>${code}</code></pre>`;
     });
-    return nodes;
+
+    // 处理内联代码 (`code`)
+    html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+    // 处理粗体 (**text**)
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // 处理斜体 (*text*)
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // 处理链接 ([text](url))
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+    // 处理标题 (# ## ###)
+    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+
+    // 处理行，按普通文本显示
+    const lines = html.split('\n');
+    let result = [];
+
+    for (let line of lines) {
+      const trimmed = line.trim();
+      if (trimmed) {
+        result.push(`<p>${line}</p>`);
+      } else {
+        result.push('<br>');
+      }
+    }
+
+    html = result.join('');
+
+    // 处理段落（将多个 <br> 合并为段落）
+    html = html.replace(/(<br>\s*)+/g, '</p><p>');
+    html = html.replace(/^(<br>|<p>)+/, '');
+    html = html.replace(/(<br>|<p>)+$/, '');
+
+    return html;
   },
 
   abortStreamTask() {
