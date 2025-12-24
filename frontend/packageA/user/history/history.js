@@ -7,9 +7,6 @@ Component({
     reach_end: false, // 是否到底
     isLoading: false, // 是否正在加载
     showLoadingAnimation: false,
-    startX: 0, // 触摸开始X坐标
-    currentSwipeIndex: -1, // 当前滑动的项目索引
-    isSwiping: false, // 是否正在滑动
     isCollectionOperating: false // 是否正在进行收藏操作
   },
 
@@ -30,9 +27,7 @@ Component({
         historyList: [],
         start_rank: 0,
         reach_end: false,
-        isLoading: false,
-        currentSwipeIndex: -1,
-        isSwiping: false
+        isLoading: false
       });
     },
 
@@ -60,7 +55,7 @@ Component({
         if (response && response.histories) {
           const newHistories = response.histories.map(item => ({
             ...item.article,
-            swipeClass: ''
+            historyId: item.id // 保留历史记录的ID，用于删除操作
           }));
           const finalList = reset ? newHistories : [...this.data.historyList, ...newHistories];
           const newStartRank = start_rank + (newHistories.length || 20);
@@ -93,132 +88,40 @@ Component({
       this.loadHistory(false);
     },
 
-    // 触摸开始
-    onTouchStart(e) {
-      if (this.data.isSwiping) return;
-
-      const index = e.currentTarget.dataset.index;
-      this.setData({
-        startX: e.touches[0].clientX,
-        currentSwipeIndex: index
-      });
-    },
-
-    // 触摸移动
-    onTouchMove(e) {
-      if (this.data.isSwiping) return;
-
-      const index = e.currentTarget.dataset.index;
-      const currentX = e.touches[0].clientX;
-      const diffX = this.data.startX - currentX;
-
-      // 只允许向右滑动（显示删除按钮）
-      if (diffX > 0) {
-        const translateX = Math.min(diffX, 120); // 最大滑动距离为单个按钮宽度
-        this.updateSwipePosition(index, -translateX);
-      }
-    },
-
-    // 触摸结束
-    onTouchEnd(e) {
-      if (this.data.isSwiping) return;
-
-      const index = e.currentTarget.dataset.index;
-      const currentX = e.changedTouches[0].clientX;
-      const diffX = this.data.startX - currentX;
-
-      // 如果滑动距离超过按钮宽度的一半，则完全展开，否则收回
-      if (diffX > 60) {
-        this.openSwipe(index);
-      } else {
-        this.closeSwipe(index);
-      }
-    },
-
-    // 更新滑动位置
-    updateSwipePosition(index, translateX) {
-      const {
-        historyList
-      } = this.data;
-      const newList = [...historyList];
-
-      if (newList[index]) {
-        newList[index].swipeClass = `swipe-open`;
-        newList[index].swipeStyle = `transform: translateX(${translateX}rpx);`;
-      }
-
-      this.setData({
-        historyList: newList
-      });
-    },
-
-    // 打开滑动（显示按钮）
-    openSwipe(index) {
-      const {
-        historyList
-      } = this.data;
-      const newList = [...historyList];
-
-      if (newList[index]) {
-        newList[index].swipeClass = 'swipe-open';
-      }
-
-      this.setData({
-        historyList: newList,
-        isSwiping: true
-      });
-
-      // 300ms后重置滑动状态
-      setTimeout(() => {
-        this.setData({
-          isSwiping: false
-        });
-      }, 300);
-    },
-
-    // 关闭滑动（隐藏按钮）
-    closeSwipe(index) {
-      const {
-        historyList
-      } = this.data;
-      const newList = [...historyList];
-      if (newList[index]) {
-        newList[index].swipeClass = '';
-        newList[index].swipeStyle = '';
-      }
-      this.setData({
-        historyList: newList,
-        currentSwipeIndex: -1,
-        isSwiping: false
-      });
-
-      // 300ms后重置滑动状态
-      setTimeout(() => {
-        this.setData({
-          isSwiping: false
-        });
-      }, 300);
-    },
-
-    // 单条删除
+    // 单条删除（从 article-list 组件的事件中接收）
     async deleteHistory(e) {
-      const articleId = e.currentTarget.dataset.id;
-      const index = e.currentTarget.dataset.index;
-      // 先关闭滑动
-      this.closeSwipe(index);
+      const { id, index, historyId, item } = e.detail || {};
+      const itemIndex = index !== undefined ? index : e.currentTarget?.dataset?.index;
+      
+      if (itemIndex === undefined) {
+        console.error('删除参数错误: 缺少index', e.detail);
+        return;
+      }
 
       const {
         historyList
       } = this.data;
-      const deletedItem = historyList[index]; // 保存被删项，用于接口失败回滚
-      const newHistoryList = historyList.filter((_, i) => i !== index);
+      const deletedItem = item || historyList[itemIndex]; // 优先使用事件传递的item，否则从列表获取
+      
+      if (!deletedItem) {
+        console.error('删除项不存在:', itemIndex);
+        return;
+      }
+      
+      // 使用历史记录的ID（historyId），如果没有则使用文章ID
+      // 注意：后端API需要的是历史记录的ID，不是文章的ID
+      const deleteId = historyId || deletedItem.historyId || deletedItem.id;
+      
+      console.log('删除历史记录:', { deleteId, deletedItem, itemIndex });
+      
+      const newHistoryList = historyList.filter((_, i) => i !== itemIndex);
       this.setData({
         historyList: newHistoryList
       }, () => {
         console.log('本地已移除历史记录，UI即时更新');
       });
       try {
-        await request.deleteHistory(articleId);
+        await request.deleteHistory(deleteId);
         wx.showToast({
           title: '删除成功'
         });
@@ -228,7 +131,7 @@ Component({
         }
       } catch (err) {
         this.setData({
-          historyList: [...newHistoryList.slice(0, index), deletedItem, ...newHistoryList.slice(index)]
+          historyList: [...newHistoryList.slice(0, itemIndex), deletedItem, ...newHistoryList.slice(itemIndex)]
         });
         wx.showToast({
           title: err || '删除失败',

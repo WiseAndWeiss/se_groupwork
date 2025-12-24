@@ -31,6 +31,11 @@ Component({
     scrollTop: {
       type: Number,
       value: 0
+    },
+    // 是否启用左滑删除功能
+    enableSwipeDelete: {
+      type: Boolean,
+      value: false
     }
   },
 
@@ -38,7 +43,36 @@ Component({
     showCollectionSelect: false,
     collectionList: [],
     defaultCollection: null,
-    currentFavoriteId: ''
+    currentFavoriteId: '',
+    // 左滑删除相关
+    startX: 0,
+    currentSwipeIndex: -1,
+    isSwiping: false,
+    swipeStates: {} // 存储每个item的滑动状态 {index: {swipeClass: '', swipeStyle: ''}}
+  },
+
+  observers: {
+    'list': function(list) {
+      // 当list变化时，重置滑动状态
+      if (list && list.length > 0) {
+        const swipeStates = {};
+        list.forEach((item, index) => {
+          swipeStates[index] = {
+            swipeClass: '',
+            swipeStyle: ''
+          };
+        });
+        this.setData({
+          swipeStates: swipeStates,
+          currentSwipeIndex: -1
+        });
+      } else {
+        this.setData({
+          swipeStates: {},
+          currentSwipeIndex: -1
+        });
+      }
+    }
   },
 
   methods: {
@@ -146,6 +180,126 @@ Component({
           icon: 'none'
         });
       }
+    },
+    // 左滑删除相关方法
+    // 触摸开始
+    onSwipeTouchStart(e) {
+      if (!this.properties.enableSwipeDelete || this.data.isSwiping) return;
+      
+      const index = parseInt(e.currentTarget.dataset.index);
+      // 如果点击的是其他项，先关闭之前打开的项
+      if (this.data.currentSwipeIndex !== -1 && this.data.currentSwipeIndex !== index) {
+        this.closeSwipe(this.data.currentSwipeIndex);
+      }
+      
+      this.setData({
+        startX: e.touches[0].clientX,
+        currentSwipeIndex: index
+      });
+    },
+    // 触摸移动
+    onSwipeTouchMove(e) {
+      if (!this.properties.enableSwipeDelete || this.data.isSwiping) return;
+      
+      const index = parseInt(e.currentTarget.dataset.index);
+      // 只处理当前滑动的项
+      if (index !== this.data.currentSwipeIndex) return;
+      
+      const currentX = e.touches[0].clientX;
+      const diffX = this.data.startX - currentX;
+      
+      // 只允许向左滑动（显示删除按钮）
+      if (diffX > 0) {
+        const translateX = Math.min(diffX, 120); // 最大滑动距离为120rpx
+        this.updateSwipePosition(index, -translateX);
+      }
+    },
+    // 触摸结束
+    onSwipeTouchEnd(e) {
+      if (!this.properties.enableSwipeDelete || this.data.isSwiping) return;
+      
+      const index = parseInt(e.currentTarget.dataset.index);
+      // 只处理当前滑动的项
+      if (index !== this.data.currentSwipeIndex) return;
+      
+      const currentX = e.changedTouches[0].clientX;
+      const diffX = this.data.startX - currentX;
+      
+      // 如果滑动距离超过按钮宽度的一半，则完全展开，否则收回
+      if (diffX > 60) {
+        this.openSwipe(index);
+      } else {
+        this.closeSwipe(index);
+      }
+    },
+    // 更新滑动位置
+    updateSwipePosition(index, translateX) {
+      const swipeStates = {...this.data.swipeStates};
+      swipeStates[index] = {
+        swipeClass: 'swipe-open',
+        swipeStyle: `transform: translateX(${translateX}rpx);`
+      };
+      this.setData({
+        swipeStates: swipeStates
+      });
+    },
+    // 打开滑动（显示按钮）
+    openSwipe(index) {
+      const swipeStates = {...this.data.swipeStates};
+      swipeStates[index] = {
+        swipeClass: 'swipe-open',
+        swipeStyle: 'transform: translateX(-120rpx);'
+      };
+      
+      this.setData({
+        swipeStates: swipeStates,
+        isSwiping: true
+      });
+      
+      // 300ms后重置滑动状态
+      setTimeout(() => {
+        this.setData({
+          isSwiping: false
+        });
+      }, 300);
+    },
+    // 关闭滑动（隐藏按钮）
+    closeSwipe(index) {
+      const swipeStates = {...this.data.swipeStates};
+      swipeStates[index] = {
+        swipeClass: '',
+        swipeStyle: ''
+      };
+      
+      this.setData({
+        swipeStates: swipeStates,
+        currentSwipeIndex: -1,
+        isSwiping: false
+      });
+    },
+    // 删除操作
+    onDeleteItem(e) {
+      if (!this.properties.enableSwipeDelete) return;
+      
+      const index = parseInt(e.currentTarget.dataset.index);
+      const list = this.properties.list || [];
+      const item = list[index];
+      
+      if (!item) {
+        console.error('删除项不存在:', index);
+        return;
+      }
+      
+      // 先关闭滑动
+      this.closeSwipe(index);
+      
+      // 向父组件传递删除事件，传递完整的item对象以便父组件获取所需字段
+      this.triggerEvent('delete', {
+        id: item.id, // 文章ID（向后兼容）
+        historyId: item.historyId, // 历史记录ID（如果有）
+        index: index,
+        item: item // 完整的item对象
+      });
     }
   },
 

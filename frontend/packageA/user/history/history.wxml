@@ -15,9 +15,9 @@
     <text class="empty-tip">展开文章后会在这里显示</text>
   </view>
 
-  <!-- 历史记录列表：复用 article-list 组件，支持分页加载 -->
+  <!-- 历史记录列表：使用 article-list 组件，支持左滑删除 -->
   <view wx:else class="history-list">
-    <article-list list="{{historyList}}" emptyText="暂无浏览历史" article_list_scrollHeight="calc(100vh - 340rpx)" bind:loadmore="onReachBottom" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
+    <article-list list="{{historyList}}" emptyText="暂无浏览历史" article_list_scrollHeight="calc(100vh - 340rpx)" bind:loadmore="onReachBottom" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" enableSwipeDelete="{{true}}" bind:delete="deleteHistory" />
   </view>
   <!-- 删除全部按钮 -->
   <view class="delete-all-btn {{isCollectionOperating ? 'hidden' : ''}}" bindtap="deleteAllHistory">

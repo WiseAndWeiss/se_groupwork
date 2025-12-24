@@ -211,3 +211,84 @@
   font-size: 24rpx;
   text-align: center;
 }
+
+/* 左滑删除样式 */
+.swipe-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  width: 120rpx;
+  padding-left: 20rpx;
+  align-items: center;
+}
+
+.swipe-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 0 20rpx;
+}
+
+.icon-circle {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.delete-circle {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2rpx solid #fecaca;
+}
+
+.swipe-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.delete-circle .swipe-icon {
+  filter: invert(40%) sepia(60%) saturate(1200%) hue-rotate(340deg) brightness(90%) contrast(95%);
+}
+
+.icon-circle:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+.delete-circle:active {
+  background: rgba(254, 202, 202, 0.1);
+}
+
+.btn-text {
+  font-size: 22rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.swipe-content {
+  position: relative;
+  background: white;
+  transition: transform 0.3s ease;
+  z-index: 10;
+  border-radius: 16rpx;
+}
+
+.swipe-open {
+  transform: translateX(-120rpx);
+}

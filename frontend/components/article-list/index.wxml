@@ -3,8 +3,24 @@
   <!-- 卡片独立滚动容器 -->
   <scroll-view class="card-scroll" scroll-y="true" scroll-top="{{scrollTop}}" style="height: {{article_list_scrollHeight}};">
     <view class="card-list">
-      <block wx:for="{{list}}" wx:key="id">
-        <card-component id_="{{item.id}}" title="{{item.title}}" time="{{item.publish_time}}" tags="{{item.tags}}" desc="{{item.summary}}" url="{{item.article_url}}" key_info="{{item.key_info}}" name="{{item.account_name}}" is_favorited="{{item.is_favorited}}" bind:showCollectionSelect="onShowCollectionSelect" bind:hideCollectionSelect="onHideCollectionSelect" bind:moveFavouriteToCollection="onMoveFavouriteToCollection" />
+      <block wx:for="{{list}}" wx:key="id" wx:for-index="index">
+        <!-- 如果启用左滑删除，使用滑动容器 -->
+        <view wx:if="{{enableSwipeDelete}}" class="swipe-item">
+          <!-- 滑动内容 -->
+          <view class="swipe-content {{swipeStates[index].swipeClass || ''}}" style="{{swipeStates[index].swipeStyle || ''}}" data-index="{{index}}" bindtouchstart="onSwipeTouchStart" bindtouchmove="onSwipeTouchMove" bindtouchend="onSwipeTouchEnd">
+            <card-component id_="{{item.id}}" title="{{item.title}}" time="{{item.publish_time}}" tags="{{item.tags}}" desc="{{item.summary}}" url="{{item.article_url}}" key_info="{{item.key_info}}" name="{{item.account_name}}" is_favorited="{{item.is_favorited}}" bind:showCollectionSelect="onShowCollectionSelect" bind:hideCollectionSelect="onHideCollectionSelect" bind:moveFavouriteToCollection="onMoveFavouriteToCollection" />
+          </view>
+          <!-- 滑动操作按钮 -->
+          <view class="swipe-actions">
+            <view class="swipe-btn-container">
+              <view class="icon-circle delete-circle" bindtap="onDeleteItem" data-id="{{item.id}}" data-index="{{index}}">
+                <image class="swipe-icon" src="/assets/icons/bin.svg" mode="widthFix"></image>
+              </view>
+            </view>
+          </view>
+        </view>
+        <!-- 如果不启用左滑删除，直接显示卡片 -->
+        <card-component wx:else id_="{{item.id}}" title="{{item.title}}" time="{{item.publish_time}}" tags="{{item.tags}}" desc="{{item.summary}}" url="{{item.article_url}}" key_info="{{item.key_info}}" name="{{item.account_name}}" is_favorited="{{item.is_favorited}}" bind:showCollectionSelect="onShowCollectionSelect" bind:hideCollectionSelect="onHideCollectionSelect" bind:moveFavouriteToCollection="onMoveFavouriteToCollection" />
       </block>
     </view>
 

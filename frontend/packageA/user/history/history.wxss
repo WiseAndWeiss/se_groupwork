@@ -76,10 +76,6 @@ page {
   padding: 170rpx 0rpx 0rpx;
 }
 
-.card-scroll {
-  max-height: calc(100vh - 340rpx);
-  /* 导航栏高度 */
-}
 
 /* 空状态 */
 .empty-history {
@@ -104,104 +100,4 @@ page {
 .empty-tip {
   font-size: 24rpx;
   color: #999;
-}
-
-/* 滑动删除样式 */
-.swipe-item {
-  position: relative;
-  overflow: hidden;
-  border-radius: 16rpx;
-}
-
-.swipe-actions {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  width: 120rpx;
-  /* 两个按钮的总宽度 */
-  padding-left: 20rpx;
-  align-items: center;
-}
-
-.swipe-btn-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: 0 20rpx;
-}
-
-.icon-circle {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20rpx;
-  transition: all 0.3s ease;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-}
-
-.cancel-circle {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2rpx solid #d8b4fe;
-}
-
-.delete-circle {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2rpx solid #fecaca;
-}
-
-.swipe-icon {
-  width: 36rpx;
-  height: 36rpx;
-}
-
-.cancel-circle .swipe-icon {
-  filter: invert(48%) sepia(90%) saturate(1300%) hue-rotate(230deg) brightness(90%) contrast(85%);
-}
-
-.delete-circle .swipe-icon {
-  filter: invert(40%) sepia(60%) saturate(1200%) hue-rotate(340deg) brightness(90%) contrast(95%);
-}
-
-/* 点击效果 */
-.icon-circle:active {
-  transform: scale(0.95);
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
-}
-
-.cancel-circle:active {
-  background: rgba(216, 180, 254, 0.1);
-}
-
-.delete-circle:active {
-  background: rgba(254, 202, 202, 0.1);
-}
-
-.btn-text {
-  font-size: 22rpx;
-  color: #666;
-  font-weight: 500;
-}
-
-.swipe-content {
-  position: relative;
-  background: white;
-  transition: transform 0.3s ease;
-  z-index: 10;
-  border-radius: 16rpx;
-}
-
-/* 滑动状态类 */
-.swipe-open {
-  transform: translateX(-120rpx);
-}
-
-.swipe-closing {
-  transform: translateX(0);
 }
