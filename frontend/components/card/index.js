@@ -68,13 +68,24 @@ Component({
       return keyInfo.replace(/[\[\]"']/g, '').trim() || '无';
     },
 
-    openWebView(e) {
+    showAndCopyUrl(e) {
       const url = e.currentTarget.dataset.url;
-      // 对URL进行编码
-      const encodedUrl = encodeURIComponent(url);
-      console.log(url);
-      wx.navigateTo({
-        url: `/pages/webview/webview?url=${encodedUrl}`
+      wx.showModal({
+        title: '原文链接（复制到浏览器中打开）',
+        content: url,
+        confirmText: '复制链接',
+        success(res) {
+          if (res.confirm) {
+            wx.setClipboardData({
+              data: url,
+              success() {
+                wx.showToast({
+                  title: '链接已复制',
+                });
+              }
+            });
+          }
+        }
       });
     },
 
