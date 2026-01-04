@@ -30,7 +30,7 @@
   <view class="search-box">
     <view class="search-inner">
       <image class="search-icon" src="/assets/icons/search.svg" bindtap="getFilteredSubscriptionList"></image>
-      <input type="text" placeholder="快速搜索动态" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
+      <input type="text" placeholder="快速搜索公众号" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
       <view class="search-text-btn" bindtap="getFilteredSubscriptionList">搜索</view>
     </view>
   </view>

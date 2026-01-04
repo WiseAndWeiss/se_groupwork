@@ -24,7 +24,7 @@
     <view class="desc">{{desc}}</view>
     <!-- 原文链接 + 添加待办按钮 -->
     <view class="link-group">
-      <view class="original-link" catchtap="openWebView" data-url="{{url}}">原文链接</view>
+      <view class="original-link" catchtap="showAndCopyUrl" data-url="{{url}}">原文链接</view>
       <view class="add-todo-btn" catchtap="handleAddTodo">添加待办</view>
     </view>
   </view>
