@@ -1,0 +1,83 @@
+page {
+  background-color: rgba(239, 239, 239, 0.6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏 */
+.custom-navbar {
+  position: fixed;
+  width: 100%;
+  height: 170rpx;
+  background: #ffffff;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20rpx;
+  box-sizing: border-box;
+  z-index: 1000;
+  color: #591bb7;
+  font-weight: 600;
+}
+
+.navbar-title {
+  font-size: 35rpx;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.return-icon {
+  width: 50rpx;
+  height: 50rpx;
+  position: absolute;
+  left: 30rpx;
+  bottom: 17rpx;
+}
+
+/* 删除全部按钮 */
+.delete-all-btn {
+  position: fixed;
+  bottom: 100rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250rpx;
+  height: 80rpx;
+  background: #ff4a4a;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 20rpx rgba(123, 47, 247, 0.3);
+  z-index: 1001;
+}
+
+.delete-btn-text {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* 收藏列表容器 */
+.favourite-container {
+  padding: 200rpx 30rpx 30rpx;
+}
+
+/* 空状态样式（已存在则忽略） */
+.empty-favourite {
+  margin-top: 80rpx;
+  text-align: center;
+  color: #888;
+}
+
+/* 列表滚动区域 */
+.card-scroll {
+  max-height: calc(100vh - 300rpx);
+  /* 导航栏高度 */
+}
+
+/* 卡片外包裹间距 */
+.favourite-item {
+  margin-bottom: 30rpx;
+}

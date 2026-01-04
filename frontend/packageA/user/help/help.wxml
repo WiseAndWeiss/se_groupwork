@@ -1,0 +1,172 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">帮助中心</view>
+</view>
+
+<!-- 内容区域 -->
+<view class="help-content">
+  <scroll-view class="help-scroll" scroll-y="true">
+    <view class="help-section">
+      <view class="section-title">欢迎使用</view>
+      <view class="section-text">
+        本小程序是一个公众号资讯聚合平台，帮助您快速浏览和获取校内外的各类资讯信息。通过本小程序，您可以订阅感兴趣的公众号、浏览收藏文章、进行智能AI问答、管理个人待办事项等。
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">一、首页功能</view>
+      <view class="section-text">
+        首页是您进入小程序后看到的第一个页面，包含以下功能：
+      </view>
+      <view class="section-text">
+        <text class="text-bold">1. 推荐文章轮播图：</text>在页面上部，您可以左右滑动浏览推荐的优质文章，点击轮播图中的文章可以查看文章详情。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">2. 最新消息列表：</text>在轮播图下方，展示最新的文章动态。您可以上下滑动浏览更多内容，点击文章卡片可以查看完整内容。当您浏览到列表底部时，可以点击按钮加载更多文章。您也可以点击星星图标收藏文章，选择所放入的收藏夹。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">3. AI桌宠：</text>在页面中有一个可爱的AI桌宠，您可以点击桌宠进入AI助手聊天页面，也可以拖动桌宠到任意位置。桌宠会在所有主要页面显示，方便您随时使用AI助手功能。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">4. 底部导航栏：</text>页面底部有四个导航按钮，分别是"首页"、"校内"、"订阅"和"我的"，点击可以快速切换不同功能模块。
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">二、校内资讯</view>
+      <view class="section-text">
+        校内页面汇集了主要校内公众号发布的最新资讯，提供强大的搜索和筛选功能：
+      </view>
+      <view class="section-text">
+        <text class="text-bold">1. 快速搜索：</text>在页面顶部的搜索框中输入关键词，点击搜索按钮或搜索图标，即可快速查找相关文章。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">2. 筛选功能：</text>点击搜索框右侧的筛选图标，可以打开筛选面板。您可以按照以下条件进行筛选并进行高级搜索：
+      </view>
+      <view class="section-text">
+        • 时间筛选：选择起始时间和终止时间，查看指定时间段内的文章
+      </view>
+      <view class="section-text">
+        • 文章类型：选择文章类型标签，如通知、活动、新闻等
+      </view>
+      <view class="section-text">
+        • 内容领域：选择内容领域标签，如学术、生活、体育等
+      </view>
+      <view class="section-text">
+        • 公众号：选择特定的公众号，查看该公众号发布的所有文章
+      </view>
+      <view class="section-text">
+        • 其他：其他筛选条件
+      </view>
+      <view class="section-text">
+        在筛选面板中，您可以组合多个筛选条件，点击"确认"按钮应用筛选，点击"重置"按钮清除所有筛选条件。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">3. 查看公众号列表：</text>点击页面左上角的图标，可以查看所有支持的校内公众号列表。
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">三、订阅功能</view>
+      <view class="section-text">
+        订阅页面展示您已订阅的公众号发布的最新文章，提供两种浏览方式：
+      </view>
+      <view class="section-text">
+        <text class="text-bold">1. 按时间排序：</text>默认显示方式，按照文章发布时间从新到旧排列。您可以使用顶部的搜索框搜索订阅公众号中的文章。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">2. 按公众号排序：</text>点击"按公众号排序"按钮，可以以公众号为单位浏览文章。在此模式下，您可以：
+      </view>
+      <view class="section-text">
+        • 点击公众号卡片查看该公众号的详细信息
+      </view>
+      <view class="section-text">
+        • 点击"编辑"按钮进入编辑模式，可以拖动公众号卡片调整顺序，点击删除按钮取消订阅
+      </view>
+      <view class="section-text">
+        • 编辑完成后点击"完成"按钮退出编辑模式
+      </view>
+      <view class="section-text">
+        <text class="text-bold">3. 添加订阅：</text>点击页面左上角的加号图标，可以浏览并添加新的公众号订阅。
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">四、我的页面</view>
+      <view class="section-text">
+        我的页面是您的个人中心，包含以下功能模块：
+      </view>
+      <view class="section-text">
+        <text class="text-bold">1. 个人资料：</text>查看和编辑您的个人信息，包括头像、用户名、密码等。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">2. 我的收藏：</text>查看您的收藏夹以及收藏的所有文章。您可以在这里管理收藏夹和收藏的文章，取消不需要的收藏。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">3. 我的订阅：</text>管理您已订阅的公众号列表，可以查看订阅详情、取消订阅等。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">4. 浏览历史：</text>查看您最近浏览过的文章记录，方便您快速找回之前看过的内容。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">5. 我的待办：</text>使用日历功能管理您的待办事项。您可以：
+      </view>
+      <view class="section-text">
+        • 添加新的待办事项，修改或者删除已有的待办事项
+      </view>
+      <view class="section-text">
+        • 查看年视图、月视图和周视图，方便规划日程
+      </view>
+      <view class="section-text">
+        <text class="text-bold">6. 帮助中心：</text>查看本使用说明，了解小程序的使用方法。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">7. 反馈建议：</text>如果您在使用过程中遇到问题或有改进建议，可以在这里提交反馈。
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">五、AI桌宠助手</view>
+      <view class="section-text">
+        小程序内置了AI桌宠助手功能，为您提供智能问答服务：
+      </view>
+      <view class="section-text">
+        <text class="text-bold">1. 桌宠位置：</text>AI桌宠会在首页、校内、订阅、我的等主要页面显示，方便您随时使用。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">2. 拖动桌宠：</text>您可以长按并拖动桌宠到屏幕上的任意位置，桌宠的位置会被自动保存，下次打开小程序时会记住您设置的位置。
+      </view>
+      <view class="section-text">
+        <text class="text-bold">3. 打开AI助手：</text>点击桌宠即可进入AI助手聊天页面。在聊天页面中，您可以：
+      </view>
+      <view class="section-text">
+        • 向AI助手提问，获取智能回答
+      </view>
+      <view class="section-text">
+        • AI助手会根据小程序内的文章内容为您提供相关答案
+      </view>
+      <view class="section-text">
+        • AI助手在回答时会提供参考文章列表，点击参考文章可以查看原文
+      </view>
+    </view>
+
+    <view class="help-section">
+      <view class="section-title">六、联系支持</view>
+      <view class="section-text">
+        如果您在使用过程中遇到任何问题，或有功能改进建议，请通过以下方式联系我们：
+      </view>
+      <view class="section-text">
+        • 在"我的"页面点击"反馈建议"，通过邮箱反馈或添加我们的联系方式
+      </view>
+      <view class="section-text">
+        • 我们会及时处理您的反馈，持续改进小程序的使用体验
+      </view>
+    </view>
+
+    <view class="help-footer">
+      <view class="footer-text">感谢您的使用！</view>
+    </view>
+  </scroll-view>
+</view>

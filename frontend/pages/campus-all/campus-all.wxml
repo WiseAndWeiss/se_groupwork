@@ -1,0 +1,39 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <loading showLoading="{{showLoadingAnimation}}" />
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">校内公众号一览</view>
+</view>
+
+<!-- 用 account-card 渲染测试数据，隐藏订阅按钮 -->
+<view class="list-area">
+  <scroll-view class="card-scroll" scroll-y="true">
+    <view class="campusAccount-list">
+      <block wx:for="{{campusAccountList}}" wx:key="id">
+        <!-- 公众号卡片 -->
+        <card-picture avatar="{{item.icon}}" name="{{item.name}}" accountId="{{item.id}}" />
+      </block>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/campus.svg"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item" bindtap="goToSelection">
+    <image class="menu-icon" src="/assets/icons/heart.svg"></image>
+    <text class="tab-text">自选</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

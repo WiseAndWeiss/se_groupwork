@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "to-do": "/components/to-do/index"
+  },
+  "navigationStyle": "custom",
+  "renderer": "webview",
+  "enablePullDownRefresh": false
+}

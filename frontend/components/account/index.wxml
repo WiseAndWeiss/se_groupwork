@@ -1,0 +1,7 @@
+<view class="account-card" bindtap="navigateToAccountDetail">
+  <image class="account-avatar" src="{{avatar}}" mode="aspectFill"></image>
+  <view class="account-name">{{name}}</view>
+  <button class="subscribe-btn {{isSubscribed ? 'subscribed' : ''}}" catchtap="toggleSubscribe">
+    {{isSubscribed ? '已订阅' : '订阅'}}
+  </button>
+</view>

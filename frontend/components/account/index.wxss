@@ -1,0 +1,79 @@
+/* 公众号卡片容器 */
+.account-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1rpx solid #f0f0f0;
+}
+
+/* 点击时的反馈样式 */
+.account-card:active {
+  background-color: #f8f9fa;
+  transform: scale(0.98);
+}
+
+/* 公众号头像 */
+.account-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 30rpx;
+  border: 2rpx solid #f5f5f5;
+}
+
+/* 公众号名称 */
+.account-name {
+  flex: 1;
+  margin-right: 60rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* 订阅按钮基础样式 */
+.subscribe-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 200rpx;
+  /* 防止过宽 */
+  padding: 0 40rpx;
+  /* 添加左右内边距 */
+  height: 64rpx;
+  font-size: 26rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #7b2ff7, #9b5cf6);
+  color: #fff;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 12rpx rgba(123, 47, 247, 0.3);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 按钮点击效果 */
+.subscribe-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 6rpx rgba(123, 47, 247, 0.4);
+}
+
+/* 已订阅状态 */
+.subscribe-btn.subscribed {
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  color: #999;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  border: 1rpx solid #e8e8e8;
+}
+
+/* 已订阅状态点击效果 */
+.subscribe-btn.subscribed:active {
+  background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+  transform: scale(0.95);
+}

@@ -1,0 +1,44 @@
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <!-- 返回上一页按钮 -->
+  <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+  <view class="navbar-title">添加订阅</view>
+</view>
+
+<!-- 加载动画组件 -->
+<loading showLoading="{{showLoadingAnimation}}" />
+
+<!-- 搜索栏 -->
+<view class="search-bar">
+  <view class="search-box">
+    <view class="search-inner">
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="searchAccount"></image>
+      <input type="text" placeholder="快速搜索公众号" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
+      <view class="search-text-btn" bindtap="searchAccount">搜索</view>
+    </view>
+  </view>
+</view>
+
+<view class="list-area">
+  <!-- 卡片独立滚动容器 -->
+  <scroll-view class="list-scroll" scroll-y="true">
+    <!-- 添加无结果提示 -->
+    <view wx:if="{{showNoResults}}" class="no-results-tip">
+      <text class="no-results-text">数据库内未搜索到相关信息</text>
+      <text class="no-results-hint">请尝试底部"获取更多公众号"</text>
+    </view>
+
+    <!-- 公众号列表 -->
+    <view class="campusAccount-list" wx:if="{{!showNoResults}}">
+      <block wx:for="{{campusAccountList}}" wx:key="id">
+        <!-- 公众号卡片 -->
+        <account-card class="card-component-{{index}}" accountId="{{item.id}}" name="{{item.name}}" avatar="{{item.icon}}" isSubscribed="{{item.is_subscribed}}" show-subscribe-btn="{{true}}" />
+      </block>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- "获取更多公众号信息"按钮 -->
+<view class="more-accounts-btn" bindtap="searchMoreAccounts">
+  <text>获取更多公众号信息</text>
+</view>

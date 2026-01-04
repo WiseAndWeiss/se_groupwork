@@ -1,0 +1,92 @@
+<loading showLoading="{{showLoadingAnimation}}" />
+<!-- 自定义导航栏 -->
+<view class="custom-navbar">
+  <image class="add-icon" bindtap="goToAdd" src="/assets/icons/add.svg"></image>
+  <view class="navbar-title">订阅</view>
+</view>
+
+<!-- 排序按钮区域 -->
+<view class="sort-bar">
+  <view class="sort-btn {{currentSort === 'time' ? 'active' : ''}}" bindtap="switchSort" data-type="time">
+    按时间排序
+  </view>
+  <view class="sort-btn {{currentSort === 'official' ? 'active' : ''}}" bindtap="switchSort" data-type="official">
+    按公众号排序
+  </view>
+</view>
+
+<!-- 搜索栏（两种排序状态下都显示） -->
+<view wx:if="{{currentSort === 'time'}}" class="search-bar">
+  <view class="search-box">
+    <view class="search-inner">
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="loadFilteredCustomizedArticles"></image>
+      <input type="text" placeholder="快速搜索动态" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
+      <view class="search-text-btn" bindtap="loadFilteredCustomizedArticles">搜索</view>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{currentSort === 'official'}}" class="search-bar">
+  <view class="search-box">
+    <view class="search-inner">
+      <image class="search-icon" src="/assets/icons/search.svg" bindtap="getFilteredSubscriptionList"></image>
+      <input type="text" placeholder="快速搜索公众号" placeholder-class="search-placeholder" class="search-input" bindinput="onSearchInput" value="{{searchContent}}" />
+      <view class="search-text-btn" bindtap="getFilteredSubscriptionList">搜索</view>
+    </view>
+  </view>
+</view>
+
+<!-- 内容区域（按排序状态切换） -->
+<view class="content-container">
+  <!-- 按时间排序 -->
+  <view wx:if="{{currentSort === 'time'}}" class="content-section">
+    <article-list list="{{selectionList}}" emptyText="暂无匹配标签的动态" article_list_scrollHeight="calc(100vh - 550rpx)" bind:loadmore="handleLoadMore" isLoading="{{isLoading}}" reachEnd="{{reach_end}}" />
+  </view>
+
+  <!-- 按公众号排序 -->
+  <view wx:if="{{currentSort === 'official'}}" class="content-section">
+    <view class="subscription-area">
+      <scroll-view class="subscription-container card-scroll" scroll-y="{{enableScroll}}" scroll-with-animation="{{isDragging}}" style="height: calc(100vh - 550rpx);">
+        <view class="subscription-item">
+          <block wx:for="{{subscriptionList}}" wx:key="id" wx:for-index="index" wx:for-item="item">
+            <!-- 公众号卡片 - 添加拖动相关事件 -->
+            <view class="draggable-item {{item.isDragging ? 'dragging' : ''}} {{item.isShaking ? 'shaking' : ''}}" data-index="{{index}}" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindtouchcancel="onTouchEnd">
+              <card-picture avatar="{{item.public_account.icon}}" name="{{item.public_account.name}}" accountId="{{item.public_account.id}}" subscriptionId="{{item.id}}" disabled="{{isEditing}}" />
+              <!-- 删除按钮（编辑模式下显示） -->
+              <view wx:if="{{isEditing}}" class="delete-btn" bindtap="deleteSubscription" data-index="{{index}}">
+                <image src="/assets/icons/close.svg" class="delete-icon"></image>
+              </view>
+            </view>
+          </block>
+        </view>
+      </scroll-view>
+    </view>
+    <!-- 编辑/完成按钮 -->
+    <view wx:if="{{currentSort === 'official'}}" class="edit-complete-btn" bindtap="{{isEditing ? 'exitEditMode' : 'enterEditMode'}}">
+      <text class="complete-btn-text">{{isEditing ? '完成' : '编辑'}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 底部导航栏 -->
+<view class="tab-bar">
+  <view class="tab-item" bindtap="goToHome">
+    <image class="menu-icon" src="/assets/icons/home.svg" mode="widthFix"></image>
+    <text class="tab-text">首页</text>
+  </view>
+  <view class="tab-item" bindtap="goToCampus">
+    <image class="menu-icon" src="/assets/icons/campus.svg" mode="widthFix"></image>
+    <text class="tab-text">校内</text>
+  </view>
+  <view class="tab-item active">
+    <image class="menu-icon" src="/assets/icons/heart.svg" mode="widthFix"></image>
+    <text class="tab-text">订阅</text>
+  </view>
+  <view class="tab-item" bindtap="goToUser">
+    <image class="menu-icon" src="/assets/icons/user2.svg" mode="widthFix"></image>
+    <text class="tab-text">我的</text>
+  </view>
+</view>
+
+<!-- 桌宠组件 -->
+<floating-pet />

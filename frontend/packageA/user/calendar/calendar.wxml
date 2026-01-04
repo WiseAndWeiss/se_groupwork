@@ -1,0 +1,205 @@
+<view class="todo-calendar-page">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar">
+    <image class="return-icon" bindtap="goBack" src="/assets/icons/return.svg"></image>
+    <view class="navbar-title">我的待办</view>
+  </view>
+
+  <!-- 日历容器 -->
+  <view class="calendar-container">
+    <view class="calendar-body">
+      <!-- 年视图 -->
+      <block wx:if="{{currentView === 'year'}}">
+        <view class="view-animate">
+          <view class="year-nav">
+            <text class="year-nav-btn" bindtap="handleYearNavClick" data-type="prev">上一年</text>
+            <text class="year-nav-title">{{currentViewTitle}}</text>
+            <text class="year-nav-btn" bindtap="handleYearNavClick" data-type="next">下一年</text>
+          </view>
+          <view class="year-grid">
+            <view class="year-month-item" wx:for="{{calendarDateList}}" wx:key="month" data-month="{{item.month}}" bindtap="handleYearMonthClick">
+              <view class="year-month-title">{{item.month}}月</view>
+              <view class="year-week-header">
+                <block wx:for="{{weekHeaders}}" wx:key="index">
+                  <view class="week-header-text">{{item}}</view>
+                </block>
+              </view>
+              <view class="year-date-list">
+                <block wx:for="{{item.dateList}}" wx:key="dateStr">
+                  <view class="year-date-item {{item.isCurrent ? 'current-date' : ''}} {{item.isSelected ? 'selected-date' : ''}} {{!item.day ? 'empty-date' : ''}}">
+                    <text>{{item.day}}</text>
+                  </view>
+                </block>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 月视图 -->
+      <block wx:if="{{currentView === 'month'}}">
+        <view class="view-animate">
+          <view class="month-nav">
+            <text class="month-nav-btn" bindtap="prevMonth">上一个月</text>
+            <text class="month-nav-title">{{currentViewTitle}}</text>
+            <text class="month-nav-btn" bindtap="nextMonth">下一个月</text>
+          </view>
+          <view class="week-header">
+            <block wx:for="{{weekHeaders}}" wx:key="index">
+              <view class="week-header-item">{{item}}</view>
+            </block>
+          </view>
+          <view class="date-list">
+            <block wx:for="{{calendarDateList}}" wx:key="dateStr">
+              <view class="date-item {{item.isCurrent ? 'current-date' : ''}} {{item.isSelected ? 'selected-date' : ''}} {{!item.day ? 'empty-date' : ''}}" bindtap="selectDate" data-date="{{item.dateStr}}">
+                <text class="date-day">{{item.day}}</text>
+                <text class="date-week">{{item.week}}</text>
+              </view>
+            </block>
+          </view>
+
+          <view class="add-todo-btn-wrap">
+            <view class="add-todo-btn" bindtap="openAddTodoModal">添加待办</view>
+          </view>
+
+          <view class="todo-list-wrap">
+            <view class="empty-tip" wx:if="{{todoList.length === 0}}">
+              暂无{{selectedDate}}的待办事项
+            </view>
+            <block wx:for="{{todoList}}" wx:key="id">
+              <to-do todoData="{{item}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo"></to-do>
+            </block>
+          </view>
+        </view>
+      </block>
+
+      <!-- 周视图 -->
+      <block wx:if="{{currentView === 'week'}}">
+        <view class="week-container view-animate">
+          <!-- 左侧时间轴 -->
+          <view class="time-axis">
+            <block wx:for="{{timeAxisList}}" wx:key="time">
+              <view class="time-axis-item" style="height: {{item.height}}rpx;">
+                <text class="time-text">{{item.time}}</text>
+              </view>
+            </block>
+          </view>
+
+          <!-- 右侧日期区域-->
+          <view class="week-date-wrapper">
+            <view class="week-date-header">
+              <block wx:for="{{calendarDateList}}" wx:key="dateStr">
+                <view class="date-header {{item.isCurrent ? 'current-date' : ''}} {{item.isSelected ? 'selected-date' : ''}}" bindtap="selectDate" data-date="{{item.dateStr}}">
+                  <text class="date-week">{{weekHeaders[item.dayIndex]}}</text>
+                  <text class="date-day">{{item.day}}</text>
+                </view>
+              </block>
+            </view>
+
+            <!-- 日期时间表格 -->
+            <view class="week-date-content">
+              <block wx:for="{{calendarDateList}}" wx:key="dateStr" wx:for-index="dayColIndex">
+                <view class="date-column">
+                  <view class="date-body">
+                    <block wx:for="{{timeAxisList}}" wx:key="time" wx:for-item="timeItem" wx:for-index="hourRowIndex">
+                      <view class="time-cell" style="height: {{timeItem.height}}rpx; position: relative;">
+                        <block wx:for="{{weekScheduleGrouped[dayColIndex] && weekScheduleGrouped[dayColIndex][hourRowIndex] || []}}" wx:key="groupId">
+                          <view class="week-schedule-bar" style="top: {{item.minuteOffset}}rpx; height: {{item.height}}rpx;" data-item="{{item}}" bindtap="handleScheduleItemClick" wx:if="{{item}}">
+                            <text class="schedule-title">{{item.title}}</text>
+                            <text class="schedule-time">{{item.startTime}}-{{item.endTime}}</text>
+                          </view>
+                        </block>
+                      </view>
+                    </block>
+                  </view>
+                </view>
+              </block>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 全部日程视图 -->
+      <block wx:if="{{currentView === 'all'}}">
+        <view class="all-todo-header">
+          <text class="all-todo-title">{{currentViewTitle}}</text>
+          <view class="add-todo-btn inline-add-btn" bindtap="openAddTodoModal">添加待办</view>
+        </view>
+
+        <view class="todo-list-wrap all-todo-list">
+          <view class="empty-tip" wx:if="{{todoList.length === 0}}">
+            暂无待办事项，点击添加按钮创建吧～
+          </view>
+          <block wx:for="{{todoList}}" wx:key="id">
+            <to-do todoData="{{item}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo"></to-do>
+          </block>
+        </view>
+
+      </block>
+    </view>
+  </view>
+
+  <!-- 底部切换栏 -->
+  <view class="view-switch-bar fixed-bottom">
+    <button class="switch-btn {{currentView === 'year' ? 'active' : ''}}" bindtap="switchView" data-view="year">年</button>
+    <button class="switch-btn {{currentView === 'month' ? 'active' : ''}}" bindtap="switchView" data-view="month">月</button>
+    <button class="switch-btn {{currentView === 'week' ? 'active' : ''}}" bindtap="switchView" data-view="week">周</button>
+    <button class="switch-btn {{currentView === 'all' ? 'active' : ''}}" bindtap="switchView" data-view="all">日程</button>
+  </view>
+
+  <!-- 添加待办弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddTodoModal}}" bindtap="closeAddTodoModal"></view>
+  <view class="modal-container" wx:if="{{showAddTodoModal}}" catchtap="stopPropagation">
+    <view class="modal-content">
+      <view class="modal-item">
+        <text class="modal-label">标题：</text>
+        <input class="modal-input" value="{{newTodoData.title}}" bindinput="handleNewTodoTitleInput" placeholder="请输入待办标题" />
+      </view>
+      <view class="modal-item">
+        <text class="modal-label">内容：</text>
+        <textarea class="modal-input desc-input" value="{{newTodoData.content}}" bindinput="handleNewTodoContentInput" placeholder="请输入待办内容（选填）" auto-height />
+      </view>
+      <view class="modal-item">
+        <text class="modal-label">开始时间：</text>
+        <picker mode="multiSelector" range="{{timeRange}}" value="{{newTodoStartTimeIndex}}" bindcolumnchange="handleNewTodoStartTimeColumnChange" bindchange="handleNewTodoStartTimeConfirm">
+          <view class="modal-input {{!newTodoData.startTime ? 'placeholder-style' : ''}}">
+            {{newTodoData.startTime || '请选择开始时间'}}
+          </view>
+        </picker>
+      </view>
+      <view class="modal-item">
+        <text class="modal-label">结束时间：</text>
+        <picker mode="multiSelector" range="{{timeRange}}" value="{{newTodoEndTimeIndex}}" bindcolumnchange="handleNewTodoEndTimeColumnChange" bindchange="handleNewTodoEndTimeConfirm">
+          <view class="modal-input {{!newTodoData.endTime ? 'placeholder-style' : ''}}">
+            {{newTodoData.endTime || '请选择结束时间'}}
+          </view>
+        </picker>
+      </view>
+      <view class="modal-btn-group add-todo-btn-group">
+        <text class="modal-btn cancel-btn" bindtap="closeAddTodoModal">取消</text>
+        <text class="modal-btn confirm-btn" bindtap="handleAddTodoConfirm">确定</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 待办详情弹窗 -->
+  <view class="todo-popup-mask" wx:if="{{showTodoPopup}}" bindtap="closeTodoPopup"></view>
+  <view class="todo-popup" wx:if="{{showTodoPopup && (popupData.type === 'single' || popupData.type === 'group')}}" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">{{popupData.type === 'single' ? '待办详情' : '当前时段待办列表'}}</text>
+      <text class="popup-close" bindtap="closeTodoPopup">×</text>
+    </view>
+    <view class="popup-content-wrapper">
+      <view class="popup-content">
+        <block wx:if="{{popupData.type === 'single' && popupData.todo}}">
+          <to-do todoData="{{popupData.todo}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%;"></to-do>
+        </block>
+        <block wx:if="{{popupData.type === 'group' && popupData.todos && popupData.todos.length > 0}}">
+          <block wx:for="{{popupData.todos}}" wx:key="id">
+            <to-do todoData="{{item}}" bind:updateTodo="handleUpdateTodo" bind:deleteTodo="handleDeleteTodo" style="width: 100%; margin-bottom: 10rpx;"></to-do>
+          </block>
+        </block>
+      </view>
+    </view>
+  </view>
+</view>
